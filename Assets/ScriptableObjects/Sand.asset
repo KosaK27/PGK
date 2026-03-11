@@ -15,4 +15,5 @@ MonoBehaviour:
   blockType: 3
   displayName: Sand
   tile: {fileID: 11400000, guid: eb0d6ad19d8d43044ba8fec7e1494ed8, type: 2}
-  Destructible: 1
+  destructible: 1
+  hardness: 1

@@ -10,5 +10,6 @@ public class BlockData : ScriptableObject
     public TileBase tile;
 
     [Header("Properties")]
-    public bool Destructible = true;
+    public bool destructible = true;
+    public float hardness = 1f;
 }

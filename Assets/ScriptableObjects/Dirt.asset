@@ -15,10 +15,5 @@ MonoBehaviour:
   blockType: 1
   displayName: Dirt
   tile: {fileID: 11400000, guid: c88ce586c99f29c40be93db516fe3d9b, type: 2}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  isSolid: 1
-  isDestructible: 1
-  hardness: 1
-  maxStack: 99
-  dropType: 0
-  dropAmount: 1
+  destructible: 1
+  hardness: 2
