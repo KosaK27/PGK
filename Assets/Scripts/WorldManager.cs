@@ -5,7 +5,7 @@ public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance { get; private set; }
 
-    [Header("Konfiguracja")]
+    [Header("Config")]
     [SerializeField] private int worldWidth  = 200;
     [SerializeField] private int worldHeight = 100;
     [SerializeField] private BlockRegistry blockRegistry;
