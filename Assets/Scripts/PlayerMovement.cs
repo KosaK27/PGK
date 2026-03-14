@@ -9,15 +9,19 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private bool isGrounded;
 
+    private PlayerStats stats;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        stats = GetComponent<PlayerStats>();
     }
 
     void Update()
     {
         Move();
         Jump();
+        DamageTest();
     }
 
     void Move()
@@ -38,6 +42,14 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        }
+    }
+
+    void DamageTest()
+    {
+        if (Keyboard.current.kKey.wasPressedThisFrame)
+        {
+            stats.TakeDamage(50);
         }
     }
 
