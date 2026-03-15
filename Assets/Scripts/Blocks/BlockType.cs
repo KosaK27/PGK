@@ -4,4 +4,5 @@ public enum BlockType : byte
     Dirt  = 1,
     Stone = 2,
     Sand  = 3,
+    Grass = 4,
 }

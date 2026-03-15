@@ -16,4 +16,4 @@ MonoBehaviour:
   displayName: Stone
   tile: {fileID: 11400000, guid: ecc7da11a03589d4a82999e9e64cfdb1, type: 2}
   destructible: 1
-  hardness: 3
+  hardness: 2
