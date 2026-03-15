@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80bd2fb8f2624e444b5d164ff6335b56, type: 3}
-  m_Name: Dirt
+  m_Name: Grass
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
-  blockType: 1
-  displayName: Dirt
-  tile: {fileID: 11400000, guid: c88ce586c99f29c40be93db516fe3d9b, type: 2}
+  blockType: 4
+  displayName: Grass
+  tile: {fileID: 11400000, guid: cb4a84c7bc67edf46b21cda604d92539, type: 2}
   destructible: 1
   hardness: 1

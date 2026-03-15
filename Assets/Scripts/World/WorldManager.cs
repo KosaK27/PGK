@@ -122,7 +122,7 @@ public class WorldManager : MonoBehaviour
         for (int y = 0; y < worldHeight; y++)
         {
             BlockType type;
-            if      (y == groundLevel)     type = BlockType.Sand;
+            if      (y == groundLevel)     type = BlockType.Grass;
             else if (y > groundLevel)      type = BlockType.Air;
             else if (y > groundLevel - 5)  type = BlockType.Dirt;
             else                           type = BlockType.Stone;

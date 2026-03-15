@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 10f;
 
     private Rigidbody2D rb;
-    private bool isGrounded;
+    public bool isGrounded;
 
     private PlayerStats stats;
 
@@ -55,9 +55,16 @@ public class PlayerMovement : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D collision)
     {
-        isGrounded = true;
+        foreach (ContactPoint2D contact in collision.contacts)
+        {
+            if (contact.normal.y > 0.5f)
+            {
+                isGrounded = true;
+                return;
+            }
+        }
+        isGrounded = false;
     }
-
     void OnCollisionExit2D(Collision2D collision)
     {
         isGrounded = false;
