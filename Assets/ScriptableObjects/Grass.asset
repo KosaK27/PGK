@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
   blockType: 4
   displayName: Grass
-  tile: {fileID: 11400000, guid: cb4a84c7bc67edf46b21cda604d92539, type: 2}
+  tile: {fileID: 11400000, guid: 5e785ecc1e5c2554c9f3146ae4eaf329, type: 2}
   destructible: 1
   hardness: 1

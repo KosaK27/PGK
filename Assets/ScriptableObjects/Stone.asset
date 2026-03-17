@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
   blockType: 2
   displayName: Stone
-  tile: {fileID: 11400000, guid: ecc7da11a03589d4a82999e9e64cfdb1, type: 2}
+  tile: {fileID: 11400000, guid: 53c6b87fb1d3b3b47983a265be06a3d0, type: 2}
   destructible: 1
-  hardness: 2
+  hardness: 1.5

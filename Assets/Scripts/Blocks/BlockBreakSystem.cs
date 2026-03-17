@@ -5,7 +5,7 @@ public class BlockBreakSystem : MonoBehaviour
     public static BlockBreakSystem Instance { get; private set; }
 
     [SerializeField] private BlockRegistry blockRegistry;
-
+    [SerializeField] private ItemRegistry itemRegistry;
     private BlockBreakProgress _breakProgress = new();
     private Vector3Int _currentBreakCell = new(int.MinValue, 0, 0);
 
@@ -35,7 +35,18 @@ public class BlockBreakSystem : MonoBehaviour
         {
             _breakProgress.Reset(cell);
             _currentBreakCell = new(int.MinValue, 0, 0);
+            var blockPos = WorldManager.Instance.CellToWorld(cell.x, cell.y) + new Vector3(0.5f, 0.5f, 0);
             WorldManager.Instance.DestroyBlock(cell.x, cell.y);
+
+            if (data.dropType != BlockType.Air)
+            {
+                var itemDef = itemRegistry.GetByBlockType(data.dropType);
+                if (itemDef != null)
+                {
+                    var stack = new ItemStack(itemDef, data.dropAmount);
+                    ItemDropSystem.Instance.DropItem(stack, blockPos);
+                }
+            }
             return true;
         }
 

@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
   blockType: 1
   displayName: Dirt
-  tile: {fileID: 11400000, guid: c88ce586c99f29c40be93db516fe3d9b, type: 2}
+  tile: {fileID: 11400000, guid: c8a69620bdc88b04e8301ec8a0abc141, type: 2}
   destructible: 1
-  hardness: 1
+  hardness: 0.5
+  dropType: 1
+  dropAmount: 1
