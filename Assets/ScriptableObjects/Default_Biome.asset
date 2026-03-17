@@ -28,5 +28,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0bb57861367562543a1a91fda77ed2d1, type: 2}
   - {fileID: 11400000, guid: f71aaa2ab78cff34e97782b4e0012a40, type: 2}
   - {fileID: 11400000, guid: cbc11394c5bd8ef4288cddb9889735e5, type: 2}
-  structures: []
-  structureChance: 0.05
+  structures:
+  - {fileID: 11400000, guid: cc99c494ed9326446b16d9321edadaa9, type: 2}
+  structureChance: 0.01

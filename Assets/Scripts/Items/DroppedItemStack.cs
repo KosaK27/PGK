@@ -18,6 +18,8 @@ public class DroppedItemStack : MonoBehaviour
     private DroppedItemStack _stackTarget = null;
     private float _stackCheckTimer = 0f;
     private float _stackCheckInterval = 0.2f;
+    private bool _frozen = false;
+    private float _defaultLifetime;
 
     public bool CanBePickedUp => Time.time > _spawnTime + _pickupDelay;
 
@@ -26,6 +28,7 @@ public class DroppedItemStack : MonoBehaviour
         ItemStack = stack;
         _lifetime = lifetime;
         _spawnTime = Time.time;
+        _defaultLifetime = lifetime;
 
         _rb = GetComponent<Rigidbody2D>();
         _sr = GetComponent<SpriteRenderer>();
@@ -40,6 +43,12 @@ public class DroppedItemStack : MonoBehaviour
 
     void Update()
     {
+        if (!ChunkManager.Instance.IsChunkLoaded(transform.position))
+        {
+            Freeze();
+            return;
+        }
+        Unfreeze();
         if (_stackTarget != null)
         {
             if (_stackTarget.ItemStack == null || _stackTarget.ItemStack.amount <= 0)
@@ -54,6 +63,7 @@ public class DroppedItemStack : MonoBehaviour
                 if (dist < 0.15f)
                 {
                     _rb.linearVelocity = Vector2.zero;
+                    RestoreCollision();
                     ItemDropSystem.Instance.MergeInto(_stackTarget, this);
                     return;
                 }
@@ -117,4 +127,24 @@ public class DroppedItemStack : MonoBehaviour
         col.excludeLayers = LayerMask.GetMask("Player", "Enemy");
     }
 
+    public void Freeze()
+    {
+        if (_frozen) return;
+        _frozen = true;
+        _rb.bodyType = RigidbodyType2D.Static;
+        _sr.enabled = false;
+    }
+
+    public void Unfreeze()
+    {
+        if (!_frozen) return;
+        _frozen = false;
+        _rb.bodyType = RigidbodyType2D.Dynamic;
+        _sr.enabled = true;
+    }
+
+    public void ResetLifetime()
+    {
+        _lifetime = _defaultLifetime;
+    }
 }

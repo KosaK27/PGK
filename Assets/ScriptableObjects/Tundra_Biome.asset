@@ -14,16 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BiomeData
   biomeType: 0
   displayName: Tundra
-  minWidth: 50
-  maxWidth: 150
+  minWidth: 200
+  maxWidth: 250
   surfaceBlock: 2
   subsurfaceBlock: 1
   deepBlock: 2
   subsurfaceDepth: 5
-  heightScale: 0.02
+  heightScale: 0.05
   heightAmplitude: 20
   baseHeightOffset: 0
   verticalLayers: []
   ores: []
-  structures: []
-  structureChance: 0.05
+  structures:
+  - {fileID: 11400000, guid: cc99c494ed9326446b16d9321edadaa9, type: 2}
+  structureChance: 0.001

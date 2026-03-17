@@ -16,6 +16,7 @@ public class Chunk : MonoBehaviour
 
     public void Initialize(Vector2Int chunkPos, BlockRegistry blockRegistry, Transform parent)
     {
+        gameObject.layer = LayerMask.NameToLayer("ChunkColliders");
         ChunkPos = chunkPos;
         _blockRegistry = blockRegistry;
         transform.SetParent(parent);

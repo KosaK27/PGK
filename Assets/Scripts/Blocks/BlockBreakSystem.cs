@@ -17,6 +17,7 @@ public class BlockBreakSystem : MonoBehaviour
 
     public bool TryBreak(Vector3Int cell, float deltaTime)
     {
+        if (!ChunkManager.Instance.IsChunkLoaded(new Vector2(cell.x, cell.y))) return false;
         var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
         if (blockType == BlockType.Air) return false;
 

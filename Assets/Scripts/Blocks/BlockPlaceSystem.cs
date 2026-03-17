@@ -12,11 +12,9 @@ public class BlockPlaceSystem : MonoBehaviour
 
     public bool TryPlace(Vector3Int cell, BlockType typeToPlace)
     {
-        var sw = System.Diagnostics.Stopwatch.StartNew();
+        if (!ChunkManager.Instance.IsChunkLoaded(new Vector2(cell.x, cell.y))) return false;
         
         bool hasNeighbor = HasNeighbor(cell);
-        sw.Stop();
-        Debug.Log($"HasNeighbor: {sw.ElapsedMilliseconds}ms");
         
         if (!hasNeighbor) return false;
         if (WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air) return false;

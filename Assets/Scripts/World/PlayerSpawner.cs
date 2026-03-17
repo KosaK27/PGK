@@ -3,12 +3,9 @@ using UnityEngine;
 public class PlayerSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject playerPrefab;
-    private bool _spawned = false;
 
-    void LateUpdate()
+    void Start()
     {
-        if (_spawned) return;
-        _spawned = true;
         SpawnPlayer();
     }
 
