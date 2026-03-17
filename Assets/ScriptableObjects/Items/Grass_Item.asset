@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
   m_Name: Grass_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 1
-  displayName: Dirt
-  sprite: {fileID: -3931065676038115036, guid: 4cc92acda8bfa474d960901bcf5af72d, type: 3}
+  itemId: 2
+  displayName: Grass
+  sprite: {fileID: -3892248032828748910, guid: 968b4ec8a12fe62449fea084a6d9515d, type: 3}
   maxStack: 99
   isBlock: 1
-  blockType: 1
+  blockType: 4

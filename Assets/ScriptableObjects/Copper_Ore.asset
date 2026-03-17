@@ -9,11 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80bd2fb8f2624e444b5d164ff6335b56, type: 3}
-  m_Name: Grass
-  m_EditorClassIdentifier: Assembly-CSharp::BlockData
+  m_Script: {fileID: 11500000, guid: fc7c3391cc52ba04d9b7ebf1201bd565, type: 3}
+  m_Name: Copper_Ore
+  m_EditorClassIdentifier: Assembly-CSharp::OreData
   blockType: 4
-  displayName: Grass
-  tile: {fileID: 11400000, guid: 5e785ecc1e5c2554c9f3146ae4eaf329, type: 2}
-  destructible: 1
-  hardness: 1
+  frequency: 0.05
+  threshold: 0.6
+  minDepth: 10
+  maxDepth: 100
+  noiseScale: 0.1

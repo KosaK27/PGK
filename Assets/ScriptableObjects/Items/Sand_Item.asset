@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
   m_Name: Sand_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 1
-  displayName: Dirt
-  sprite: {fileID: -3931065676038115036, guid: 4cc92acda8bfa474d960901bcf5af72d, type: 3}
+  itemId: 3
+  displayName: Sand
+  sprite: {fileID: -120659064025943385, guid: a27a37e00f96b014a91fbbfdf887c954, type: 3}
   maxStack: 99
   isBlock: 1
-  blockType: 1
+  blockType: 3

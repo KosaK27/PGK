@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a3819a99fb858e40880b321253b54d6, type: 3}
+  m_Name: WorldGenerator
+  m_EditorClassIdentifier: Assembly-CSharp::WorldGenerator
+  seed: 0
+  randomSeed: 1
+  defaultBiome: {fileID: 11400000, guid: ee18ce399cb7764459468d097234c667, type: 2}
+  biomes:
+  - {fileID: 11400000, guid: ee18ce399cb7764459468d097234c667, type: 2}
+  - {fileID: 11400000, guid: ffdea852679f791488e39e87e9f819ca, type: 2}
+  - {fileID: 11400000, guid: 979302cb177ded344acfe6841625a188, type: 2}
+  caveNoiseScale: 0.05
+  caveThreshold: 0.45
+  caveStartDepth: 10

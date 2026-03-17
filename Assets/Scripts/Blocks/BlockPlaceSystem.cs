@@ -12,7 +12,13 @@ public class BlockPlaceSystem : MonoBehaviour
 
     public bool TryPlace(Vector3Int cell, BlockType typeToPlace)
     {
-        if (!HasNeighbor(cell)) return false;
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        
+        bool hasNeighbor = HasNeighbor(cell);
+        sw.Stop();
+        Debug.Log($"HasNeighbor: {sw.ElapsedMilliseconds}ms");
+        
+        if (!hasNeighbor) return false;
         if (WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air) return false;
 
         WorldManager.Instance.PlaceBlock(cell.x, cell.y, typeToPlace);

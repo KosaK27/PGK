@@ -17,3 +17,5 @@ MonoBehaviour:
   tile: {fileID: 11400000, guid: 53c6b87fb1d3b3b47983a265be06a3d0, type: 2}
   destructible: 1
   hardness: 1.5
+  dropType: 2
+  dropAmount: 1
