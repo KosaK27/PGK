@@ -39,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Jump()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+        if (Keyboard.current.spaceKey.isPressed && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }

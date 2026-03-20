@@ -5,15 +5,15 @@ using UnityEngine;
 public class WorldGenerator : ScriptableObject
 {
     [Header("Seed")]
-    public int seed = 0;
+    public int  seed       = 0;
     public bool randomSeed = true;
 
-    [Header("Biomy")]
-    public BiomeData defaultBiome;
+    [Header("Biomes")]
+    public BiomeData       defaultBiome;
     public List<BiomeData> biomes = new();
 
-    [Header("Jaskinie")]
-    public float caveNoiseScale = 0.05f;
+    [Header("Caves")]
+    public float caveScale      = 0.05f;
     public float caveThreshold  = 0.45f;
     public int   caveStartDepth = 10;
 
@@ -25,107 +25,114 @@ public class WorldGenerator : ScriptableObject
         int width  = world.Width;
         int height = world.Height;
 
-        var biomeMap      = GenerateBiomeMap(width);
-        var surfaceHeights = GenerateSurfaceHeights(width, height, biomeMap);
+        var biomeMap = GenerateBiomeMap(width);
+        var surface  = GenerateSurface(width, height, biomeMap);
 
-        FillTerrain(world, width, height, biomeMap, surfaceHeights);
-        GenerateCaves(world, width, height, surfaceHeights);
-        GenerateOres(world, width, height, biomeMap, surfaceHeights);
-        GenerateStructures(world, width, height, biomeMap, surfaceHeights);
+        FillTerrain(world, width, height, biomeMap, surface);
+        GenerateCaves(world, width, height, surface);
+        GenerateOres(world, width, height, biomeMap, surface);
+        GenerateStructures(world, width, height, biomeMap, surface);
     }
-
-    // --- Biomy ---
 
     private BiomeData[] GenerateBiomeMap(int width)
     {
-        // zwracamy BiomeData zamiast BiomeType — koniec z problemem porównania
-        var map = new BiomeData[width];
+        var map      = new BiomeData[width];
         var sections = new List<(int end, BiomeData biome)>();
 
         int centerStart = width / 4;
         int centerEnd   = width * 3 / 4;
 
-        // lewa strona
-        int x = 0;
-        while (x < centerStart)
+        var counts = new Dictionary<BiomeData, int>();
+        foreach (var b in biomes) counts[b] = 0;
+
+        BiomeData PickBiome()
         {
-            var biome = biomes.Count > 0 ? biomes[Random.Range(0, biomes.Count)] : defaultBiome;
-            int w = Random.Range(biome.minWidth, biome.maxWidth);
-            sections.Add((Mathf.Min(x + w, centerStart), biome));
-            x += w;
+            var available = biomes.FindAll(b => counts[b] < b.maxCount);
+            if (available.Count == 0) return defaultBiome;
+            return available[Random.Range(0, available.Count)];
         }
 
-        // środek — default
+        void PlaceSections(int from, int to)
+        {
+            var guaranteed = new List<BiomeData>();
+            foreach (var b in biomes)
+                for (int n = counts[b]; n < b.minCount; n++)
+                    guaranteed.Add(b);
+
+            for (int i = guaranteed.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (guaranteed[i], guaranteed[j]) = (guaranteed[j], guaranteed[i]);
+            }
+
+            int x = from;
+            int gIdx = 0;
+
+            while (x < to)
+            {
+                var biome = gIdx < guaranteed.Count ? guaranteed[gIdx++] : PickBiome();
+                int w     = Random.Range(biome.minWidth, biome.maxWidth);
+                sections.Add((Mathf.Min(x + w, to), biome));
+                counts[biome]++;
+                x += w;
+            }
+        }
+
+        PlaceSections(0, centerStart);
         sections.Add((centerEnd, defaultBiome));
-
-        // prawa strona
-        x = centerEnd;
-        while (x < width)
-        {
-            var biome = biomes.Count > 0 ? biomes[Random.Range(0, biomes.Count)] : defaultBiome;
-            int w = Random.Range(biome.minWidth, biome.maxWidth);
-            sections.Add((Mathf.Min(x + w, width), biome));
-            x += w;
-        }
+        PlaceSections(centerEnd, width);
 
         int idx = 0;
         for (int i = 0; i < width; i++)
         {
-            while (idx < sections.Count - 1 && i >= sections[idx].end)
-                idx++;
+            while (idx < sections.Count - 1 && i >= sections[idx].end) idx++;
             map[i] = sections[idx].biome;
         }
 
         return map;
     }
 
-    // --- Powierzchnia ---
-
-    private int[] GenerateSurfaceHeights(int width, int height, BiomeData[] biomeMap)
+    private int[] GenerateSurface(int width, int height, BiomeData[] biomeMap)
     {
-        var heights = new int[width];
-        int baseHeight = height / 2;
-        float offsetX  = seed * 0.1f;
+        var   heights    = new int[width];
+        int   baseHeight = height / 2;
+        float offsetX    = seed * 0.1f;
 
         for (int x = 0; x < width; x++)
         {
-            var biome = biomeMap[x];
+            var   biome = biomeMap[x];
+            float ox    = (x + offsetX) * biome.terrainScale;
 
-            float n1 = Mathf.PerlinNoise((x + offsetX) * biome.heightScale,         0f);
-            float n2 = Mathf.PerlinNoise((x + offsetX) * biome.heightScale * 2f, 100f) * 0.5f;
-            float n3 = Mathf.PerlinNoise((x + offsetX) * biome.heightScale * 4f, 200f) * 0.25f;
+            float noise = Mathf.PerlinNoise(ox,       0f)
+                        + Mathf.PerlinNoise(ox * 2f, 100f) * 0.5f
+                        + Mathf.PerlinNoise(ox * 4f, 200f) * 0.25f;
 
-            float combined = (n1 + n2 + n3) / 1.75f;
-            heights[x] = baseHeight + (int)biome.baseHeightOffset +
-                         Mathf.RoundToInt((combined - 0.5f) * biome.heightAmplitude);
+            heights[x] = baseHeight + (int)biome.terrainElevation +
+                         Mathf.RoundToInt((noise / 1.75f - 0.5f) * biome.terrainHeight);
         }
 
         return heights;
     }
 
-    // --- Teren ---
-
-    private void FillTerrain(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surfaceHeights)
+    private void FillTerrain(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface)
     {
         for (int x = 0; x < width; x++)
         {
-            var biome   = biomeMap[x];
-            int surface = surfaceHeights[x];
+            var biome = biomeMap[x];
+            int top   = surface[x];
 
             for (int y = 0; y < height; y++)
             {
-                if (y > surface) { world.SetBlock(x, y, BlockType.Air); continue; }
+                if (y > top) { world.SetBlock(x, y, BlockType.Air); continue; }
 
-                int depth = surface - y;
+                int depth = top - y;
 
-                BlockType layerBlock = BlockType.Air;
+                BlockType block = BlockType.Air;
                 foreach (var layer in biome.verticalLayers)
-                {
                     if (depth >= layer.startDepth && depth < layer.endDepth)
-                    { layerBlock = layer.blockType; break; }
-                }
+                        { block = layer.blockType; break; }
 
-                if (layerBlock != BlockType.Air) { world.SetBlock(x, y, layerBlock); continue; }
+                if (block != BlockType.Air) { world.SetBlock(x, y, block); continue; }
 
                 if      (depth == 0)                    world.SetBlock(x, y, biome.surfaceBlock);
                 else if (depth < biome.subsurfaceDepth) world.SetBlock(x, y, biome.subsurfaceBlock);
@@ -134,9 +141,7 @@ public class WorldGenerator : ScriptableObject
         }
     }
 
-    // --- Jaskinie ---
-
-    private void GenerateCaves(WorldData world, int width, int height, int[] surfaceHeights)
+    private void GenerateCaves(WorldData world, int width, int height, int[] surface)
     {
         float ox = seed * 0.3f;
         float oy = seed * 0.7f;
@@ -145,54 +150,83 @@ public class WorldGenerator : ScriptableObject
         for (int y = 0; y < height; y++)
         {
             if (world.GetBlock(x, y) == BlockType.Air) continue;
-            if (surfaceHeights[x] - y < caveStartDepth) continue;
+            if (surface[x] - y < caveStartDepth) continue;
 
-            float noise = Mathf.PerlinNoise((x + ox) * caveNoiseScale, (y + oy) * caveNoiseScale);
-            if (noise < caveThreshold)
+            if (Mathf.PerlinNoise((x + ox) * caveScale, (y + oy) * caveScale) < caveThreshold)
                 world.SetBlock(x, y, BlockType.Air);
         }
     }
 
-    // --- Rudy ---
-
-    private void GenerateOres(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surfaceHeights)
-    {
-        float ox = seed * 0.5f;
-        float oy = seed * 0.9f;
-
-        for (int x = 0; x < width; x++)
-        {
-            var biome   = biomeMap[x];
-            int surface = surfaceHeights[x];
-
-            foreach (var ore in biome.ores)
-            for (int y = 0; y < height; y++)
-            {
-                int depth = surface - y;
-                if (depth < ore.minDepth || depth > ore.maxDepth) continue;
-                if (world.GetBlock(x, y) == BlockType.Air) continue;
-
-                float noise = Mathf.PerlinNoise((x + ox) * ore.noiseScale, (y + oy) * ore.noiseScale);
-                if (noise > ore.threshold)
-                    world.SetBlock(x, y, ore.blockType);
-            }
-        }
-    }
-
-    // --- Struktury ---
-
-    private void GenerateStructures(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surfaceHeights)
+    private void GenerateOres(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface)
     {
         for (int x = 0; x < width; x++)
         {
             var biome = biomeMap[x];
-            if (biome.structures.Count == 0) continue;
-            if (Random.value > biome.structureChance) continue;
+            int top   = surface[x];
+
+            for (int i = 0; i < biome.ores.Count; i++)
+            {
+                var   ore = biome.ores[i];
+                float ox  = seed * 0.5f + i * 1000f;
+                float oy  = seed * 0.9f + i * 1000f;
+
+                for (int y = 0; y < height; y++)
+                {
+                    int depth = top - y;
+                    if (depth < ore.minDepth || depth > ore.maxDepth) continue;
+                    if (world.GetBlock(x, y) != biome.deepBlock) continue;
+
+                    if (Mathf.PerlinNoise((x + ox) * 0.02f, (y + oy) * 0.02f) < ore.rarity) continue;
+                    if (Mathf.PerlinNoise((x + ox) * 0.08f, (y + oy) * 0.08f) < 1f - ore.veinSize) continue;
+
+                    world.SetBlock(x, y, ore.blockType);
+                }
+            }
+        }
+    }
+
+    private void GenerateStructures(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface)
+    {
+        var counts = new Dictionary<StructureTemplate, int>();
+
+        for (int x = 0; x < width; x++)
+        {
+            var biome = biomeMap[x];
+            if (biome.structures.Count == 0 || Random.value > biome.structureChance) continue;
 
             var template = biome.structures[Random.Range(0, biome.structures.Count)];
             if (template?.blocks == null) continue;
 
-            PlaceStructure(world, template, x, surfaceHeights[x]);
+            if (!counts.ContainsKey(template)) counts[template] = 0;
+            if (counts[template] >= template.maxCount) continue;
+
+            PlaceStructure(world, template, x, surface[x]);
+            counts[template]++;
+        }
+
+        foreach (var biome in biomes)
+        foreach (var template in biome.structures)
+        {
+            if (template?.blocks == null) continue;
+            if (!counts.ContainsKey(template)) counts[template] = 0;
+            if (counts[template] >= template.minCount) continue;
+
+            var cols = new List<int>();
+            for (int x = 0; x < width; x++)
+                if (biomeMap[x] == biome) cols.Add(x);
+
+            for (int i = cols.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (cols[i], cols[j]) = (cols[j], cols[i]);
+            }
+
+            while (counts[template] < template.minCount && cols.Count > 0)
+            {
+                PlaceStructure(world, template, cols[0], surface[cols[0]]);
+                cols.RemoveAt(0);
+                counts[template]++;
+            }
         }
     }
 
@@ -202,8 +236,8 @@ public class WorldGenerator : ScriptableObject
         for (int x = 0; x < template.size.x; x++)
         {
             var block = template.GetBlock(x, y);
-            if (block == BlockType.Air) continue;
-            world.SetBlock(originX + x, originY + y, block);
+            if (block != BlockType.Air)
+                world.SetBlock(originX + x, originY + y, block);
         }
     }
 }

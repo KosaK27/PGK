@@ -1,4 +1,3 @@
-// Assets/Scripts/Items/ItemRegistry.cs
 using System.Collections.Generic;
 using UnityEngine;
 

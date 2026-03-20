@@ -22,4 +22,12 @@ public class BlockRegistry : ScriptableObject
         _lookup.TryGetValue(type, out var data);
         return data;
     }
+
+    public BlockType GetBlockType(UnityEngine.Tilemaps.TileBase tile)
+    {
+        foreach (var block in blocks)
+            if (block != null && block.tile == tile)
+                return block.blockType;
+        return BlockType.Air;
+    }
 }

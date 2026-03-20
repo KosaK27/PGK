@@ -897,7 +897,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldManager
   worldGenerator: {fileID: 11400000, guid: cbed6ef41f6e2c34fb0cc5ff009d1599, type: 2}
-  worldWidth: 1000
+  worldWidth: 2000
   worldHeight: 1000
   blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
   foregroundTilemap: {fileID: 1692829430}

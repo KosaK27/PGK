@@ -10,20 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a88d8a49c063fe41afcf9dbd541b979, type: 3}
-  m_Name: Desert_Biome
+  m_Name: Tundra_Biome
   m_EditorClassIdentifier: Assembly-CSharp::BiomeData
-  biomeType: 0
-  displayName: Desert
-  minWidth: 50
-  maxWidth: 150
-  surfaceBlock: 3
-  subsurfaceBlock: 1
+  displayName: Tundra
+  minWidth: 200
+  maxWidth: 300
+  minCount: 1
+  maxCount: 2
+  surfaceBlock: 5
+  subsurfaceBlock: 5
   deepBlock: 2
   subsurfaceDepth: 5
-  heightScale: 0.02
-  heightAmplitude: 15
-  baseHeightOffset: 0
+  terrainScale: 0.02
+  terrainHeight: 15
+  terrainElevation: 0
   verticalLayers: []
   ores: []
-  structures: []
-  structureChance: 0.05
+  structures:
+  - {fileID: 11400000, guid: cc99c494ed9326446b16d9321edadaa9, type: 2}
+  structureChance: 0.001

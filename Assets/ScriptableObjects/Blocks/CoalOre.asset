@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80bd2fb8f2624e444b5d164ff6335b56, type: 3}
-  m_Name: Stone
+  m_Name: CoalOre
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
-  blockType: 2
-  displayName: Stone
-  tile: {fileID: 11400000, guid: 7d98f6148f28bc1469a6f1a117fd4388, type: 2}
+  blockType: 8
+  displayName: CoalOre
+  tile: {fileID: 11400000, guid: c999a34cfe893fe438d57ec656631d8d, type: 2}
   destructible: 1
   hardness: 1.5
-  dropType: 2
+  dropType: 8
   dropAmount: 1

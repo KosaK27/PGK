@@ -12,17 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a88d8a49c063fe41afcf9dbd541b979, type: 3}
   m_Name: Default_Biome
   m_EditorClassIdentifier: Assembly-CSharp::BiomeData
-  biomeType: 0
   displayName: Plains
-  minWidth: 50
-  maxWidth: 150
+  minWidth: 100
+  maxWidth: 200
+  minCount: 1
+  maxCount: 100
   surfaceBlock: 4
   subsurfaceBlock: 1
   deepBlock: 2
   subsurfaceDepth: 5
-  heightScale: 0.02
-  heightAmplitude: 8
-  baseHeightOffset: 0
+  terrainScale: 0.02
+  terrainHeight: 15
+  terrainElevation: 0
   verticalLayers: []
   ores:
   - {fileID: 11400000, guid: 0bb57861367562543a1a91fda77ed2d1, type: 2}

@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc7c3391cc52ba04d9b7ebf1201bd565, type: 3}
-  m_Name: Coal_Ore
+  m_Name: Copper_Ore
   m_EditorClassIdentifier: Assembly-CSharp::OreData
-  blockType: 4
-  frequency: 0.05
-  threshold: 0.6
-  minDepth: 10
+  blockType: 6
+  rarity: 0.4
+  veinSize: 0.2
+  minDepth: 15
   maxDepth: 100
-  noiseScale: 0.1

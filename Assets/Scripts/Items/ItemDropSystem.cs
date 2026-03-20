@@ -5,7 +5,7 @@ public class ItemDropSystem : MonoBehaviour
 {
     public static ItemDropSystem Instance { get; private set; }
 
-    [Header("Konfiguracja")]
+    [Header("Config")]
     [SerializeField] private float defaultLifetime = 300f;
     [SerializeField] private GameObject droppedItemPrefab;
     [SerializeField] private ItemRegistry itemRegistry;
@@ -53,6 +53,7 @@ public class ItemDropSystem : MonoBehaviour
         int canAdd = target.ItemStack.item.maxStack - target.ItemStack.amount;
         int toAdd = Mathf.Min(canAdd, source.ItemStack.amount);
         target.AddAmount(toAdd);
+        target.ResetLifetime();
 
         int remaining = source.ItemStack.amount - toAdd;
         if (remaining <= 0)
@@ -63,7 +64,7 @@ public class ItemDropSystem : MonoBehaviour
             source.RestoreCollision();
         }
     }
-    
+
     public DroppedItemStack GetNearbyItem(Vector2 playerPosition, float pickupRadius)
     {
         foreach (var dropped in _droppedItems)

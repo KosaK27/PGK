@@ -15,7 +15,7 @@ public class PlayerSpawner : MonoBehaviour
         int worldX = 0;
 
         int surfaceY = world.GetSurfaceWorldY(worldX);
-        var spawnPos = new Vector3(worldX + 0.5f, surfaceY + 1.5f, 0f);
+        var spawnPos = new Vector3(worldX + 0.5f, surfaceY + 2f, 0f);
 
         if (playerPrefab == null) { Debug.LogWarning("Brak Player Prefab!"); return; }
 

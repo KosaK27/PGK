@@ -196,7 +196,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 8
-  jumpForce: 12
+  jumpForce: 20
   isGrounded: 0
 --- !u!114 &4496886122501145658
 MonoBehaviour:
