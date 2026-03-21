@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 477021934886250010}
   - component: {fileID: 6296602872818693057}
   - component: {fileID: 4982498738606345404}
+  - component: {fileID: -5258877558881943753}
+  - component: {fileID: 6726673571210045911}
   m_Layer: 7
   m_Name: BanditEnemy
   m_TagString: Untagged
@@ -193,3 +195,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WalkingEnemyAI
   jumpForce: 20
+--- !u!114 &-5258877558881943753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5036973930710842147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18e22fa66aecf0c46a3b2f5e66f67fde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContactDamage
+--- !u!114 &6726673571210045911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5036973930710842147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2745c0a969846224ea5034272f4572c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitEffect
+  flashDuration: 0.12
+  flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}

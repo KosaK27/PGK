@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5745997484967960410}
   - component: {fileID: 4496886122501145658}
   - component: {fileID: 8583829408742081960}
+  - component: {fileID: -7491167240366154177}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -52,6 +53,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
   mainCamera: {fileID: 0}
   blockToPlace: 2
+  attackRange: 1.5
+  attackDamage: 15
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!212 &3830852830915164063
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -231,3 +237,17 @@ MonoBehaviour:
   jumpSprite: {fileID: 8158605244509288230, guid: 652ae1a8c8e2bb14f8d73faeacae915e, type: 3}
   fallSprite: {fileID: 6184959299203262911, guid: 652ae1a8c8e2bb14f8d73faeacae915e, type: 3}
   walkFrameRate: 4
+--- !u!114 &-7491167240366154177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4831351373685645997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2745c0a969846224ea5034272f4572c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitEffect
+  flashDuration: 0.12
+  flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}

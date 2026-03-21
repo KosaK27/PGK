@@ -11,10 +11,13 @@ public class EntityStats : MonoBehaviour
     public event Action OnDeath;
     public event Action<int, int> OnHPChanged;
 
+    private HitEffect _hitEffect;
+
     void Awake()
     {
         if (data != null)
             CurrentHP = data.maxHP;
+        _hitEffect = GetComponent<HitEffect>();
     }
 
     public void Initialize(EntityData entityData)
@@ -24,11 +27,14 @@ public class EntityStats : MonoBehaviour
         IsDead = false;
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, Vector2? sourcePosition = null)
     {
         if (IsDead) return;
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
         OnHPChanged?.Invoke(CurrentHP, data.maxHP);
+
+        if (sourcePosition.HasValue && _hitEffect != null)
+            _hitEffect.TriggerHit(sourcePosition.Value);
 
         if (CurrentHP <= 0)
             Die();

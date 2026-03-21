@@ -7,6 +7,10 @@ public class PlayerInteraction : MonoBehaviour
 
     [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
 
+    [SerializeField] private float attackRange = 1.5f;
+    [SerializeField] private int attackDamage = 15;
+    [SerializeField] private LayerMask enemyLayer;
+
     void Start()
     {
         if (mainCamera == null)
@@ -15,6 +19,29 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            var cell = GetCellUnderMouse();
+            var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
+            if (blockType == BlockType.Air)
+            {
+                var mousePos = Mouse.current.position.ReadValue();
+                var worldPos = mainCamera.ScreenToWorldPoint(
+                    new Vector3(mousePos.x, mousePos.y, 0));
+                worldPos.z = 0;
+                var hits = Physics2D.OverlapCircleAll(worldPos, attackRange, enemyLayer);
+                foreach (var hit in hits)
+                {
+                    var entity = hit.GetComponent<EntityStats>();
+                    if (entity != null)
+                    {
+                        entity.TakeDamage(attackDamage, transform.position);
+                        break;
+                    }
+                }
+            }
+        }
+
         if (Mouse.current.leftButton.isPressed)
         {
             var cell = GetCellUnderMouse();
