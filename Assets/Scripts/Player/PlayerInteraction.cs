@@ -4,12 +4,11 @@ using UnityEngine.InputSystem;
 public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
-
     [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
-
     [SerializeField] private float attackRange = 1.5f;
     [SerializeField] private int attackDamage = 15;
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float blockReach = 5f;
 
     void Start()
     {
@@ -45,7 +44,10 @@ public class PlayerInteraction : MonoBehaviour
         if (Mouse.current.leftButton.isPressed)
         {
             var cell = GetCellUnderMouse();
-            BlockBreakSystem.Instance.TryBreak(cell, Time.deltaTime);
+            if (IsInReach(cell))
+                BlockBreakSystem.Instance.TryBreak(cell, Time.deltaTime);
+            else
+                BlockBreakSystem.Instance.CancelBreak();
         }
 
         if (Mouse.current.leftButton.wasReleasedThisFrame)
@@ -56,8 +58,15 @@ public class PlayerInteraction : MonoBehaviour
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
             var cell = GetCellUnderMouse();
-            BlockPlaceSystem.Instance.TryPlace(cell, blockToPlace);
+            if (IsInReach(cell))
+                BlockPlaceSystem.Instance.TryPlace(cell, blockToPlace);
         }
+    }
+
+    private bool IsInReach(Vector3Int cell)
+    {
+        var cellCenter = new Vector2(cell.x + 0.5f, cell.y + 0.5f);
+        return Vector2.Distance(transform.position, cellCenter) <= blockReach;
     }
 
     private Vector3Int GetCellUnderMouse()
