@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80bd2fb8f2624e444b5d164ff6335b56, type: 3}
+  m_Name: IronOre
+  m_EditorClassIdentifier: Assembly-CSharp::BlockData
+  blockType: 7
+  displayName: IronOre
+  tile: {fileID: 11400000, guid: 2dabd4c2823358b4eab67ec924b91b3b, type: 2}
+  destructible: 1
+  hardness: 1.5
+  dropType: 7
+  dropAmount: 1
