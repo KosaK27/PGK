@@ -32,7 +32,7 @@ public class PlayerStats : MonoBehaviour
 
     IEnumerator Respawn()
     {
-        GetComponent<SpriteRenderer>().enabled = false;
+        SetRenderersEnabled(false);
         GetComponent<Rigidbody2D>().simulated = false;
         GetComponent<PlayerMovement>().enabled = false;
 
@@ -41,8 +41,14 @@ public class PlayerStats : MonoBehaviour
         transform.position = PlayerSpawner.Instance.GetSpawnPosition();
         currentHP = maxHP;
 
-        GetComponent<SpriteRenderer>().enabled = true;
+        SetRenderersEnabled(true);
         GetComponent<Rigidbody2D>().simulated = true;
         GetComponent<PlayerMovement>().enabled = true;
+    }
+
+    void SetRenderersEnabled(bool enabled)
+    {
+        foreach (SpriteRenderer sr in GetComponentsInChildren<SpriteRenderer>())
+            sr.enabled = enabled;
     }
 }

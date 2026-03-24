@@ -9,6 +9,9 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     public bool isGrounded;
 
+    private float groundedTimer;
+    private const float GROUNDED_COOLDOWN = 0.1f;
+
     private PlayerStats stats;
 
     void Start()
@@ -19,6 +22,12 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (groundedTimer > 0)
+        {
+            groundedTimer -= Time.deltaTime;
+            isGrounded = true;
+        }
+
         Move();
         Jump();
         DamageTest();
@@ -60,13 +69,16 @@ public class PlayerMovement : MonoBehaviour
             if (contact.normal.y > 0.5f)
             {
                 isGrounded = true;
+                groundedTimer = GROUNDED_COOLDOWN;
                 return;
             }
         }
         isGrounded = false;
     }
+
     void OnCollisionExit2D(Collision2D collision)
     {
+        groundedTimer = 0f;
         isGrounded = false;
     }
 }
