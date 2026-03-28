@@ -13,8 +13,9 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
+        if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
         HandleBreak();
-        HandlePlacement();
+        HandlePlaceOrWallBreak();
         HandleDropKey();
     }
 
@@ -36,17 +37,41 @@ public class PlayerInteraction : MonoBehaviour
             BlockBreakSystem.Instance.CancelBreak();
     }
 
-    private void HandlePlacement()
+    private void HandlePlaceOrWallBreak()
     {
-        if (!Mouse.current.rightButton.wasPressedThisFrame) return;
-        var cell = GetCellUnderMouse();
-        if (!IsInReach(cell)) return;
-
         var selected = InventorySystem.Instance.SelectedItem;
-        if (selected == null || selected.IsEmpty || !selected.item.isBlock) return;
+        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool
+                    && selected.item.toolType != ToolType.Sword;
 
-        if (BlockPlaceSystem.Instance.TryPlace(cell, selected.item.blockType))
-            InventorySystem.Instance.ConsumeSelected(1);
+        if (Mouse.current.rightButton.isPressed && hasTool)
+        {
+            var cell = GetCellUnderMouse();
+            if (IsInReach(cell)) WallBreakSystem.Instance.TryBreak(cell, Time.deltaTime);
+            else                 WallBreakSystem.Instance.CancelBreak();
+        }
+        else if (Mouse.current.rightButton.wasReleasedThisFrame && hasTool)
+        {
+            WallBreakSystem.Instance.CancelBreak();
+        }
+        else if (Mouse.current.rightButton.wasPressedThisFrame && !hasTool)
+        {
+            var cell = GetCellUnderMouse();
+            if (!IsInReach(cell)) return;
+
+            if (selected != null && !selected.IsEmpty)
+            {
+                if (selected.item.isBlock)
+                {
+                    if (BlockPlaceSystem.Instance.TryPlace(cell, selected.item.blockType))
+                        InventorySystem.Instance.ConsumeSelected(1);
+                }
+                else if (selected.item.isWall)
+                {
+                    if (WallPlaceSystem.Instance.TryPlace(cell, selected.item.wallType))
+                        InventorySystem.Instance.ConsumeSelected(1);
+                }
+            }
+        }
     }
 
     private void HandleDropKey()
@@ -57,8 +82,7 @@ public class PlayerInteraction : MonoBehaviour
         var stack = InventorySystem.Instance.GetSlot(idx);
         if (stack == null || stack.IsEmpty) return;
 
-        int amount = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
-
+        int amount     = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
         Vector2 playerPos  = transform.position;
         var mousePos       = Mouse.current.position.ReadValue();
         Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));

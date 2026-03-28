@@ -1201,7 +1201,9 @@ MonoBehaviour:
   worldWidth: 2000
   worldHeight: 1000
   blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
+  wallRegistry: {fileID: 0}
   foregroundTilemap: {fileID: 1692829430}
+  wallTilemap: {fileID: 0}
 --- !u!4 &1501033226
 Transform:
   m_ObjectHideFlags: 0
@@ -1232,6 +1234,8 @@ GameObject:
   - component: {fileID: 1548276940}
   - component: {fileID: 1548276941}
   - component: {fileID: 1548276942}
+  - component: {fileID: 1548276944}
+  - component: {fileID: 1548276943}
   m_Layer: 0
   m_Name: Systems
   m_TagString: Untagged
@@ -1312,6 +1316,7 @@ MonoBehaviour:
   chunkParent: {fileID: 1091144312}
   viewDistanceX: 4
   viewDistanceY: 3
+  wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}
 --- !u!114 &1548276942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1327,6 +1332,32 @@ MonoBehaviour:
   hotbarSize: 10
   mainRows: 4
   mainCols: 10
+--- !u!114 &1548276943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548276936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df583c29a00baf44b8f2546b667f0d3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallPlaceSystem
+--- !u!114 &1548276944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548276936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8489ea0dbd093f04dafdbb9e181bb3d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallBreakSystem
+  wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}
+  itemRegistry: {fileID: 11400000, guid: 81c9f440bb275914b95b3e221eb0747b, type: 2}
 --- !u!1 &1568410902
 GameObject:
   m_ObjectHideFlags: 0

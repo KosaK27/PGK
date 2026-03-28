@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
+  m_Name: DirtWall_Item
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  itemId: 12
+  displayName: Dirt Wall
+  sprite: {fileID: 8123345698268676208, guid: 4f672e74fa1633e4e81effbbbe03afa7, type: 3}
+  maxStack: 99
+  isBlock: 0
+  blockType: 8
+  isWall: 1
+  wallType: 0
+  isTool: 0
+  toolType: 0
+  breakingSpeed: 1

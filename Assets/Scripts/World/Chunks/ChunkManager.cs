@@ -10,6 +10,7 @@ public class ChunkManager : MonoBehaviour
     [SerializeField] private Transform chunkParent;
     [SerializeField] private int viewDistanceX = 4;
     [SerializeField] private int viewDistanceY = 3;
+    [SerializeField] private WallRegistry wallRegistry;
 
     private Dictionary<Vector2Int, Chunk> _loadedChunks = new();
     private Transform _playerTransform;
@@ -69,9 +70,9 @@ public class ChunkManager : MonoBehaviour
 
     private void LoadChunk(Vector2Int chunkPos, WorldManager world)
     {
-        var go = new GameObject($"Chunk_{chunkPos.x}_{chunkPos.y}");
+        var go    = new GameObject($"Chunk_{chunkPos.x}_{chunkPos.y}");
         var chunk = go.AddComponent<Chunk>();
-        chunk.Initialize(chunkPos, blockRegistry, chunkParent);
+        chunk.Initialize(chunkPos, blockRegistry, wallRegistry, chunkParent);
         chunk.RenderAll(world.Data, world.OffsetX, world.OffsetY);
         _loadedChunks[chunkPos] = chunk;
     }
@@ -121,6 +122,12 @@ public class ChunkManager : MonoBehaviour
         return _loadedChunks.ContainsKey(chunkPos);
     }
 
+    public void RefreshWall(int lx, int ly, int offsetX, int offsetY, TileBase tile)
+    {
+        var chunkPos = GetChunkPos(lx, ly);
+        if (_loadedChunks.TryGetValue(chunkPos, out var chunk))
+            chunk.RefreshWallTile(lx, ly, offsetX, offsetY, tile);
+    }
     void OnDrawGizmos()
     {
         if (_loadedChunks == null) return;

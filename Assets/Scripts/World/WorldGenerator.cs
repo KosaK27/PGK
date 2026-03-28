@@ -17,6 +17,16 @@ public class WorldGenerator : ScriptableObject
     public float caveThreshold  = 0.45f;
     public int   caveStartDepth = 10;
 
+    [Header("Wall Generation")]
+    public List<BlockToWall> wallMappings = new();
+
+    [System.Serializable]
+    public class BlockToWall
+    {
+        public BlockType blockType;
+        public WallType  wallType;
+    }
+
     public void Generate(WorldData world)
     {
         if (randomSeed) seed = Random.Range(0, 999999);
@@ -29,9 +39,26 @@ public class WorldGenerator : ScriptableObject
         var surface  = GenerateSurface(width, height, biomeMap);
 
         FillTerrain(world, width, height, biomeMap, surface);
+        GenerateWalls(world, width, height, surface);
         GenerateCaves(world, width, height, surface);
         GenerateOres(world, width, height, biomeMap, surface);
         GenerateStructures(world, width, height, biomeMap, surface);
+    }
+
+    private void GenerateWalls(WorldData world, int width, int height, int[] surface)
+    {
+        var mappingDict = new Dictionary<BlockType, WallType>();
+        foreach (var m in wallMappings)
+            mappingDict[m.blockType] = m.wallType;
+
+        for (int x = 0; x < width; x++)
+        for (int y = 0; y < height; y++)
+        {
+            var block = world.GetBlock(x, y);
+            if (block == BlockType.Air) continue;
+            if (mappingDict.TryGetValue(block, out var wallType))
+                world.SetWall(x, y, wallType);
+        }
     }
 
     private BiomeData[] GenerateBiomeMap(int width)

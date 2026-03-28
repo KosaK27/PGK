@@ -14,6 +14,10 @@ public class ItemDefinition : ScriptableObject
     public bool isBlock;
     public BlockType blockType;
 
+    [Header("Wall")]
+    public bool     isWall;
+    public WallType wallType;
+
     [Header("Tool")]
     public bool isTool;
     public ToolType toolType;
