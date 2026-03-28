@@ -19,7 +19,7 @@ MonoBehaviour:
   isBlock: 0
   blockType: 8
   isWall: 1
-  wallType: 1
+  wallType: 2
   isTool: 0
   toolType: 0
   breakingSpeed: 1

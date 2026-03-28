@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c560bb534e065841aa89660bd39b0e5, type: 3}
   m_Name: Dirt_Wall
   m_EditorClassIdentifier: Assembly-CSharp::WallData
-  wallType: 0
+  wallType: 1
   displayName: Dirt Wall
   tile: {fileID: 11400000, guid: d1b37970827f1134e855e6fd5633b002, type: 2}
   destructible: 1

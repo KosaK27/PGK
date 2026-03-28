@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: WallRegistry
   m_EditorClassIdentifier: Assembly-CSharp::WallRegistry
   walls:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 5026f6ee2f32ca94ea85bc4ff20504a8, type: 2}
+  - {fileID: 11400000, guid: 36b64d5635a7326428c14913b175d818, type: 2}

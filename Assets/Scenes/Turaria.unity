@@ -1201,9 +1201,7 @@ MonoBehaviour:
   worldWidth: 2000
   worldHeight: 1000
   blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
-  wallRegistry: {fileID: 0}
-  foregroundTilemap: {fileID: 1692829430}
-  wallTilemap: {fileID: 0}
+  wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}
 --- !u!4 &1501033226
 Transform:
   m_ObjectHideFlags: 0
