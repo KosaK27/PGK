@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3333760d53772644494b3428b3c63b9b, type: 3}
+  m_Name: WallRegistry
+  m_EditorClassIdentifier: Assembly-CSharp::WallRegistry
+  walls:
+  - {fileID: 11400000, guid: 5026f6ee2f32ca94ea85bc4ff20504a8, type: 2}
+  - {fileID: 11400000, guid: 36b64d5635a7326428c14913b175d818, type: 2}

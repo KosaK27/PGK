@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: IronOre
   tile: {fileID: 11400000, guid: 2dabd4c2823358b4eab67ec924b91b3b, type: 2}
   destructible: 1
-  hardness: 1.5
+  hardness: 3
+  requiredTool: 1
   dropType: 7
   dropAmount: 1

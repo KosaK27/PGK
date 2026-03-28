@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: CoalOre
   tile: {fileID: 11400000, guid: c999a34cfe893fe438d57ec656631d8d, type: 2}
   destructible: 1
-  hardness: 1.5
+  hardness: 2.5
+  requiredTool: 1
   dropType: 8
   dropAmount: 1

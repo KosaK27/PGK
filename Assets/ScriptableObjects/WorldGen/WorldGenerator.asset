@@ -19,6 +19,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ee18ce399cb7764459468d097234c667, type: 2}
   - {fileID: 11400000, guid: ffdea852679f791488e39e87e9f819ca, type: 2}
   - {fileID: 11400000, guid: 979302cb177ded344acfe6841625a188, type: 2}
-  caveNoiseScale: 0.05
+  caveScale: 0.05
   caveThreshold: 0.45
   caveStartDepth: 10
+  wallMappings:
+  - blockType: 1
+    wallType: 1
+  - blockType: 2
+    wallType: 2
+  - blockType: 3
+    wallType: 1
+  - blockType: 5
+    wallType: 1
+  - blockType: 4
+    wallType: 1

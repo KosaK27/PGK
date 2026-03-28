@@ -29,4 +29,12 @@ public class ItemRegistry : ScriptableObject
                 return item;
         return null;
     }
+
+    public ItemDefinition GetByWallType(WallType wallType)
+    {
+        foreach (var item in items)
+            if (item != null && item.isWall && item.wallType == wallType)
+                return item;
+        return null;
+    }
 }

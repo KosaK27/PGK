@@ -3,64 +3,95 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
-    [SerializeField] private float attackRange = 1.5f;
-    [SerializeField] private int attackDamage = 15;
-    [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private float blockReach = 5f;
+    [SerializeField] private Camera    mainCamera;
+    [SerializeField] private float     blockReach = 5f;
 
     void Start()
     {
-        if (mainCamera == null)
-            mainCamera = Camera.main;
+        if (mainCamera == null) mainCamera = Camera.main;
     }
 
     void Update()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            var cell = GetCellUnderMouse();
-            var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
-            if (blockType == BlockType.Air)
-            {
-                var mousePos = Mouse.current.position.ReadValue();
-                var worldPos = mainCamera.ScreenToWorldPoint(
-                    new Vector3(mousePos.x, mousePos.y, 0));
-                worldPos.z = 0;
-                var hits = Physics2D.OverlapCircleAll(worldPos, attackRange, enemyLayer);
-                foreach (var hit in hits)
-                {
-                    var entity = hit.GetComponent<EntityStats>();
-                    if (entity != null)
-                    {
-                        entity.TakeDamage(attackDamage, transform.position);
-                        break;
-                    }
-                }
-            }
-        }
+        if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
+        HandleBreak();
+        HandlePlaceOrWallBreak();
+        HandleDropKey();
+    }
+
+    private void HandleBreak()
+    {
+        var selected = InventorySystem.Instance.SelectedItem;
+        bool isSword = selected != null && !selected.IsEmpty
+                    && selected.item.isTool && selected.item.toolType == ToolType.Sword;
+        if (isSword) { BlockBreakSystem.Instance.CancelBreak(); return; }
 
         if (Mouse.current.leftButton.isPressed)
         {
             var cell = GetCellUnderMouse();
-            if (IsInReach(cell))
-                BlockBreakSystem.Instance.TryBreak(cell, Time.deltaTime);
-            else
-                BlockBreakSystem.Instance.CancelBreak();
+            if (IsInReach(cell)) BlockBreakSystem.Instance.TryBreak(cell, Time.deltaTime);
+            else                 BlockBreakSystem.Instance.CancelBreak();
         }
 
         if (Mouse.current.leftButton.wasReleasedThisFrame)
-        {
             BlockBreakSystem.Instance.CancelBreak();
-        }
+    }
 
-        if (Mouse.current.rightButton.wasPressedThisFrame)
+    private void HandlePlaceOrWallBreak()
+    {
+        var selected = InventorySystem.Instance.SelectedItem;
+        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool
+                    && selected.item.toolType != ToolType.Sword;
+
+        if (Mouse.current.rightButton.isPressed && hasTool)
         {
             var cell = GetCellUnderMouse();
-            if (IsInReach(cell))
-                BlockPlaceSystem.Instance.TryPlace(cell, blockToPlace);
+            if (IsInReach(cell)) WallBreakSystem.Instance.TryBreak(cell, Time.deltaTime);
+            else                 WallBreakSystem.Instance.CancelBreak();
         }
+        else if (Mouse.current.rightButton.wasReleasedThisFrame && hasTool)
+        {
+            WallBreakSystem.Instance.CancelBreak();
+        }
+        else if (Mouse.current.rightButton.wasPressedThisFrame && !hasTool)
+        {
+            var cell = GetCellUnderMouse();
+            if (!IsInReach(cell)) return;
+
+            if (selected != null && !selected.IsEmpty)
+            {
+                if (selected.item.isBlock)
+                {
+                    if (BlockPlaceSystem.Instance.TryPlace(cell, selected.item.blockType))
+                        InventorySystem.Instance.ConsumeSelected(1);
+                }
+                else if (selected.item.isWall)
+                {
+                    if (WallPlaceSystem.Instance.TryPlace(cell, selected.item.wallType))
+                        InventorySystem.Instance.ConsumeSelected(1);
+                }
+            }
+        }
+    }
+
+    private void HandleDropKey()
+    {
+        if (!Keyboard.current.qKey.wasPressedThisFrame) return;
+
+        int idx   = InventorySystem.Instance.SelectedHotbarIndex;
+        var stack = InventorySystem.Instance.GetSlot(idx);
+        if (stack == null || stack.IsEmpty) return;
+
+        int amount     = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
+        Vector2 playerPos  = transform.position;
+        var mousePos       = Mouse.current.position.ReadValue();
+        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
+        mouseWorld.z = 0;
+        Vector2 dir = ((Vector2)mouseWorld - playerPos).normalized;
+        if (dir == Vector2.zero) dir = Vector2.right;
+
+        ItemDropSystem.Instance.DropItem(new ItemStack(stack.item, amount), playerPos, dir.x);
+        InventorySystem.Instance.RemoveItem(stack.item, amount);
     }
 
     private bool IsInReach(Vector3Int cell)
