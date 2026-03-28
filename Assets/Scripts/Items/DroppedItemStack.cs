@@ -20,6 +20,7 @@ public class DroppedItemStack : MonoBehaviour
     private float _stackCheckInterval = 0.2f;
     private bool _frozen = false;
     private float _defaultLifetime;
+    public float SpawnTime => _spawnTime;
 
     public bool CanBePickedUp => Time.time > _spawnTime + _pickupDelay;
 

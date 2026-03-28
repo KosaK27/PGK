@@ -12,6 +12,7 @@ public class BlockData : ScriptableObject
     [Header("Properties")]
     public bool destructible = true;
     public float hardness = 1f;
+    public ToolType requiredTool = ToolType.None;
 
     [Header("Drop")]
     public BlockType dropType;

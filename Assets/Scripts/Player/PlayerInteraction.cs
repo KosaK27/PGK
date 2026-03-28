@@ -4,10 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] private Camera    mainCamera;
-    [SerializeField] private float     attackRange  = 1.5f;
-    [SerializeField] private int       attackDamage = 15;
-    [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private float     blockReach   = 5f;
+    [SerializeField] private float     blockReach = 5f;
 
     void Start()
     {
@@ -16,19 +13,17 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
-        HandleAttackAndBreak();
+        HandleBreak();
         HandlePlacement();
         HandleDropKey();
     }
 
-    private void HandleAttackAndBreak()
+    private void HandleBreak()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            var cell = GetCellUnderMouse();
-            if (WorldManager.Instance.GetBlock(cell.x, cell.y) == BlockType.Air)
-                TryAttack();
-        }
+        var selected = InventorySystem.Instance.SelectedItem;
+        bool isSword = selected != null && !selected.IsEmpty
+                    && selected.item.isTool && selected.item.toolType == ToolType.Sword;
+        if (isSword) { BlockBreakSystem.Instance.CancelBreak(); return; }
 
         if (Mouse.current.leftButton.isPressed)
         {
@@ -39,19 +34,6 @@ public class PlayerInteraction : MonoBehaviour
 
         if (Mouse.current.leftButton.wasReleasedThisFrame)
             BlockBreakSystem.Instance.CancelBreak();
-    }
-
-    private void TryAttack()
-    {
-        var mousePos = Mouse.current.position.ReadValue();
-        var worldPos = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
-        worldPos.z   = 0;
-        var hits = Physics2D.OverlapCircleAll(worldPos, attackRange, enemyLayer);
-        foreach (var hit in hits)
-        {
-            var entity = hit.GetComponent<EntityStats>();
-            if (entity != null) { entity.TakeDamage(attackDamage, transform.position); break; }
-        }
     }
 
     private void HandlePlacement()

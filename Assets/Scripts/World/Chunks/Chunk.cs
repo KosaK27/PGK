@@ -24,7 +24,7 @@ public class Chunk : MonoBehaviour
         _tilemap = gameObject.AddComponent<Tilemap>();
         
         var renderer = gameObject.AddComponent<TilemapRenderer>();
-        renderer.sortingOrder = -999;
+        renderer.sortingOrder = 100;
 
         _tilemapCollider = gameObject.AddComponent<TilemapCollider2D>();
         _tilemapCollider.compositeOperation = Collider2D.CompositeOperation.Merge;
