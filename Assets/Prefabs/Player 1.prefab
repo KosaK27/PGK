@@ -510,6 +510,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 8
   jumpForce: 20
+  maxJumps: 2
+  dashSpeed: 18
+  dashDuration: 0.3
+  dashCooldown: 0.8
   isGrounded: 0
 --- !u!114 &8586743150569446516
 MonoBehaviour:
@@ -591,8 +595,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac9475d5ca6cb0c49b8630914902c7e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPickup
-  pickupRadius: 2
-  pickupDelay: 3
+  pickupRadius: 4
+  pickupDelay: 1
 --- !u!114 &703254176258799059
 MonoBehaviour:
   m_ObjectHideFlags: 0
