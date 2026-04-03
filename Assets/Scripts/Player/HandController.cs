@@ -9,12 +9,14 @@ public class HandController : MonoBehaviour
     private ToolSwing _toolSwing;
     private MeleeWeapon _meleeWeapon;
     private PlayerArmAnimator _arm;
+    private PlayerMovement _movement;
 
     void Awake()
     {
         _arm = GetComponent<PlayerArmAnimator>();
         _toolSwing = GetComponent<ToolSwing>();
         _meleeWeapon = GetComponent<MeleeWeapon>();
+        _movement = GetComponent<PlayerMovement>();
 
         if (toolRoot != null)
             _toolRenderer = toolRoot.GetComponentInChildren<SpriteRenderer>();
@@ -31,6 +33,7 @@ public class HandController : MonoBehaviour
         if (!hasItem || !selected.item.IsHandheld)
         {
             HideAll();
+            _movement.ActionState = PlayerActionState.None;
             return;
         }
 
@@ -41,11 +44,16 @@ public class HandController : MonoBehaviour
         if (selected.item.isWeapon)
         {
             _meleeWeapon.UpdateWeapon(selected.item, lmbPressed, lmbHeld);
-            if (lmbReleased) _toolSwing.Cancel();
+            _movement.ActionState = _meleeWeapon.IsSwinging
+                ? PlayerActionState.UsingWeapon
+                : PlayerActionState.None;
         }
         else if (selected.item.isTool)
         {
             _toolSwing.UpdateSwing(selected.item, lmbHeld);
+            _movement.ActionState = lmbHeld
+                ? PlayerActionState.UsingTool
+                : PlayerActionState.None;
             if (lmbReleased) _meleeWeapon.Cancel();
         }
     }

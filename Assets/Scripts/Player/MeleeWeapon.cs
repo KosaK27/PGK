@@ -20,7 +20,7 @@ public class MeleeWeapon : MonoBehaviour
     private float _localStartAngle;
     private float _localEndAngle;
     private float _hitboxAngle;
-    private bool _swingFromTop = true;
+    private bool _chainSwing;
 
     private GameObject _activeHitbox;
     private Vector3 _hitboxOffset;
@@ -44,6 +44,9 @@ public class MeleeWeapon : MonoBehaviour
 
     public void UpdateWeapon(ItemDefinition item, bool lmbPressed, bool lmbHeld)
     {
+        if (lmbHeld && !lmbPressed && _isSwinging) _chainSwing = true;
+        if (!lmbHeld) _chainSwing = false;
+
         _currentDamage = item.damage;
         _currentHitboxSize = item.hitboxSize;
         _currentHitboxDistance = item.hitboxDistance;
@@ -82,25 +85,33 @@ public class MeleeWeapon : MonoBehaviour
                 _isSwinging = false;
                 ClearHitbox();
                 if (_toolRenderer != null) _toolRenderer.enabled = false;
-                if (lmbHeld) StartSwing(item);
+
+                if (_chainSwing)
+                {
+                    _chainSwing = false;
+                    StartSwing(item);
+                }
             }
             return;
         }
 
         if (_toolRenderer != null) _toolRenderer.enabled = false;
-        if (lmbPressed) StartSwing(item);
+
+        if (lmbPressed)
+            StartSwing(item);
     }
 
     public void Cancel()
     {
         _isSwinging = false;
-        _swingFromTop = true;
+        _chainSwing = false;
         ClearHitbox();
         if (_toolRenderer != null) _toolRenderer.enabled = false;
     }
 
     private void StartSwing(ItemDefinition item)
     {
+        _chainSwing = false;
         _arm.FaceTowardCursor();
 
         Vector3 mouseWorld = _cam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
@@ -113,18 +124,8 @@ public class MeleeWeapon : MonoBehaviour
         dir.y = -dir.y;
         float visualAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
-        if (_swingFromTop)
-        {
-            _localStartAngle = visualAngle - arcDegrees * 0.5f;
-            _localEndAngle = visualAngle + arcDegrees * 0.5f;
-        }
-        else
-        {
-            _localStartAngle = visualAngle + arcDegrees * 0.5f;
-            _localEndAngle = visualAngle - arcDegrees * 0.5f;
-        }
-
-        _swingFromTop = !_swingFromTop;
+        _localStartAngle = visualAngle - arcDegrees * 0.5f;
+        _localEndAngle = visualAngle + arcDegrees * 0.5f;
         _swingTimer = 0f;
         _isSwinging = true;
 

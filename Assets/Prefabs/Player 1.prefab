@@ -612,6 +612,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af7d9bd61b17be640a45c8206a300f3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerToolHolder
+  angleOffsetUp: -45
+  angleOffsetForward: 0
+  angleOffsetDown: 45
 --- !u!114 &5439477180617477063
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -692,6 +695,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af7d9bd61b17be640a45c8206a300f3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolSwing
+  angleOffsetUp: -45
+  angleOffsetForward: 0
+  angleOffsetDown: 45
 --- !u!114 &3878274592790930452
 MonoBehaviour:
   m_ObjectHideFlags: 0
