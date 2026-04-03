@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerAnimator : MonoBehaviour
+public class PlayerAnimation : MonoBehaviour
 {
     [Header("Leg Sprites")]
     public Sprite legsIdle;
@@ -18,72 +18,64 @@ public class PlayerAnimator : MonoBehaviour
     public Sprite[] backArmWalk = new Sprite[4];
     public Sprite backArmJump;
 
-    [Header("Child Renderers")]
+    [Header("Renderers")]
     public SpriteRenderer legsRenderer;
     public SpriteRenderer frontArmRenderer;
     public SpriteRenderer backArmRenderer;
-    public SpriteRenderer torsoRenderer;
-    public SpriteRenderer headRenderer;
-    public SpriteRenderer hairRenderer;
 
     [Header("Settings")]
     public float walkFrameRate = 8f;
 
-    private Rigidbody2D rb;
-    private PlayerMovement movement;
-    private float walkTimer;
-    private int walkFrame;
-    private bool facingRight = true;
+    private PlayerMovement _movement;
+    private float _walkTimer;
+    private int _walkFrame;
 
     void Start()
     {
-        rb       = GetComponent<Rigidbody2D>();
-        movement = GetComponent<PlayerMovement>();
+        _movement = GetComponent<PlayerMovement>();
     }
 
     void Update()
     {
-        bool isGrounded  = movement.isGrounded;
-        bool movingLeft  = Keyboard.current.aKey.isPressed;
+        var state = _movement.State;
+        if (state == PlayerState.Dead) return;
+
+        bool movingLeft = Keyboard.current.aKey.isPressed;
         bool movingRight = Keyboard.current.dKey.isPressed;
-        bool isWalking   = movingLeft || movingRight;
-        if (movingRight) facingRight = true;
-        else if (movingLeft) facingRight = false;
 
-        transform.localScale = new Vector3(facingRight ? -1f : 1f, 1f, 1f);
+        if (movingRight) transform.localScale = new Vector3(-1f, 1f, 1f);
+        else if (movingLeft) transform.localScale = new Vector3(1f, 1f, 1f);
 
-        if (isWalking && isGrounded)
+        bool walking = state == PlayerState.Walk;
+        if (walking)
         {
-            walkTimer += Time.deltaTime;
-            if (walkTimer >= 1f / walkFrameRate)
-            {
-                walkTimer = 0f;
-                walkFrame = (walkFrame + 1) % 4;
-            }
+            _walkTimer += Time.deltaTime;
+            if (_walkTimer >= 1f / walkFrameRate) { _walkTimer = 0f; _walkFrame = (_walkFrame + 1) % 4; }
         }
         else
         {
-            walkTimer = 0f;
-            walkFrame = 0;
+            _walkTimer = 0f;
+            _walkFrame = 0;
         }
 
-        if (!isGrounded)
+        switch (state)
         {
-            legsRenderer.sprite     = legsJump;
-            frontArmRenderer.sprite = frontArmJump;
-            backArmRenderer.sprite  = backArmJump;
-        }
-        else if (isWalking)
-        {
-            legsRenderer.sprite     = legsWalk[walkFrame];
-            frontArmRenderer.sprite = frontArmWalk[walkFrame];
-            backArmRenderer.sprite  = backArmWalk[walkFrame];
-        }
-        else
-        {
-            legsRenderer.sprite     = legsIdle;
-            frontArmRenderer.sprite = frontArmIdle;
-            backArmRenderer.sprite  = backArmIdle;
+            case PlayerState.Jump:
+            case PlayerState.Dash:
+                legsRenderer.sprite = legsJump;
+                frontArmRenderer.sprite = frontArmJump;
+                backArmRenderer.sprite = backArmJump;
+                break;
+            case PlayerState.Walk:
+                legsRenderer.sprite = legsWalk[_walkFrame];
+                frontArmRenderer.sprite = frontArmWalk[_walkFrame];
+                backArmRenderer.sprite = backArmWalk[_walkFrame];
+                break;
+            default:
+                legsRenderer.sprite = legsIdle;
+                frontArmRenderer.sprite = frontArmIdle;
+                backArmRenderer.sprite = backArmIdle;
+                break;
         }
     }
 }

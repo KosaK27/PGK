@@ -7,12 +7,12 @@ public class BreakSystem : MonoBehaviour
     public static BreakSystem Instance { get; private set; }
 
     [SerializeField] private BlockRegistry blockRegistry;
-    [SerializeField] private WallRegistry  wallRegistry;
-    [SerializeField] private ItemRegistry  itemRegistry;
+    [SerializeField] private WallRegistry wallRegistry;
+    [SerializeField] private ItemRegistry itemRegistry;
 
-    private BlockBreakProgress _breakProgress    = new();
-    private Vector3Int         _currentBreakCell = new(int.MinValue, 0, 0);
-    private BreakTarget        _currentTarget;
+    private BlockBreakProgress _breakProgress = new();
+    private Vector3Int _currentBreakCell = new(int.MinValue, 0, 0);
+    private BreakTarget _currentTarget;
 
     void Awake()
     {
@@ -23,14 +23,13 @@ public class BreakSystem : MonoBehaviour
     public bool TryBreak(Vector3Int cell, BreakTarget target, float deltaTime)
     {
         if (!ChunkManager.Instance.IsChunkLoaded(new Vector2(cell.x, cell.y))) return false;
-
         if (!TryGetEffectiveHardness(cell, target, out float effectiveHardness)) return false;
 
         if (cell != _currentBreakCell || target != _currentTarget)
         {
             _breakProgress.Reset(_currentBreakCell);
             _currentBreakCell = cell;
-            _currentTarget    = target;
+            _currentTarget = target;
         }
 
         _breakProgress.Add(cell, deltaTime);
@@ -42,10 +41,8 @@ public class BreakSystem : MonoBehaviour
 
             var worldPos = WorldManager.Instance.CellToWorld(cell.x, cell.y) + new Vector3(0.5f, 0.5f, 0);
 
-            if (target == BreakTarget.Block)
-                FinishBreakBlock(cell, worldPos);
-            else
-                FinishBreakWall(cell, worldPos);
+            if (target == BreakTarget.Block) FinishBreakBlock(cell, worldPos);
+            else FinishBreakWall(cell, worldPos);
 
             return true;
         }
@@ -70,10 +67,17 @@ public class BreakSystem : MonoBehaviour
         effectiveHardness = 0f;
 
         var selected = InventorySystem.Instance.SelectedItem;
-        bool isTool  = selected != null && !selected.IsEmpty && selected.item.isTool;
-        var toolType = isTool ? selected.item.toolType : ToolType.None;
 
-        if (toolType == ToolType.Sword) return false;
+        if (selected == null || selected.IsEmpty)
+            return false;
+
+        var item = selected.item;
+
+        if (!item.isTool) return false;
+
+        if (item.isWeapon) return false;
+
+        var toolType = item.toolType;
 
         if (target == BreakTarget.Block)
         {
@@ -83,7 +87,7 @@ public class BreakSystem : MonoBehaviour
             var data = blockRegistry.Get(blockType);
             if (data == null || !data.destructible) return false;
 
-            effectiveHardness = (isTool && toolType == data.requiredTool)
+            effectiveHardness = toolType == data.requiredTool
                 ? data.hardness / selected.item.breakingSpeed
                 : data.hardness * 2f;
         }
@@ -95,7 +99,7 @@ public class BreakSystem : MonoBehaviour
             var data = wallRegistry.Get(wallType);
             if (data == null || !data.destructible) return false;
 
-            effectiveHardness = (isTool && toolType != ToolType.None && toolType == data.requiredTool)
+            effectiveHardness = toolType != ToolType.None && toolType == data.requiredTool
                 ? data.hardness / selected.item.breakingSpeed
                 : data.hardness * 2f;
         }
@@ -106,8 +110,7 @@ public class BreakSystem : MonoBehaviour
     private void FinishBreakBlock(Vector3Int cell, Vector3 worldPos)
     {
         var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
-        var data      = blockRegistry.Get(blockType);
-
+        var data = blockRegistry.Get(blockType);
         WorldManager.Instance.DestroyBlock(cell.x, cell.y);
 
         if (data.dropType != BlockType.Air)
@@ -121,8 +124,7 @@ public class BreakSystem : MonoBehaviour
     private void FinishBreakWall(Vector3Int cell, Vector3 worldPos)
     {
         var wallType = WorldManager.Instance.GetWall(cell.x, cell.y);
-        var data     = wallRegistry.Get(wallType);
-
+        var data = wallRegistry.Get(wallType);
         WorldManager.Instance.DestroyWall(cell.x, cell.y);
 
         if (data.dropType != WallType.None)

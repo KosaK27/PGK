@@ -14,10 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 9
   displayName: Stone Sword
-  sprite: {fileID: 5807921338739458136, guid: cd11b602afd512f4185ad8159f418d0c, type: 3}
+  sprite: {fileID: 712035800519618848, guid: 44a9b63cd97d4844e91f323d147046a1, type: 3}
   maxStack: 1
   isBlock: 0
   blockType: 0
-  isTool: 1
-  toolType: 4
+  isWall: 0
+  wallType: 0
+  isTool: 0
+  toolType: 0
   breakingSpeed: 1
+  isWeapon: 1
+  weaponType: 1
+  damage: 10
+  hitboxSize: {x: 3, y: 2}
+  hitboxDistance: 0
+  holdPositionUp: {x: -0.75, y: 1}
+  holdPositionForward: {x: -0.7, y: 0}
+  holdPositionDown: {x: -0.6, y: -1}

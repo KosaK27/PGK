@@ -1,5 +1,7 @@
 using UnityEngine;
 
+public enum EntityState { Patrol, Chase, Attack, Dead }
+
 [RequireComponent(typeof(EntityStats))]
 public abstract class EntityAI : MonoBehaviour
 {
@@ -7,6 +9,8 @@ public abstract class EntityAI : MonoBehaviour
     protected Transform player;
     protected Rigidbody2D rb;
     protected SpriteRenderer sr;
+
+    public EntityState State { get; protected set; } = EntityState.Patrol;
 
     protected float distanceToPlayer =>
         player != null ? Vector2.Distance(transform.position, player.position) : float.MaxValue;
@@ -21,24 +25,25 @@ public abstract class EntityAI : MonoBehaviour
     protected virtual void Start()
     {
         var playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-            player = playerObj.transform;
-
+        if (playerObj != null) player = playerObj.transform;
         stats.OnDeath += OnDeath;
     }
 
     protected virtual void Update()
     {
-        if (stats.IsDead) return;
+        if (State == EntityState.Dead) return;
+        UpdateState();
         Tick();
     }
 
+    protected abstract void UpdateState();
     protected abstract void Tick();
 
     protected virtual void OnDeath()
     {
-        enabled = false;
+        State = EntityState.Dead;
         if (rb != null) rb.linearVelocity = Vector2.zero;
+        enabled = false;
     }
 
     protected void FlipTowards(float directionX)

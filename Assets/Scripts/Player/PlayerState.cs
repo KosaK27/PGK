@@ -1,0 +1,1 @@
+public enum PlayerState { Idle, Walk, Jump, Dash, Dead }

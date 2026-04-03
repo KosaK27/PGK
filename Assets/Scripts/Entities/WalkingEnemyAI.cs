@@ -2,23 +2,20 @@ using UnityEngine;
 
 public class WalkingEnemyAI : EntityAI
 {
-    private enum State { Patrol, Chase, Attack }
-    private State _state = State.Patrol;
+    [SerializeField] private float jumpForce = 7f;
 
     private float _patrolTimer;
     private float _patrolDir = 1f;
     private bool _isGrounded;
-
     private float _attackCooldown;
-    private const float ATTACK_CD = 1.2f;
-
     private float _stuckTimer;
-    private Vector2 _lastPosition;
-    private const float STUCK_CHECK_INTERVAL = 0.5f;
     private float _stuckCheckTimer;
+    private Vector2 _lastPosition;
+
+    private const float ATTACK_CD = 1.2f;
+    private const float STUCK_CHECK_INTERVAL = 0.5f;
     private const float STUCK_THRESHOLD = 0.1f;
     private const float STUCK_JUMP_DELAY = 3f;
-    [SerializeField] private float jumpForce = 7f;
 
     protected override void Start()
     {
@@ -26,57 +23,28 @@ public class WalkingEnemyAI : EntityAI
         _lastPosition = transform.position;
     }
 
-    protected override void Tick()
+    protected override void UpdateState()
     {
         var d = stats.data;
         float dist = distanceToPlayer;
 
         if (d.isHostile && dist < d.detectionRange)
-            _state = dist < d.attackRange ? State.Attack : State.Chase;
+            State = dist < d.attackRange ? EntityState.Attack : EntityState.Chase;
         else
-            _state = State.Patrol;
+            State = EntityState.Patrol;
+    }
 
-        switch (_state)
-        {
-            case State.Patrol: DoPatrol(d); break;
-            case State.Chase: DoChase(d); break;
-            case State.Attack: DoAttack(d); break;
-        }
-
+    protected override void Tick()
+    {
+        var d = stats.data;
         _attackCooldown -= Time.deltaTime;
 
-        if (_state != State.Attack)
-            CheckStuck();
-    }
-
-    private void CheckStuck()
-    {
-        _stuckCheckTimer -= Time.deltaTime;
-        if (_stuckCheckTimer > 0f) return;
-        _stuckCheckTimer = STUCK_CHECK_INTERVAL;
-
-        float movedDistance = Vector2.Distance(transform.position, _lastPosition);
-        _lastPosition = transform.position;
-
-        bool shouldBeMoving = Mathf.Abs(rb.linearVelocity.x) > 0.05f || _patrolDir != 0f;
-        if (shouldBeMoving && movedDistance < STUCK_THRESHOLD)
+        switch (State)
         {
-            _stuckTimer += STUCK_CHECK_INTERVAL;
-            if (_stuckTimer >= STUCK_JUMP_DELAY && _isGrounded)
-            {
-                Jump();
-                _stuckTimer = 0f;
-            }
+            case EntityState.Patrol: DoPatrol(d); CheckStuck(); break;
+            case EntityState.Chase: DoChase(d); CheckStuck(); break;
+            case EntityState.Attack: DoAttack(); break;
         }
-        else
-        {
-            _stuckTimer = 0f;
-        }
-    }
-
-    private void Jump()
-    {
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
     private void DoPatrol(EntityData d)
@@ -88,7 +56,6 @@ public class WalkingEnemyAI : EntityAI
             if (Random.value < 0.3f) _patrolDir = 0f;
             _patrolTimer = d.patrolChangeInterval;
         }
-
         rb.linearVelocity = new Vector2(_patrolDir * d.moveSpeed * 0.5f, rb.linearVelocity.y);
         FlipTowards(_patrolDir);
     }
@@ -101,12 +68,32 @@ public class WalkingEnemyAI : EntityAI
         FlipTowards(dir);
     }
 
-    private void DoAttack(EntityData d)
+    private void DoAttack()
     {
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        if (_attackCooldown <= 0f) _attackCooldown = ATTACK_CD;
+    }
 
-        if (_attackCooldown <= 0f)
-            _attackCooldown = ATTACK_CD;
+    private void CheckStuck()
+    {
+        _stuckCheckTimer -= Time.deltaTime;
+        if (_stuckCheckTimer > 0f) return;
+        _stuckCheckTimer = STUCK_CHECK_INTERVAL;
+
+        float moved = Vector2.Distance(transform.position, _lastPosition);
+        _lastPosition = transform.position;
+
+        bool shouldMove = Mathf.Abs(rb.linearVelocity.x) > 0.05f || _patrolDir != 0f;
+        if (shouldMove && moved < STUCK_THRESHOLD)
+        {
+            _stuckTimer += STUCK_CHECK_INTERVAL;
+            if (_stuckTimer >= STUCK_JUMP_DELAY && _isGrounded)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+                _stuckTimer = 0f;
+            }
+        }
+        else _stuckTimer = 0f;
     }
 
     void OnCollisionStay2D(Collision2D col)

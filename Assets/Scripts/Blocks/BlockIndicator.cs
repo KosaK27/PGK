@@ -7,7 +7,7 @@ public class BlockIndicator : MonoBehaviour
     [SerializeField] private Color hologramColor = new Color(1f, 1f, 1f, 0.4f);
 
     [Header("Break Highlight")]
-    [SerializeField] private Color breakIdleColor   = new Color(1f, 0.3f, 0.1f, 0.5f);
+    [SerializeField] private Color breakIdleColor = new Color(1f, 0.3f, 0.1f, 0.5f);
     [SerializeField] private Color breakActiveColor = new Color(1f, 0.3f, 0.1f, 0.8f);
 
     [Header("Refs")]
@@ -35,20 +35,19 @@ public class BlockIndicator : MonoBehaviour
 
     void Update()
     {
-        var selected  = InventorySystem.Instance.SelectedItem;
-        bool hasBlock = selected != null && !selected.IsEmpty && selected.item.isBlock;
-        bool hasWall  = selected != null && !selected.IsEmpty && selected.item.isWall;
-        bool hasTool  = selected != null && !selected.IsEmpty
-                        && selected.item.isTool
-                        && selected.item.toolType != ToolType.Sword;
+        if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
 
-        var cell      = GetCellUnderMouse();
-        bool inReach  = IsInReach(cell);
+        var selected = InventorySystem.Instance.SelectedItem;
+        bool hasBlock = selected != null && !selected.IsEmpty && selected.item != null && selected.item.isBlock;
+        bool hasWall = selected != null && !selected.IsEmpty && selected.item != null && selected.item.isWall;
+        bool hasTool = selected != null && !selected.IsEmpty && selected.item != null
+                       && selected.item.isTool;
 
-        var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
-        var wallType  = WorldManager.Instance.GetWall(cell.x, cell.y);
-        bool cellHasBlock = blockType != BlockType.Air;
-        bool cellHasWall  = wallType  != WallType.None;
+        var cell = GetCellUnderMouse();
+        bool inReach = IsInReach(cell);
+
+        bool cellHasBlock = WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air;
+        bool cellHasWall = WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None;
 
         bool rightHeld = Mouse.current.rightButton.isPressed;
 
@@ -60,8 +59,8 @@ public class BlockIndicator : MonoBehaviour
             _placeRenderer.enabled = false;
 
         BreakTarget? target = null;
-        if      (hasTool && inReach && cellHasBlock) target = BreakTarget.Block;
-        else if (hasTool && inReach && cellHasWall)  target = BreakTarget.Wall;
+        if (hasTool && inReach && cellHasBlock) target = BreakTarget.Block;
+        else if (hasTool && inReach && cellHasWall) target = BreakTarget.Wall;
 
         if (target.HasValue)
         {
@@ -73,7 +72,7 @@ public class BlockIndicator : MonoBehaviour
                 : Mouse.current.rightButton.isPressed;
 
             float progress = BreakSystem.Instance.GetBreakProgress(cell, target.Value);
-            float pulse    = pressing ? 0.5f + 0.15f * Mathf.Sin(Time.time * 14f) : 0f;
+            float pulse = pressing ? 0.5f + 0.15f * Mathf.Sin(Time.time * 14f) : 0f;
 
             _breakRenderer.color = pressing
                 ? new Color(breakActiveColor.r, breakActiveColor.g,
@@ -92,8 +91,8 @@ public class BlockIndicator : MonoBehaviour
     void ShowPlace(Vector3Int cell, Sprite sprite)
     {
         _placeRenderer.enabled = true;
-        _placeRenderer.sprite  = sprite;
-        _placeRenderer.color   = hologramColor;
+        _placeRenderer.sprite = sprite;
+        _placeRenderer.color = hologramColor;
         _placeGO.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
     }
 

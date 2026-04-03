@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private float  blockReach = 5f;
+    [SerializeField] private float blockReach = 5f;
 
     void Start()
     {
@@ -22,15 +22,15 @@ public class PlayerInteraction : MonoBehaviour
     private void HandleBreak()
     {
         var selected = InventorySystem.Instance.SelectedItem;
-        bool isSword = selected != null && !selected.IsEmpty
-                    && selected.item.isTool && selected.item.toolType == ToolType.Sword;
-        if (isSword) { BreakSystem.Instance.CancelBreak(); return; }
+        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
+
+        if (!hasTool) { BreakSystem.Instance.CancelBreak(); return; }
 
         if (Mouse.current.leftButton.isPressed)
         {
             var cell = GetCellUnderMouse();
             if (IsInReach(cell)) BreakSystem.Instance.TryBreak(cell, BreakTarget.Block, Time.deltaTime);
-            else                 BreakSystem.Instance.CancelBreak();
+            else BreakSystem.Instance.CancelBreak();
         }
 
         if (Mouse.current.leftButton.wasReleasedThisFrame)
@@ -40,14 +40,13 @@ public class PlayerInteraction : MonoBehaviour
     private void HandlePlaceOrWallBreak()
     {
         var selected = InventorySystem.Instance.SelectedItem;
-        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool
-                    && selected.item.toolType != ToolType.Sword;
+        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
 
         if (Mouse.current.rightButton.isPressed && hasTool)
         {
             var cell = GetCellUnderMouse();
             if (IsInReach(cell)) BreakSystem.Instance.TryBreak(cell, BreakTarget.Wall, Time.deltaTime);
-            else                 BreakSystem.Instance.CancelBreak();
+            else BreakSystem.Instance.CancelBreak();
         }
         else if (Mouse.current.rightButton.wasReleasedThisFrame && hasTool)
         {
@@ -78,13 +77,13 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (!Keyboard.current.qKey.wasPressedThisFrame) return;
 
-        int idx   = InventorySystem.Instance.SelectedHotbarIndex;
+        int idx = InventorySystem.Instance.SelectedHotbarIndex;
         var stack = InventorySystem.Instance.GetSlot(idx);
         if (stack == null || stack.IsEmpty) return;
 
-        int amount         = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
-        Vector2 playerPos  = transform.position;
-        var mousePos       = Mouse.current.position.ReadValue();
+        int amount = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
+        Vector2 playerPos = transform.position;
+        var mousePos = Mouse.current.position.ReadValue();
         Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
         mouseWorld.z = 0;
         Vector2 dir = ((Vector2)mouseWorld - playerPos).normalized;
