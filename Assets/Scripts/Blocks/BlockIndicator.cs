@@ -33,61 +33,46 @@ public class BlockIndicator : MonoBehaviour
         _breakRenderer.enabled = false;
     }
 
-    GameObject CreateIndicator(string goName, int sortOrder)
-    {
-        var go = new GameObject(goName);
-        var sr = go.AddComponent<SpriteRenderer>();
-        sr.sortingOrder = sortOrder;
-
-        sr.sprite = CreateWhiteSquareSprite();
-        go.transform.localScale = Vector3.one;
-        return go;
-    }
-
-    Sprite CreateWhiteSquareSprite()
-    {
-        var tex = new Texture2D(1, 1);
-        tex.SetPixel(0, 0, Color.white);
-        tex.Apply();
-        return Sprite.Create(tex,
-            new Rect(0, 0, 1, 1),
-            new Vector2(0.5f, 0.5f),
-            1f);
-    }
-
     void Update()
     {
+        if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
+
         var selected = InventorySystem.Instance.SelectedItem;
-        bool hasBlock = selected != null && !selected.IsEmpty && selected.item.isBlock;
-        bool hasTool = selected != null && !selected.IsEmpty
-                        && selected.item.isTool
-                        && selected.item.toolType != ToolType.Sword;
+        bool hasBlock = selected != null && !selected.IsEmpty && selected.item != null && selected.item.isBlock;
+        bool hasWall = selected != null && !selected.IsEmpty && selected.item != null && selected.item.isWall;
+        bool hasTool = selected != null && !selected.IsEmpty && selected.item != null
+                       && selected.item.isTool;
 
         var cell = GetCellUnderMouse();
         bool inReach = IsInReach(cell);
-        var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
-        bool cellFull = blockType != BlockType.Air;
 
-        if (hasBlock && inReach && !cellFull && HasNeighbor(cell))
-        {
-            _placeRenderer.enabled = true;
-            _placeRenderer.sprite = selected.item.sprite;
-            _placeRenderer.color = hologramColor;
-            _placeGO.transform.position =
-                new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
-        }
-        else _placeRenderer.enabled = false;
+        bool cellHasBlock = WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air;
+        bool cellHasWall = WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None;
 
-        if (hasTool && inReach && cellFull)
+        bool rightHeld = Mouse.current.rightButton.isPressed;
+
+        if (inReach && hasBlock && !cellHasBlock && HasNeighbor(cell))
+            ShowPlace(cell, selected.item.sprite);
+        else if (inReach && hasWall && !cellHasWall && rightHeld)
+            ShowPlace(cell, selected.item.sprite);
+        else
+            _placeRenderer.enabled = false;
+
+        BreakTarget? target = null;
+        if (hasTool && inReach && cellHasBlock) target = BreakTarget.Block;
+        else if (hasTool && inReach && cellHasWall) target = BreakTarget.Wall;
+
+        if (target.HasValue)
         {
             _breakRenderer.enabled = true;
-            _breakGO.transform.position =
-                new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+            _breakGO.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
 
-            bool pressing = Mouse.current.leftButton.isPressed;
-            float progress = BlockBreakSystem.Instance.GetBreakProgress(cell);
-            float pulse = pressing
-                ? 0.5f + 0.15f * Mathf.Sin(Time.time * 14f) : 0f;
+            bool pressing = target == BreakTarget.Block
+                ? Mouse.current.leftButton.isPressed
+                : Mouse.current.rightButton.isPressed;
+
+            float progress = BreakSystem.Instance.GetBreakProgress(cell, target.Value);
+            float pulse = pressing ? 0.5f + 0.15f * Mathf.Sin(Time.time * 14f) : 0f;
 
             _breakRenderer.color = pressing
                 ? new Color(breakActiveColor.r, breakActiveColor.g,
@@ -97,7 +82,18 @@ public class BlockIndicator : MonoBehaviour
             float s = 1f + progress * 0.12f;
             _breakGO.transform.localScale = new Vector3(s, s, 1f);
         }
-        else _breakRenderer.enabled = false;
+        else
+        {
+            _breakRenderer.enabled = false;
+        }
+    }
+
+    void ShowPlace(Vector3Int cell, Sprite sprite)
+    {
+        _placeRenderer.enabled = true;
+        _placeRenderer.sprite = sprite;
+        _placeRenderer.color = hologramColor;
+        _placeGO.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
     }
 
     bool IsInReach(Vector3Int cell)
@@ -123,6 +119,24 @@ public class BlockIndicator : MonoBehaviour
             if (WorldManager.Instance.GetBlock(nb.x, nb.y) != BlockType.Air)
                 return true;
         return false;
+    }
+
+    GameObject CreateIndicator(string goName, int sortOrder)
+    {
+        var go = new GameObject(goName);
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sortingOrder = sortOrder;
+        sr.sprite = CreateWhiteSquareSprite();
+        go.transform.localScale = Vector3.one;
+        return go;
+    }
+
+    Sprite CreateWhiteSquareSprite()
+    {
+        var tex = new Texture2D(1, 1);
+        tex.SetPixel(0, 0, Color.white);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
     }
 
     void OnDestroy()

@@ -380,6 +380,10 @@ GameObject:
   - component: {fileID: 703254176258799059}
   - component: {fileID: 5439477180617477063}
   - component: {fileID: -4352479022709797026}
+  - component: {fileID: 563494656830642947}
+  - component: {fileID: 2005496690065143004}
+  - component: {fileID: 1594963349682887127}
+  - component: {fileID: 3878274592790930452}
   m_Layer: 6
   m_Name: Player 1
   m_TagString: Player
@@ -396,7 +400,7 @@ Transform:
   m_GameObject: {fileID: 4175107969890725933}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.53337, y: 8.82875, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -510,6 +514,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 8
   jumpForce: 20
+  maxJumps: 2
+  dashSpeed: 18
+  dashDuration: 0.3
+  dashCooldown: 0.8
   isGrounded: 0
 --- !u!114 &8586743150569446516
 MonoBehaviour:
@@ -525,6 +533,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   maxHP: 20
   currentHP: 20
+  iframeDuration: 0.6
 --- !u!114 &8844961302905461198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,6 +548,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HitEffect
   flashDuration: 0.12
   flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  iframeBlinkInterval: 0.1
 --- !u!114 &1812226459800828785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,9 +585,6 @@ MonoBehaviour:
   legsRenderer: {fileID: 4290266772917594716}
   frontArmRenderer: {fileID: 8981702099010259705}
   backArmRenderer: {fileID: 7677512927962482125}
-  torsoRenderer: {fileID: 5606949891637271197}
-  headRenderer: {fileID: 51285108776085480}
-  hairRenderer: {fileID: 1664218938550470190}
   walkFrameRate: 6
 --- !u!114 &1346497717015371000
 MonoBehaviour:
@@ -591,8 +598,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac9475d5ca6cb0c49b8630914902c7e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPickup
-  pickupRadius: 2
-  pickupDelay: 3
+  pickupRadius: 4
+  pickupDelay: 1
 --- !u!114 &703254176258799059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -605,21 +612,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af7d9bd61b17be640a45c8206a300f3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerToolHolder
-  frontArmRenderer: {fileID: 8981702099010259705}
-  armUp: {fileID: -6724383200826972151, guid: 6b9f559c8e03cb54bb110a84a31d451b, type: 3}
-  armForward: {fileID: -426616138157428316, guid: 3855133629e47f6449d3d3c789e354f5, type: 3}
-  armDown: {fileID: 3099793813175479135, guid: f59aa70c37695f8439275c71ea8e4285, type: 3}
-  toolPosUp: {x: -0.4, y: 0.6}
-  toolPosForward: {x: -0.5, y: 0}
-  toolPosDown: {x: -0.4, y: -0.6}
-  toolRotUp: -75
-  toolRotForward: -30
-  toolRotDown: -15
-  toolRoot: {fileID: 4531313074957109127}
-  swordHitboxPrefab: {fileID: 7383180676380536301, guid: 96f7dc6411655b742993af124cd85aec, type: 3}
-  hitboxSize: {x: 2.5, y: 1}
-  swordSwingDuration: 0.2
-  swordArcDegrees: 60
+  angleOffsetUp: -45
+  angleOffsetForward: 0
+  angleOffsetDown: 45
 --- !u!114 &5439477180617477063
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -653,6 +648,71 @@ MonoBehaviour:
   breakActiveColor: {r: 1, g: 0.3, b: 0.1, a: 0.8}
   mainCamera: {fileID: 0}
   blockReach: 5
+--- !u!114 &563494656830642947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1f27f17372f5af4fbf1edc3815f9f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerArmAnimator
+  frontArmRenderer: {fileID: 8981702099010259705}
+  armUp: {fileID: -6724383200826972151, guid: 6b9f559c8e03cb54bb110a84a31d451b, type: 3}
+  armForward: {fileID: -426616138157428316, guid: 3855133629e47f6449d3d3c789e354f5, type: 3}
+  armDown: {fileID: 3099793813175479135, guid: f59aa70c37695f8439275c71ea8e4285, type: 3}
+  toolPosUp: {x: 0, y: 0.5}
+  toolPosForward: {x: 0.5, y: 0.2}
+  toolPosDown: {x: 0.3, y: -0.5}
+  toolRotUp: -45
+  toolRotForward: 0
+  toolRotDown: 45
+--- !u!114 &2005496690065143004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ac99a778d88eb4439c2a510172fabd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HandController
+  toolRoot: {fileID: 4531313074957109127}
+--- !u!114 &1594963349682887127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af7d9bd61b17be640a45c8206a300f3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToolSwing
+  angleOffsetUp: -45
+  angleOffsetForward: 0
+  angleOffsetDown: 45
+--- !u!114 &3878274592790930452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2b24b6805f0ab745a15ab4fe1fae500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeWeapon
+  swingDuration: 0.3
+  arcDegrees: 120
+  hitboxPrefab: {fileID: 7383180676380536301, guid: 96f7dc6411655b742993af124cd85aec, type: 3}
 --- !u!1 &5291934614461029377
 GameObject:
   m_ObjectHideFlags: 0

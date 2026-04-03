@@ -188,20 +188,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3b0a0ad213857f47b09e8f75e229168, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapSystem
-  mapPanel: {fileID: 1841882957}
-  mapImage: {fileID: 622301303}
-  playerMarker: {fileID: 1497678276}
-  markersContainer: {fileID: 884211032}
-  textureScale: 2
-  airColor: {r: 0.08, g: 0.08, b: 0.15, a: 1}
-  dirtColor: {r: 0.55, g: 0.35, b: 0.15, a: 1}
-  stoneColor: {r: 0.45, g: 0.45, b: 0.45, a: 1}
-  sandColor: {r: 0.87, g: 0.78, b: 0.45, a: 1}
-  grassColor: {r: 0.25, g: 0.65, b: 0.2, a: 1}
-  snowColor: {r: 1, g: 1, b: 1, a: 1}
-  copperColor: {r: 0.8, g: 0.45, b: 0.2, a: 1}
-  ironColor: {r: 0.75, g: 0.75, b: 0.8, a: 1}
-  coalColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  _panel: {fileID: 1841882957}
+  _image: {fileID: 622301303}
+  _playerMarker: {fileID: 1497678276}
+  _scale: 2
 --- !u!4 &408260021
 Transform:
   m_ObjectHideFlags: 0
@@ -1515,11 +1505,11 @@ RectTransform:
   - {fileID: 544017938}
   m_Father: {fileID: 1773846665}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -30, y: -120}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -30, y: 30}
   m_SizeDelta: {x: 300, y: 300}
-  m_Pivot: {x: 1, y: 1}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &1499389382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1692,8 +1682,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1548276939}
-  - component: {fileID: 1548276938}
-  - component: {fileID: 1548276937}
   - component: {fileID: 1548276940}
   - component: {fileID: 1548276941}
   - component: {fileID: 1548276942}
@@ -1706,32 +1694,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1548276937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1548276936}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef0b878c6977ddf4483d5a035f26c5e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BlockPlaceSystem
---- !u!114 &1548276938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1548276936}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fb227e45994ded4c82a7c17532d21cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BlockBreakSystem
-  blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
-  itemRegistry: {fileID: 11400000, guid: 81c9f440bb275914b95b3e221eb0747b, type: 2}
 --- !u!4 &1548276939
 Transform:
   m_ObjectHideFlags: 0
@@ -1804,9 +1766,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1548276936}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df583c29a00baf44b8f2546b667f0d3c, type: 3}
+  m_Script: {fileID: 11500000, guid: 9fb227e45994ded4c82a7c17532d21cb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WallPlaceSystem
+  m_EditorClassIdentifier: Assembly-CSharp::BreakSystem
+  blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
+  wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}
+  itemRegistry: {fileID: 11400000, guid: 81c9f440bb275914b95b3e221eb0747b, type: 2}
 --- !u!114 &1548276944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1816,11 +1781,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1548276936}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8489ea0dbd093f04dafdbb9e181bb3d7, type: 3}
+  m_Script: {fileID: 11500000, guid: ef0b878c6977ddf4483d5a035f26c5e3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WallBreakSystem
-  wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}
-  itemRegistry: {fileID: 11400000, guid: 81c9f440bb275914b95b3e221eb0747b, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::BlockPlaceSystem
 --- !u!1 &1568410902
 GameObject:
   m_ObjectHideFlags: 0
@@ -3574,19 +3537,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe999ea3f74c0644989a3710e88326d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinimapSystem
-  minimapImage: {fileID: 544017939}
-  playerDot: {fileID: 1525268660}
-  viewRadius: 40
-  texSize: 128
-  airColor: {r: 0.08, g: 0.08, b: 0.15, a: 1}
-  dirtColor: {r: 0.55, g: 0.35, b: 0.15, a: 1}
-  stoneColor: {r: 0.45, g: 0.45, b: 0.45, a: 1}
-  sandColor: {r: 0.87, g: 0.78, b: 0.45, a: 1}
-  grassColor: {r: 0.25, g: 0.65, b: 0.2, a: 1}
-  snowColor: {r: 1, g: 1, b: 1, a: 1}
-  copperColor: {r: 0.8, g: 0.45, b: 0.2, a: 1}
-  ironColor: {r: 0.75, g: 0.75, b: 0.8, a: 1}
-  coalColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  _image: {fileID: 544017939}
+  _playerDot: {fileID: 1525268660}
+  _viewRadius: 40
+  _texSize: 128
 --- !u!4 &1959067153
 Transform:
   m_ObjectHideFlags: 0

@@ -1,89 +1,84 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerAnimator : MonoBehaviour
+public class PlayerAnimation : MonoBehaviour
 {
-    [Header("Leg Sprites")]
     public Sprite legsIdle;
     public Sprite[] legsWalk = new Sprite[4];
     public Sprite legsJump;
 
-    [Header("Front Arm Sprites")]
     public Sprite frontArmIdle;
     public Sprite[] frontArmWalk = new Sprite[4];
     public Sprite frontArmJump;
 
-    [Header("Back Arm Sprites")]
     public Sprite backArmIdle;
     public Sprite[] backArmWalk = new Sprite[4];
     public Sprite backArmJump;
 
-    [Header("Child Renderers")]
     public SpriteRenderer legsRenderer;
     public SpriteRenderer frontArmRenderer;
     public SpriteRenderer backArmRenderer;
-    public SpriteRenderer torsoRenderer;
-    public SpriteRenderer headRenderer;
-    public SpriteRenderer hairRenderer;
 
-    [Header("Settings")]
     public float walkFrameRate = 8f;
 
-    private Rigidbody2D rb;
-    private PlayerMovement movement;
-    private float walkTimer;
-    private int walkFrame;
-    private bool facingRight = true;
+    private PlayerMovement _movement;
+    private float _walkTimer;
+    private int _walkFrame;
 
     void Start()
     {
-        rb       = GetComponent<Rigidbody2D>();
-        movement = GetComponent<PlayerMovement>();
+        _movement = GetComponent<PlayerMovement>();
     }
 
     void Update()
     {
-        bool isGrounded  = movement.isGrounded;
-        bool movingLeft  = Keyboard.current.aKey.isPressed;
+        if (_movement.ActionState == PlayerActionState.Dead) return;
+
+        bool movingLeft = Keyboard.current.aKey.isPressed;
         bool movingRight = Keyboard.current.dKey.isPressed;
-        bool isWalking   = movingLeft || movingRight;
-        if (movingRight) facingRight = true;
-        else if (movingLeft) facingRight = false;
 
-        transform.localScale = new Vector3(facingRight ? -1f : 1f, 1f, 1f);
+        if (movingRight) transform.localScale = new Vector3(-1f, 1f, 1f);
+        else if (movingLeft) transform.localScale = new Vector3(1f, 1f, 1f);
 
-        if (isWalking && isGrounded)
+        bool inAir = _movement.AirState == PlayerAirState.Jumping;
+        bool walking = _movement.LocomotionState == PlayerLocomotionState.Walk;
+
+        if (inAir || _movement.IsDashing)
         {
-            walkTimer += Time.deltaTime;
-            if (walkTimer >= 1f / walkFrameRate)
+            SetArms(frontArmJump, backArmJump);
+            legsRenderer.sprite = legsJump;
+            _walkTimer = 0f;
+            _walkFrame = 0;
+            return;
+        }
+
+        if (walking)
+        {
+            _walkTimer += Time.deltaTime;
+            if (_walkTimer >= 1f / walkFrameRate)
             {
-                walkTimer = 0f;
-                walkFrame = (walkFrame + 1) % 4;
+                _walkTimer = 0f;
+                _walkFrame = (_walkFrame + 1) % 4;
             }
-        }
-        else
-        {
-            walkTimer = 0f;
-            walkFrame = 0;
+
+            legsRenderer.sprite = legsWalk[_walkFrame];
+            SetArms(frontArmWalk[_walkFrame], backArmWalk[_walkFrame]);
+            return;
         }
 
-        if (!isGrounded)
-        {
-            legsRenderer.sprite     = legsJump;
-            frontArmRenderer.sprite = frontArmJump;
-            backArmRenderer.sprite  = backArmJump;
-        }
-        else if (isWalking)
-        {
-            legsRenderer.sprite     = legsWalk[walkFrame];
-            frontArmRenderer.sprite = frontArmWalk[walkFrame];
-            backArmRenderer.sprite  = backArmWalk[walkFrame];
-        }
-        else
-        {
-            legsRenderer.sprite     = legsIdle;
-            frontArmRenderer.sprite = frontArmIdle;
-            backArmRenderer.sprite  = backArmIdle;
-        }
+        _walkTimer = 0f;
+        _walkFrame = 0;
+        legsRenderer.sprite = legsIdle;
+        SetArms(frontArmIdle, backArmIdle);
+    }
+
+    private void SetArms(Sprite front, Sprite back)
+    {
+        if (_movement.ActionState == PlayerActionState.UsingTool ||
+            _movement.ActionState == PlayerActionState.UsingWeapon)
+            return;
+
+        frontArmRenderer.sprite = front;
+        backArmRenderer.sprite = back;
     }
 }

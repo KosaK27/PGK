@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class BlockPlaceSystem : MonoBehaviour
+public class PlaceSystem : MonoBehaviour
 {
-    public static BlockPlaceSystem Instance { get; private set; }
+    public static PlaceSystem Instance { get; private set; }
 
     void Awake()
     {
@@ -10,16 +10,22 @@ public class BlockPlaceSystem : MonoBehaviour
         Instance = this;
     }
 
-    public bool TryPlace(Vector3Int cell, BlockType typeToPlace)
+    public bool TryPlace(Vector3Int cell, BlockType blockType)
     {
         if (!ChunkManager.Instance.IsChunkLoaded(new Vector2(cell.x, cell.y))) return false;
-        
-        bool hasNeighbor = HasNeighbor(cell);
-        
-        if (!hasNeighbor) return false;
+        if (!HasNeighbor(cell)) return false;
         if (WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air) return false;
 
-        WorldManager.Instance.PlaceBlock(cell.x, cell.y, typeToPlace);
+        WorldManager.Instance.PlaceBlock(cell.x, cell.y, blockType);
+        return true;
+    }
+
+    public bool TryPlace(Vector3Int cell, WallType wallType)
+    {
+        if (!ChunkManager.Instance.IsChunkLoaded(new Vector2(cell.x, cell.y))) return false;
+        if (WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None) return false;
+
+        WorldManager.Instance.PlaceWall(cell.x, cell.y, wallType);
         return true;
     }
 

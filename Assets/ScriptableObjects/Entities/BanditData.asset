@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: BanditEnemy
   isHostile: 1
   maxHP: 30
-  contactDamage: 25
+  contactDamage: 5
   moveSpeed: 3
   detectionRange: 8
   attackRange: 0.8
