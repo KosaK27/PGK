@@ -32,6 +32,12 @@ public class BreakSystem : MonoBehaviour
             _currentTarget = target;
         }
 
+        if (target == BreakTarget.Block)
+        {
+            if (MultitileObjectSystem.Instance.IsSupporting(new Vector2Int(cell.x, cell.y)))
+                return false;
+        }
+        
         _breakProgress.Add(cell, deltaTime);
 
         if (_breakProgress.IsComplete(cell, effectiveHardness))

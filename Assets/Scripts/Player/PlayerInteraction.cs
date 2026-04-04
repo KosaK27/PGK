@@ -24,17 +24,41 @@ public class PlayerInteraction : MonoBehaviour
         var selected = InventorySystem.Instance.SelectedItem;
         bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
 
-        if (!hasTool) { BreakSystem.Instance.CancelBreak(); return; }
+        if (!hasTool)
+        {
+            BreakSystem.Instance.CancelBreak();
+            MultitileObjectSystem.Instance.CancelBreak();
+            return;
+        }
 
         if (Mouse.current.leftButton.isPressed)
         {
             var cell = GetCellUnderMouse();
-            if (IsInReach(cell)) BreakSystem.Instance.TryBreak(cell, BreakTarget.Block, Time.deltaTime);
-            else BreakSystem.Instance.CancelBreak();
+            if (!IsInReach(cell))
+            {
+                BreakSystem.Instance.CancelBreak();
+                MultitileObjectSystem.Instance.CancelBreak();
+                return;
+            }
+
+            var cellV2 = new Vector2Int(cell.x, cell.y);
+            if (MultitileObjectSystem.Instance.IsOccupied(cellV2))
+            {
+                BreakSystem.Instance.CancelBreak();
+                MultitileObjectSystem.Instance.TryBreak(cellV2, Time.deltaTime);
+            }
+            else
+            {
+                MultitileObjectSystem.Instance.CancelBreak();
+                BreakSystem.Instance.TryBreak(cell, BreakTarget.Block, Time.deltaTime);
+            }
         }
 
         if (Mouse.current.leftButton.wasReleasedThisFrame)
+        {
             BreakSystem.Instance.CancelBreak();
+            MultitileObjectSystem.Instance.CancelBreak();
+        }
     }
 
     private void HandlePlaceOrWallBreak()
@@ -55,20 +79,23 @@ public class PlayerInteraction : MonoBehaviour
         else if (Mouse.current.rightButton.wasPressedThisFrame && !hasTool)
         {
             var cell = GetCellUnderMouse();
-            if (!IsInReach(cell)) return;
+            if (!IsInReach(cell) || selected == null || selected.IsEmpty) return;
 
-            if (selected != null && !selected.IsEmpty)
+            if (selected.item.isBlock)
             {
-                if (selected.item.isBlock)
-                {
-                    if (PlaceSystem.Instance.TryPlace(cell, selected.item.blockType))
-                        InventorySystem.Instance.ConsumeSelected(1);
-                }
-                else if (selected.item.isWall)
-                {
-                    if (PlaceSystem.Instance.TryPlace(cell, selected.item.wallType))
-                        InventorySystem.Instance.ConsumeSelected(1);
-                }
+                if (PlaceSystem.Instance.TryPlace(cell, selected.item.blockType))
+                    InventorySystem.Instance.ConsumeSelected(1);
+            }
+            else if (selected.item.isWall)
+            {
+                if (PlaceSystem.Instance.TryPlace(cell, selected.item.wallType))
+                    InventorySystem.Instance.ConsumeSelected(1);
+            }
+            else if (selected.item.isMultitileObject && selected.item.multitileObjectDefinition != null)
+            {
+                var origin = new Vector2Int(cell.x, cell.y);
+                if (MultitileObjectSystem.Instance.TryPlace(origin, selected.item.multitileObjectDefinition))
+                    InventorySystem.Instance.ConsumeSelected(1);
             }
         }
     }

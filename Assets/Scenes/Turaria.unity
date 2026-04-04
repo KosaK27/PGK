@@ -1687,6 +1687,7 @@ GameObject:
   - component: {fileID: 1548276942}
   - component: {fileID: 1548276944}
   - component: {fileID: 1548276943}
+  - component: {fileID: 1548276945}
   m_Layer: 0
   m_Name: Systems
   m_TagString: Untagged
@@ -1784,6 +1785,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef0b878c6977ddf4483d5a035f26c5e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockPlaceSystem
+--- !u!114 &1548276945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548276936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae7b7824ad3c98540b93af5149afd330, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultitileObjectSystem
 --- !u!1 &1568410902
 GameObject:
   m_ObjectHideFlags: 0

@@ -631,6 +631,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c7333205c942f71409dd30b67723441a, type: 2}
   - {fileID: 11400000, guid: c6e46751f3e037447b80201805d2f86c, type: 2}
   - {fileID: 11400000, guid: 220270b926b29914b8af9db59c88f789, type: 2}
+  - {fileID: 11400000, guid: 24aca1424333d3149ab5c59b9e0efae3, type: 2}
 --- !u!114 &-4352479022709797026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -643,11 +644,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad0c9c7f7d4be740a7b89d6ac1f3bbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockIndicator
-  hologramColor: {r: 1, g: 1, b: 1, a: 0.4}
-  breakIdleColor: {r: 1, g: 0.3, b: 0.1, a: 0.5}
-  breakActiveColor: {r: 1, g: 0.3, b: 0.1, a: 0.8}
-  mainCamera: {fileID: 0}
-  blockReach: 5
+  _placeColor: {r: 1, g: 1, b: 1, a: 0.4}
+  _breakIdleColor: {r: 1, g: 0.3, b: 0.1, a: 0.5}
+  _breakActiveColor: {r: 1, g: 0.3, b: 0.1, a: 0.8}
+  _cam: {fileID: 0}
+  _reach: 5
 --- !u!114 &563494656830642947
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,145 +3,182 @@ using UnityEngine.InputSystem;
 
 public class BlockIndicator : MonoBehaviour
 {
-    [Header("Place Hologram")]
-    [SerializeField] private Color hologramColor = new Color(1f, 1f, 1f, 0.4f);
+    [SerializeField] private Color _placeColor = new(1f, 1f, 1f, 0.4f);
+    [SerializeField] private Color _breakIdleColor = new(1f, 0.3f, 0.1f, 0.5f);
+    [SerializeField] private Color _breakActiveColor = new(1f, 0.3f, 0.1f, 0.8f);
+    [SerializeField] private Camera _cam;
+    [SerializeField] private float _reach = 5f;
 
-    [Header("Break Highlight")]
-    [SerializeField] private Color breakIdleColor = new Color(1f, 0.3f, 0.1f, 0.5f);
-    [SerializeField] private Color breakActiveColor = new Color(1f, 0.3f, 0.1f, 0.8f);
-
-    [Header("Refs")]
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private float blockReach = 5f;
-
-    private SpriteRenderer _placeRenderer;
-    private SpriteRenderer _breakRenderer;
-    private GameObject _placeGO;
-    private GameObject _breakGO;
+    private SpriteRenderer _placeSr;
+    private SpriteRenderer _breakSr;
+    private GameObject _placeGo;
+    private GameObject _breakGo;
 
     void Awake()
     {
-        if (mainCamera == null) mainCamera = Camera.main;
-
-        _placeGO = CreateIndicator("_PlaceHologram", 200);
-        _breakGO = CreateIndicator("_BreakHighlight", 199);
-
-        _placeRenderer = _placeGO.GetComponent<SpriteRenderer>();
-        _breakRenderer = _breakGO.GetComponent<SpriteRenderer>();
-
-        _placeRenderer.enabled = false;
-        _breakRenderer.enabled = false;
+        if (_cam == null) _cam = Camera.main;
+        _placeGo = MakeIndicator("PlaceHologram", 1);
+        _breakGo = MakeIndicator("BreakHighlight", 199);
+        _placeSr = _placeGo.GetComponent<SpriteRenderer>();
+        _breakSr = _breakGo.GetComponent<SpriteRenderer>();
+        _placeSr.enabled = false;
+        _breakSr.enabled = false;
     }
 
     void Update()
     {
         if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
 
-        var selected = InventorySystem.Instance.SelectedItem;
-        bool hasBlock = selected != null && !selected.IsEmpty && selected.item != null && selected.item.isBlock;
-        bool hasWall = selected != null && !selected.IsEmpty && selected.item != null && selected.item.isWall;
-        bool hasTool = selected != null && !selected.IsEmpty && selected.item != null
-                       && selected.item.isTool;
+        var item = InventorySystem.Instance.SelectedItem;
+        bool hasBlock = item != null && !item.IsEmpty && item.item != null && item.item.isBlock;
+        bool hasWall = item != null && !item.IsEmpty && item.item != null && item.item.isWall;
+        bool hasMultitile = item != null && !item.IsEmpty && item.item != null
+            && item.item.isMultitileObject && item.item.multitileObjectDefinition != null;
+        bool hasTool = item != null && !item.IsEmpty && item.item != null && item.item.isTool;
 
-        var cell = GetCellUnderMouse();
-        bool inReach = IsInReach(cell);
+        var cell = CellUnderMouse();
+        bool inReach = InReach(cell);
+        var cellV2 = new Vector2Int(cell.x, cell.y);
 
         bool cellHasBlock = WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air;
         bool cellHasWall = WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None;
-
+        bool cellHasObject = MultitileObjectSystem.Instance != null && MultitileObjectSystem.Instance.IsOccupied(cellV2);
+        bool cellIsSupporting = MultitileObjectSystem.Instance != null && MultitileObjectSystem.Instance.IsSupporting(cellV2);
         bool rightHeld = Mouse.current.rightButton.isPressed;
 
-        if (inReach && hasBlock && !cellHasBlock && HasNeighbor(cell))
-            ShowPlace(cell, selected.item.sprite);
+        if (inReach && hasMultitile)
+        {
+            var def = item.item.multitileObjectDefinition;
+            bool canPlace = MultitileAreaIsClear(cell, def.size) && HasAllSupportBelow(cell, def.size);
+            _placeSr.enabled = canPlace;
+            if (canPlace)
+            {
+                _placeSr.sprite = item.item.sprite;
+                _placeSr.color = _placeColor;
+                _placeGo.transform.localScale = new Vector3(def.size.x, def.size.y, 1f);
+                _placeGo.transform.position = new Vector3(cell.x + def.size.x * 0.5f, cell.y + def.size.y * 0.5f);
+            }
+        }
+        else if (inReach && hasBlock && !cellHasBlock && !cellHasObject && HasNeighbor(cell))
+        {
+            _placeSr.enabled = true;
+            _placeSr.sprite = item.item.sprite;
+            _placeSr.color = _placeColor;
+            _placeGo.transform.localScale = Vector3.one;
+            _placeGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+        }
         else if (inReach && hasWall && !cellHasWall && rightHeld)
-            ShowPlace(cell, selected.item.sprite);
-        else
-            _placeRenderer.enabled = false;
-
-        BreakTarget? target = null;
-        if (hasTool && inReach && cellHasBlock) target = BreakTarget.Block;
-        else if (hasTool && inReach && cellHasWall) target = BreakTarget.Wall;
-
-        if (target.HasValue)
         {
-            _breakRenderer.enabled = true;
-            _breakGO.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+            _placeSr.enabled = true;
+            _placeSr.sprite = item.item.sprite;
+            _placeSr.color = _placeColor;
+            _placeGo.transform.localScale = Vector3.one;
+            _placeGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+        }
+        else
+        {
+            _placeSr.enabled = false;
+        }
 
-            bool pressing = target == BreakTarget.Block
-                ? Mouse.current.leftButton.isPressed
-                : Mouse.current.rightButton.isPressed;
+        bool breaking = false;
+        float progress = 0f;
+        bool pressing = false;
 
-            float progress = BreakSystem.Instance.GetBreakProgress(cell, target.Value);
-            float pulse = pressing ? 0.5f + 0.15f * Mathf.Sin(Time.time * 14f) : 0f;
-
-            _breakRenderer.color = pressing
-                ? new Color(breakActiveColor.r, breakActiveColor.g,
-                            breakActiveColor.b, breakActiveColor.a + pulse)
-                : breakIdleColor;
-
+        if (hasTool && inReach && cellHasObject)
+        {
+            breaking = true;
+            pressing = Mouse.current.leftButton.isPressed;
+            progress = MultitileObjectSystem.Instance.GetBreakProgress(cellV2);
+            var obj = MultitileObjectSystem.Instance.Get(cellV2);
+            if (obj != null)
+            {
+                float s = 1f + progress * 0.12f;
+                _breakGo.transform.position = new Vector3(
+                    obj.Origin.x + obj.Definition.size.x * 0.5f,
+                    obj.Origin.y + obj.Definition.size.y * 0.5f);
+                _breakGo.transform.localScale = new Vector3(obj.Definition.size.x * s, obj.Definition.size.y * s, 1f);
+            }
+        }
+        else if (hasTool && inReach && cellHasBlock && !cellIsSupporting)
+        {
+            breaking = true;
+            pressing = Mouse.current.leftButton.isPressed;
+            progress = BreakSystem.Instance.GetBreakProgress(cell, BreakTarget.Block);
             float s = 1f + progress * 0.12f;
-            _breakGO.transform.localScale = new Vector3(s, s, 1f);
+            _breakGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+            _breakGo.transform.localScale = new Vector3(s, s, 1f);
         }
-        else
+        else if (hasTool && inReach && cellHasWall)
         {
-            _breakRenderer.enabled = false;
+            breaking = true;
+            pressing = Mouse.current.rightButton.isPressed;
+            progress = BreakSystem.Instance.GetBreakProgress(cell, BreakTarget.Wall);
+            float s = 1f + progress * 0.12f;
+            _breakGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+            _breakGo.transform.localScale = new Vector3(s, s, 1f);
         }
+
+        if (breaking)
+        {
+            _breakSr.enabled = true;
+            float pulse = pressing ? 0.5f + 0.15f * Mathf.Sin(Time.time * 14f) : 0f;
+            _breakSr.color = pressing
+                ? new Color(_breakActiveColor.r, _breakActiveColor.g, _breakActiveColor.b, _breakActiveColor.a + pulse)
+                : _breakIdleColor;
+        }
+        else _breakSr.enabled = false;
     }
 
-    void ShowPlace(Vector3Int cell, Sprite sprite)
+    private bool MultitileAreaIsClear(Vector3Int origin, Vector2Int size)
     {
-        _placeRenderer.enabled = true;
-        _placeRenderer.sprite = sprite;
-        _placeRenderer.color = hologramColor;
-        _placeGO.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+        for (int y = 0; y < size.y; y++)
+        for (int x = 0; x < size.x; x++)
+        {
+            var c = new Vector2Int(origin.x + x, origin.y + y);
+            if (MultitileObjectSystem.Instance.IsOccupied(c)) return false;
+            if (WorldManager.Instance.GetBlock(c.x, c.y) != BlockType.Air) return false;
+        }
+        return true;
     }
 
-    bool IsInReach(Vector3Int cell)
+    private bool HasAllSupportBelow(Vector3Int origin, Vector2Int size)
     {
-        var center = new Vector2(cell.x + 0.5f, cell.y + 0.5f);
-        return Vector2.Distance(transform.position, center) <= blockReach;
+        for (int x = 0; x < size.x; x++)
+        {
+            var below = new Vector2Int(origin.x + x, origin.y - 1);
+            if (WorldManager.Instance.GetBlock(below.x, below.y) == BlockType.Air) return false;
+        }
+        return true;
     }
 
-    Vector3Int GetCellUnderMouse()
+    private GameObject MakeIndicator(string name, int order)
     {
-        var mp = Mouse.current.position.ReadValue();
-        var wp = mainCamera.ScreenToWorldPoint(new Vector3(mp.x, mp.y, 0));
-        return WorldManager.Instance.WorldToCell(wp);
-    }
-
-    bool HasNeighbor(Vector3Int cell)
-    {
-        Vector3Int[] n = {
-            cell + Vector3Int.up, cell + Vector3Int.down,
-            cell + Vector3Int.left, cell + Vector3Int.right
-        };
-        foreach (var nb in n)
-            if (WorldManager.Instance.GetBlock(nb.x, nb.y) != BlockType.Air)
-                return true;
-        return false;
-    }
-
-    GameObject CreateIndicator(string goName, int sortOrder)
-    {
-        var go = new GameObject(goName);
+        var go = new GameObject(name);
         var sr = go.AddComponent<SpriteRenderer>();
-        sr.sortingOrder = sortOrder;
-        sr.sprite = CreateWhiteSquareSprite();
-        go.transform.localScale = Vector3.one;
-        return go;
-    }
-
-    Sprite CreateWhiteSquareSprite()
-    {
+        sr.sortingOrder = order;
         var tex = new Texture2D(1, 1);
         tex.SetPixel(0, 0, Color.white);
         tex.Apply();
-        return Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+        sr.sprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+        return go;
     }
 
-    void OnDestroy()
+    private bool InReach(Vector3Int cell)
+        => Vector2.Distance(transform.position, new Vector2(cell.x + 0.5f, cell.y + 0.5f)) <= _reach;
+
+    private Vector3Int CellUnderMouse()
     {
-        if (_placeGO != null) Destroy(_placeGO);
-        if (_breakGO != null) Destroy(_breakGO);
+        var mp = Mouse.current.position.ReadValue();
+        return WorldManager.Instance.WorldToCell(_cam.ScreenToWorldPoint(new Vector3(mp.x, mp.y, 0)));
     }
+
+    private bool HasNeighbor(Vector3Int cell)
+    {
+        Vector3Int[] n = { cell + Vector3Int.up, cell + Vector3Int.down, cell + Vector3Int.left, cell + Vector3Int.right };
+        foreach (var nb in n)
+            if (WorldManager.Instance.GetBlock(nb.x, nb.y) != BlockType.Air) return true;
+        return false;
+    }
+
+    void OnDestroy() { if (_placeGo) Destroy(_placeGo); if (_breakGo) Destroy(_breakGo); }
 }

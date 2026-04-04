@@ -19,6 +19,10 @@ public class ItemDefinition : ScriptableObject
     public bool isWall;
     public WallType wallType;
 
+    [Header("Multitile Object")]
+    public bool isMultitileObject;
+    public MultitileObjectDefinition multitileObjectDefinition;
+    
     [Header("Tool")]
     public bool isTool;
     public ToolType toolType;
