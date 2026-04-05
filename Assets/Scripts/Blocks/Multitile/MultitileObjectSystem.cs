@@ -7,7 +7,6 @@ public class MultitileObjectSystem : MonoBehaviour
 
     private readonly Dictionary<Vector2Int, MultitileObject> _cellMap = new();
     private readonly List<MultitileObject> _objects = new();
-
     private MultitileObject _currentBreakTarget;
 
     void Awake()
@@ -28,11 +27,24 @@ public class MultitileObjectSystem : MonoBehaviour
             if (WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air) return false;
         }
 
-        if (!HasSupportBelow(origin, def.size)) return false;
+        if (!HasAllSupportBelow(origin, def.size)) return false;
 
-        var go = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
-        var obj = go.AddComponent<MultitileObject>();
-        obj.Initialize(def, origin);
+        GameObject go;
+        MultitileObject obj;
+
+        if (def is ChestDefinition chestDef)
+        {
+            go = new GameObject($"Chest_{origin.x}_{origin.y}");
+            var chest = go.AddComponent<ChestObject>();
+            chest.InitializeChest(chestDef, origin);
+            obj = chest;
+        }
+        else
+        {
+            go = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
+            obj = go.AddComponent<MultitileObject>();
+            obj.Initialize(def, origin);
+        }
 
         Register(obj);
         return true;
@@ -43,6 +55,8 @@ public class MultitileObjectSystem : MonoBehaviour
         var obj = Get(cell);
         if (obj == null) return false;
 
+        if (obj is ChestObject chest && !IsChestEmpty(chest)) return false;
+
         if (_currentBreakTarget != obj)
         {
             _currentBreakTarget?.ResetBreakProgress();
@@ -50,7 +64,6 @@ public class MultitileObjectSystem : MonoBehaviour
         }
 
         obj.AddBreakProgress(delta);
-
         if (!obj.IsComplete()) return false;
 
         var dropPos = new Vector2(
@@ -61,7 +74,20 @@ public class MultitileObjectSystem : MonoBehaviour
             ItemDropSystem.Instance.DropItem(
                 new ItemStack(obj.Definition.dropItem, obj.Definition.dropAmount), dropPos);
 
+        if (ContainerUIManager.Instance.IsOpen)
+            ContainerUIManager.Instance.CloseContainer();
+
         DestroyObject(obj);
+        return true;
+    }
+
+    private bool IsChestEmpty(ChestObject chest)
+    {
+        for (int i = 0; i < chest.Container.SlotCount; i++)
+        {
+            var slot = chest.Container.GetSlot(i);
+            if (slot != null && !slot.IsEmpty) return false;
+        }
         return true;
     }
 
@@ -85,6 +111,18 @@ public class MultitileObjectSystem : MonoBehaviour
 
     public bool IsOccupied(Vector2Int cell) => _cellMap.ContainsKey(cell);
 
+    public bool IsSupporting(Vector2Int cell)
+    {
+        foreach (var obj in _objects)
+        {
+            var def = obj.Definition;
+            for (int x = 0; x < def.size.x; x++)
+                if (obj.Origin.x + x == cell.x && obj.Origin.y - 1 == cell.y)
+                    return true;
+        }
+        return false;
+    }
+
     private void Register(MultitileObject obj)
     {
         var def = obj.Definition;
@@ -105,7 +143,7 @@ public class MultitileObjectSystem : MonoBehaviour
         Destroy(obj.gameObject);
     }
 
-    private bool HasSupportBelow(Vector2Int origin, Vector2Int size)
+    private bool HasAllSupportBelow(Vector2Int origin, Vector2Int size)
     {
         for (int x = 0; x < size.x; x++)
         {
@@ -113,23 +151,5 @@ public class MultitileObjectSystem : MonoBehaviour
             if (WorldManager.Instance.GetBlock(below.x, below.y) == BlockType.Air) return false;
         }
         return true;
-    }
-
-    public bool IsSupporting(Vector2Int cell)
-    {
-        var above = new Vector2Int(cell.x, cell.y + 1);
-        var obj = Get(above);
-        if (obj != null) return true;
-
-        foreach (var o in _objects)
-        {
-            var def = o.Definition;
-            for (int x = 0; x < def.size.x; x++)
-            {
-                if (o.Origin.x + x == cell.x && o.Origin.y - 1 == cell.y)
-                    return true;
-            }
-        }
-        return false;
     }
 }

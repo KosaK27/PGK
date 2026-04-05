@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8750d00577b73b046952d2476ddb60dc, type: 3}
-  m_Name: MultitileObjectDefinition
+  m_Name: Furnace_Object
   m_EditorClassIdentifier: Assembly-CSharp::MultitileObjectDefinition
   displayName: Furnace
   size: {x: 2, y: 2}

@@ -16,6 +16,7 @@ public class PlayerInteraction : MonoBehaviour
         if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
         HandleBreak();
         HandlePlaceOrWallBreak();
+        HandleInteract();
         HandleDropKey();
     }
 
@@ -98,6 +99,22 @@ public class PlayerInteraction : MonoBehaviour
                     InventorySystem.Instance.ConsumeSelected(1);
             }
         }
+    }
+
+    private void HandleInteract()
+    {
+        if (!Mouse.current.rightButton.wasPressedThisFrame) return;
+
+        var selected = InventorySystem.Instance.SelectedItem;
+        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
+        if (hasTool) return;
+
+        var cell = GetCellUnderMouse();
+        if (!IsInReach(cell)) return;
+
+        var cellV2 = new Vector2Int(cell.x, cell.y);
+        var obj = MultitileObjectSystem.Instance.Get(cellV2);
+        if (obj != null) obj.Interact();
     }
 
     private void HandleDropKey()

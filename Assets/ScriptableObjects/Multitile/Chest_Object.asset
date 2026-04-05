@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34018882d814cec46a856d9a1f65d085, type: 3}
+  m_Name: Chest_Object
+  m_EditorClassIdentifier: Assembly-CSharp::ChestDefinition
+  displayName: Chest
+  size: {x: 2, y: 2}
+  sprite: {fileID: 712035800519618848, guid: 44a9b63cd97d4844e91f323d147046a1, type: 3}
+  hardness: 3
+  requiredTool: 1
+  dropItem: {fileID: 11400000, guid: b282ab5d7399ab749b870d1c9ec577f0, type: 2}
+  dropAmount: 1
+  sortingOrder: 1
+  hasCollision: 0
+  slotCount: 20
