@@ -52,7 +52,7 @@ public class MeleeWeapon : MonoBehaviour
         _currentHitboxDistance = item.hitboxDistance;
 
         _arm.UpdateZone();
-        _arm.FaceTowardCursor();
+        if (lmbHeld) _arm.FaceTowardCursor();
 
         var zone = _arm.CurrentZone;
         Vector2 pos = zone switch

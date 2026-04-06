@@ -74,11 +74,12 @@ public class PlayerAnimation : MonoBehaviour
 
     private void SetArms(Sprite front, Sprite back)
     {
-        if (_movement.ActionState == PlayerActionState.UsingTool ||
-            _movement.ActionState == PlayerActionState.UsingWeapon)
-            return;
+        if (_movement.ActionState != PlayerActionState.UsingTool &&
+            _movement.ActionState != PlayerActionState.UsingWeapon)
+        {
+            frontArmRenderer.sprite = front;
+        }
 
-        frontArmRenderer.sprite = front;
         backArmRenderer.sprite = back;
     }
 }

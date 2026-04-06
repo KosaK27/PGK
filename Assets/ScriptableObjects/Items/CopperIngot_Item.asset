@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
-  m_Name: Furnace_Item
+  m_Name: CopperIngot_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 15
-  displayName: Furnace
-  sprite: {fileID: -228819513787663229, guid: 9fa341cc6c591d643a2402bddb70e4cf, type: 3}
+  itemId: 16
+  displayName: Copper Ingot
+  sprite: {fileID: -8801845800345047390, guid: cbf98aea49074e74a943a97182e531fd, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 8
   isWall: 0
   wallType: 2
-  isMultitileObject: 1
+  isMultitileObject: 0
   multitileObjectDefinition: {fileID: 11400000, guid: 3937095b43be710488274a264083a0a3, type: 2}
   isTool: 0
   toolType: 0

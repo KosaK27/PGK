@@ -32,7 +32,14 @@ public class MultitileObjectSystem : MonoBehaviour
         GameObject go;
         MultitileObject obj;
 
-        if (def is ChestDefinition chestDef)
+        if (def is CraftingStationDefinition stationDef)
+        {
+            go = new GameObject($"CraftingStation_{stationDef.stationType}_{origin.x}_{origin.y}");
+            var station = go.AddComponent<CraftingStationObject>();
+            station.InitializeStation(stationDef, origin);
+            obj = station;
+        }
+        else if (def is ChestDefinition chestDef)
         {
             go = new GameObject($"Chest_{origin.x}_{origin.y}");
             var chest = go.AddComponent<ChestObject>();

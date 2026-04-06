@@ -26,7 +26,7 @@ public class ToolSwing : MonoBehaviour
     public void UpdateSwing(ItemDefinition item, bool lmbHeld)
     {
         _arm.UpdateZone();
-        _arm.FaceTowardCursor();
+        if (lmbHeld) _arm.FaceTowardCursor();
 
         var zone = _arm.CurrentZone;
         Vector2 pos = zone switch

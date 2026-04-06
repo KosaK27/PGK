@@ -127,14 +127,12 @@ public class InventoryUI : MonoBehaviour
             _hotbarSlots[i].SetHighlight(i == selectedIndex, normalSlotColor, selectedSlotColor);
     }
 
-    // Called when player clicks a slot in their own inventory
     private void OnSlotClicked(int slotIndex)
     {
         var playerContainer = GetPlayerContainer();
         HandleSlotClick(slotIndex, playerContainer);
     }
 
-    // Called from ContainerUI when player clicks a slot in a chest
     public void OnContainerSlotClicked(int slotIndex, IContainer container)
     {
         HandleSlotClick(slotIndex, container);
@@ -229,6 +227,12 @@ public class InventoryUI : MonoBehaviour
         if (ContainerUIManager.Instance.IsOpen)
         {
             ContainerUIManager.Instance.CloseContainer();
+            return;
+        }
+
+        if (CraftingUIManager.Instance.IsOpen)
+        {
+            CraftingUIManager.Instance.CloseStation();
             return;
         }
 

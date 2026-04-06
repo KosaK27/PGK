@@ -107,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
         float dir = 0f;
         if (Keyboard.current.dKey.isPressed) dir = 1f;
         else if (Keyboard.current.aKey.isPressed) dir = -1f;
-        else dir = transform.localScale.x > 0 ? 1f : -1f;
+        else dir = transform.localScale.x > 0 ? -1f : 1f;
 
         _dashDir = dir;
         _dashTimer = dashDuration;
