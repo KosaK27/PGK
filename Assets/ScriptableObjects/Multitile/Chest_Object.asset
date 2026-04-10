@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChestDefinition
   displayName: Chest
   size: {x: 2, y: 2}
-  sprite: {fileID: 712035800519618848, guid: 44a9b63cd97d4844e91f323d147046a1, type: 3}
+  sprite: {fileID: 80887322275887844, guid: 969076ae558342b428a3296dc67e5456, type: 3}
   hardness: 3
   requiredTool: 1
   dropItem: {fileID: 11400000, guid: b282ab5d7399ab749b870d1c9ec577f0, type: 2}
   dropAmount: 1
   sortingOrder: 0
-  hasCollision: 0
+  hasCollision: 1
   slotCount: 20

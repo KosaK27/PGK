@@ -17,7 +17,7 @@ public class MultitileObject : MonoBehaviour
 
         var spriteGo = new GameObject("Sprite");
         spriteGo.transform.SetParent(transform);
-        spriteGo.transform.localPosition = new Vector3(def.size.x * 0.5f, def.size.y * 0.5f, 0);
+        spriteGo.transform.localPosition = Vector3.one;
         _sr = spriteGo.AddComponent<SpriteRenderer>();
         _sr.sprite = def.sprite;
         _sr.sortingOrder = def.sortingOrder;

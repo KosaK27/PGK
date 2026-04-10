@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1dbcd50aab43a7c4692a5fc75e7ef762
+guid: 8e88816cc5420db4ea0a4278e1521051
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1113306844126515307
-    second: zarm_f0000_0
+      213: 1527090145958743599
+    second: mark_enemy_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: zarm_f0000_0
+      name: mark_enemy_0
       rect:
         serializedVersion: 2
-        x: 15
-        y: 5
-        width: 6
-        height: 11
+        x: 0
+        y: 0
+        width: 8
+        height: 8
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 59fe3d5e25dbc80f0800000000000000
-      internalID: -1113306844126515307
+      spriteID: f2eced99560513510800000000000000
+      internalID: 1527090145958743599
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      zarm_f0000_0: -1113306844126515307
+      mark_enemy_0: 1527090145958743599
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

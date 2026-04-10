@@ -55,7 +55,7 @@ public class BlockIndicator : MonoBehaviour
             {
                 _placeSr.sprite = item.item.sprite;
                 _placeSr.color = _placeColor;
-                _placeGo.transform.localScale = new Vector3(def.size.x, def.size.y, 1f);
+                _placeGo.transform.localScale = new Vector3(1f, 1f, 1f);
                 _placeGo.transform.position = new Vector3(cell.x + def.size.x * 0.5f, cell.y + def.size.y * 0.5f);
             }
         }
