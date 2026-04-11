@@ -1882,6 +1882,7 @@ MonoBehaviour:
   spawnTable:
   - {fileID: 11400000, guid: c0d3c1ddd845fbc42848177db2fd15df, type: 2}
   - {fileID: 11400000, guid: 58abb826655c1404cba705471ccdccdc, type: 2}
+  - {fileID: 11400000, guid: 10dc1cd63d2e2cd47afdb468b88fb9e1, type: 2}
   maxEntities: 5
   spawnInterval: 1
   spawnMinDist: 12

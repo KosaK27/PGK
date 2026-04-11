@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b7a83ecf65dc6549b9bbc5e75113be0, type: 3}
+  m_Name: BatData
+  m_EditorClassIdentifier: Assembly-CSharp::EntityData
+  displayName: Enemy
+  isHostile: 1
+  maxHP: 30
+  contactDamage: 10
+  moveSpeed: 2
+  detectionRange: 12
+  attackRange: 0.8
+  patrolChangeInterval: 2
+  prefab: {fileID: 1437335698542309438, guid: 19fdb85b3ae55b94ca15eefc5eb09f65, type: 3}
+  spawnWeight: 1
+  xpDrop: 10
