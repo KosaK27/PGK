@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b7a83ecf65dc6549b9bbc5e75113be0, type: 3}
+  m_Name: SkeletonData
+  m_EditorClassIdentifier: Assembly-CSharp::EntityData
+  displayName: SkeletonEnemy
+  isHostile: 1
+  maxHP: 30
+  contactDamage: 0
+  moveSpeed: 2
+  detectionRange: 8
+  attackRange: 0.8
+  patrolChangeInterval: 2
+  prefab: {fileID: 3571781426469725603, guid: d1f68304db7605d4a8f9afeb895f6a5c, type: 3}
+  spawnWeight: 1
+  xpDrop: 10
