@@ -4,10 +4,11 @@ using UnityEngine;
 public class MultitileObjectSystem : MonoBehaviour
 {
     public static MultitileObjectSystem Instance { get; private set; }
-
     private readonly Dictionary<Vector2Int, MultitileObject> _cellMap = new();
     private readonly List<MultitileObject> _objects = new();
     private MultitileObject _currentBreakTarget;
+
+    public IReadOnlyList<MultitileObject> GetAllObjects() => _objects;
 
     void Awake()
     {
@@ -158,5 +159,34 @@ public class MultitileObjectSystem : MonoBehaviour
             if (WorldManager.Instance.GetBlock(below.x, below.y) == BlockType.Air) return false;
         }
         return true;
+    }
+
+    public void PlaceDirect(Vector2Int origin, MultitileObjectDefinition def)
+    {
+        GameObject go;
+        MultitileObject obj;
+
+        if (def is CraftingStationDefinition stationDef)
+        {
+            go = new GameObject($"CraftingStation_{stationDef.stationType}_{origin.x}_{origin.y}");
+            var station = go.AddComponent<CraftingStationObject>();
+            station.InitializeStation(stationDef, origin);
+            obj = station;
+        }
+        else if (def is ChestDefinition chestDef)
+        {
+            go = new GameObject($"Chest_{origin.x}_{origin.y}");
+            var chest = go.AddComponent<ChestObject>();
+            chest.InitializeChest(chestDef, origin);
+            obj = chest;
+        }
+        else
+        {
+            go = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
+            obj = go.AddComponent<MultitileObject>();
+            obj.Initialize(def, origin);
+        }
+
+        Register(obj);
     }
 }

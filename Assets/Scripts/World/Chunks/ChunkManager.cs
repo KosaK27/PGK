@@ -128,6 +128,17 @@ public class ChunkManager : MonoBehaviour
         if (_loadedChunks.TryGetValue(chunkPos, out var chunk))
             chunk.RefreshWallTile(lx, ly, offsetX, offsetY, tile);
     }
+
+    public void RebuildAll(int offsetX, int offsetY)
+    {
+        var world = WorldManager.Instance;
+        if (world == null) return;
+
+        foreach (var chunk in _loadedChunks.Values)
+        {
+            chunk.RenderAll(world.Data, offsetX, offsetY);
+        }
+    }
     void OnDrawGizmos()
     {
         if (_loadedChunks == null) return;
@@ -148,4 +159,6 @@ public class ChunkManager : MonoBehaviour
             );
         }
     }
+
+
 }

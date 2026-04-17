@@ -5,14 +5,14 @@ public class WorldManager : MonoBehaviour
     public static WorldManager Instance { get; private set; }
 
     [SerializeField] private WorldGenerator worldGenerator;
-    [SerializeField] private int            worldWidth  = 200;
-    [SerializeField] private int            worldHeight = 100;
-    [SerializeField] private BlockRegistry  blockRegistry;
-    [SerializeField] private WallRegistry   wallRegistry;
+    [SerializeField] private int worldWidth = 200;
+    [SerializeField] private int worldHeight = 100;
+    [SerializeField] private BlockRegistry blockRegistry;
+    [SerializeField] private WallRegistry wallRegistry;
 
-    public WorldData Data    { get; private set; }
-    public int       OffsetX => -worldWidth  / 2;
-    public int       OffsetY => -worldHeight / 2;
+    public WorldData Data { get; private set; }
+    public int OffsetX => -Data.Width / 2;
+    public int OffsetY => -Data.Height / 2;
 
     void Awake()
     {
@@ -21,19 +21,30 @@ public class WorldManager : MonoBehaviour
 
         blockRegistry.Initialize();
         wallRegistry.Initialize();
-        Data = new WorldData(worldWidth, worldHeight);
-        worldGenerator.Generate(Data);
+
+        var sm = SaveManager.Instance;
+        var worldSave = sm?.SelectedWorld;
+
+        if (worldSave != null && worldSave.blocks != null && worldSave.blocks.Count > 0)
+        {
+            Data = new WorldData(worldSave.width, worldSave.height);
+        }
+        else if (worldSave != null)
+        {
+            Data = new WorldData(worldSave.width, worldSave.height);
+            worldGenerator.randomSeed = false;
+            worldGenerator.seed = worldSave.seed;
+            worldGenerator.Generate(Data);
+        }
+        else
+        {
+            Data = new WorldData(worldWidth, worldHeight);
+            worldGenerator.Generate(Data);
+        }
     }
 
-    void Start()
-    {
-    }
-
-    public BlockType GetBlock(int x, int y)
-        => Data.GetBlock(x - OffsetX, y - OffsetY);
-
-    public WallType GetWall(int x, int y)
-        => Data.GetWall(x - OffsetX, y - OffsetY);
+    public BlockType GetBlock(int x, int y) => Data.GetBlock(x - OffsetX, y - OffsetY);
+    public WallType GetWall(int x, int y) => Data.GetWall(x - OffsetX, y - OffsetY);
 
     public void PlaceBlock(int x, int y, BlockType type)
     {
@@ -85,8 +96,7 @@ public class WorldManager : MonoBehaviour
         int lx = worldX - OffsetX;
         for (int ly = Data.Height - 1; ly >= 0; ly--)
         {
-            if (Data.GetBlock(lx, ly) != BlockType.Air &&
-                Data.GetBlock(lx, ly + 1) == BlockType.Air)
+            if (Data.GetBlock(lx, ly) != BlockType.Air && Data.GetBlock(lx, ly + 1) == BlockType.Air)
                 return ly + OffsetY;
         }
         return OffsetY;

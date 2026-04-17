@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
   m_Name: Chest_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 14
+  itemId: 16
   displayName: Chest
   sprite: {fileID: 80887322275887844, guid: 969076ae558342b428a3296dc67e5456, type: 3}
   maxStack: 99
