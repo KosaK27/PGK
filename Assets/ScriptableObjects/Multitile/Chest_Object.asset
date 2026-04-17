@@ -20,5 +20,5 @@ MonoBehaviour:
   dropItem: {fileID: 11400000, guid: b282ab5d7399ab749b870d1c9ec577f0, type: 2}
   dropAmount: 1
   sortingOrder: 0
-  hasCollision: 1
+  hasCollision: 0
   slotCount: 20
