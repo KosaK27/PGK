@@ -15,14 +15,14 @@ public class ParallaxBackground : MonoBehaviour
     public float undergroundParallaxX = 0.2f;
     public float undergroundParallaxY = 0.2f;
 
+    public float backgroundOffsetY = 0f;
+
     private Dictionary<Vector2Int, SpriteRenderer> tiles = new Dictionary<Vector2Int, SpriteRenderer>();
     private bool wasUnderground;
-    private Vector2 parallaxOffset;
-    private Vector3 lastCamPos;
 
     void Start()
     {
-        lastCamPos = cam.position;
+        wasUnderground = cam.position.y < surfaceThresholdY;
     }
 
     void Update()
@@ -33,20 +33,16 @@ public class ParallaxBackground : MonoBehaviour
         {
             ClearAll();
             wasUnderground = underground;
-            parallaxOffset = Vector2.zero;
         }
-
-        Vector3 delta = cam.position - lastCamPos;
-        lastCamPos = cam.position;
 
         float px = underground ? undergroundParallaxX : surfaceParallaxX;
         float py = underground ? undergroundParallaxY : surfaceParallaxY;
 
-        parallaxOffset.x += delta.x * px;
-        parallaxOffset.y += delta.y * py;
+        float parallaxOffsetX = cam.position.x * px;
+        float parallaxOffsetY = cam.position.y * py;
 
         int centerX = underground
-            ? Mathf.RoundToInt((cam.position.x - parallaxOffset.x) / tileWidth)
+            ? Mathf.RoundToInt((cam.position.x - parallaxOffsetX) / tileWidth)
             : Mathf.RoundToInt(cam.position.x / tileWidth);
         int centerY = underground ? Mathf.RoundToInt(cam.position.y / tileHeight) : 0;
 
@@ -85,18 +81,18 @@ public class ParallaxBackground : MonoBehaviour
 
         foreach (var kvp in tiles)
         {
-            float wx;   
+            float wx;
             float wy;
 
             if (underground)
             {
-                wx = cam.position.x + (kvp.Key.x - centerX) * tileWidth - parallaxOffset.x;
-                wy = cam.position.y + (kvp.Key.y - centerY) * tileHeight - parallaxOffset.y;
+                wx = cam.position.x + (kvp.Key.x - centerX) * tileWidth - parallaxOffsetX;
+                wy = cam.position.y + (kvp.Key.y - centerY) * tileHeight - parallaxOffsetY + backgroundOffsetY;
             }
             else
             {
-                wx = cam.position.x + (kvp.Key.x - centerX) * tileWidth - (parallaxOffset.x % tileWidth);
-                wy = cam.position.y - parallaxOffset.y;
+                wx = cam.position.x + (kvp.Key.x - centerX) * tileWidth - (parallaxOffsetX % tileWidth);
+                wy = cam.position.y - parallaxOffsetY + backgroundOffsetY;
             }
 
             kvp.Value.transform.position = new Vector3(wx, wy, 10f);
