@@ -24,8 +24,9 @@ public class PlayerInteraction : MonoBehaviour
     {
         var selected = InventorySystem.Instance.SelectedItem;
         bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
+        bool hasWeapon = selected != null && !selected.IsEmpty && selected.item.isWeapon;
 
-        if (!hasTool)
+        if (!hasTool || hasWeapon)
         {
             BreakSystem.Instance.CancelBreak();
             MultitileObjectSystem.Instance.CancelBreak();
@@ -66,6 +67,14 @@ public class PlayerInteraction : MonoBehaviour
     {
         var selected = InventorySystem.Instance.SelectedItem;
         bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
+        bool hasWeapon = selected != null && !selected.IsEmpty && selected.item.isWeapon;
+
+        if (hasWeapon)
+        {
+            if (Mouse.current.rightButton.wasReleasedThisFrame)
+                BreakSystem.Instance.CancelBreak();
+            return;
+        }
 
         if (Mouse.current.rightButton.isPressed && hasTool)
         {
@@ -107,7 +116,8 @@ public class PlayerInteraction : MonoBehaviour
 
         var selected = InventorySystem.Instance.SelectedItem;
         bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
-        if (hasTool) return;
+        bool hasWeapon = selected != null && !selected.IsEmpty && selected.item.isWeapon;
+        if (hasTool || hasWeapon) return;
 
         var cell = GetCellUnderMouse();
         if (!IsInReach(cell)) return;
@@ -128,7 +138,8 @@ public class PlayerInteraction : MonoBehaviour
         int amount = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
         Vector2 playerPos = transform.position;
         var mousePos = Mouse.current.position.ReadValue();
-        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
+        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(
+                                new Vector3(mousePos.x, mousePos.y, 0));
         mouseWorld.z = 0;
         Vector2 dir = ((Vector2)mouseWorld - playerPos).normalized;
         if (dir == Vector2.zero) dir = Vector2.right;
@@ -146,7 +157,8 @@ public class PlayerInteraction : MonoBehaviour
     private Vector3Int GetCellUnderMouse()
     {
         var mousePos = Mouse.current.position.ReadValue();
-        var worldPos = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
+        var worldPos = mainCamera.ScreenToWorldPoint(
+                           new Vector3(mousePos.x, mousePos.y, 0));
         return WorldManager.Instance.WorldToCell(worldPos);
     }
 }

@@ -384,6 +384,7 @@ GameObject:
   - component: {fileID: 2005496690065143004}
   - component: {fileID: 1594963349682887127}
   - component: {fileID: 3878274592790930452}
+  - component: {fileID: 1527234593803233811}
   m_Layer: 6
   m_Name: Player 1
   m_TagString: Player
@@ -636,6 +637,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8a930f258ef17ed4d83a0a78aa638444, type: 2}
   - {fileID: 11400000, guid: 8a930f258ef17ed4d83a0a78aa638444, type: 2}
   - {fileID: 11400000, guid: 5ebded21b3acffa4c800138a2193c91c, type: 2}
+  - {fileID: 11400000, guid: f8f85dc33f702eb488973ce0c9175eaf, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
 --- !u!114 &-4352479022709797026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -718,6 +723,21 @@ MonoBehaviour:
   swingDuration: 0.3
   arcDegrees: 120
   hitboxPrefab: {fileID: 7383180676380536301, guid: 96f7dc6411655b742993af124cd85aec, type: 3}
+--- !u!114 &1527234593803233811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32ec7fa49085a9149b19c45b81bc22de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BowShooter
+  arrowPrefab: {fileID: 7648679989447725951, guid: 6949f56d7346c114783be6cab407958b, type: 3}
+  arrowItemDef: {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  mainCamera: {fileID: 0}
 --- !u!1 &5291934614461029377
 GameObject:
   m_ObjectHideFlags: 0

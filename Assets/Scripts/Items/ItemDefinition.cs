@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public enum ToolType { None, Pickaxe, Axe, Shovel }
-public enum WeaponType { None, Sword }
+public enum WeaponType { None, Sword, Bow }
 
 [CreateAssetMenu(fileName = "ItemDefinition", menuName = "Items/ItemDefinition")]
 public class ItemDefinition : ScriptableObject
@@ -34,6 +34,10 @@ public class ItemDefinition : ScriptableObject
     public int damage = 10;
     public Vector2 hitboxSize = new Vector2(2.5f, 0.6f);
     public float hitboxDistance = 1.2f;
+
+    [Header("Bow")]
+    public float projectileSpeed = 14f;
+    public float shootCooldown = 0.8f;
 
     [Header("Hold Positions")]
     public Vector2 holdPositionUp;
