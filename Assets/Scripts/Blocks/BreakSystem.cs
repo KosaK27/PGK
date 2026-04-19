@@ -37,7 +37,7 @@ public class BreakSystem : MonoBehaviour
             if (MultitileObjectSystem.Instance.IsSupporting(new Vector2Int(cell.x, cell.y)))
                 return false;
         }
-        
+
         _breakProgress.Add(cell, deltaTime);
 
         if (_breakProgress.IsComplete(cell, effectiveHardness))
@@ -45,7 +45,8 @@ public class BreakSystem : MonoBehaviour
             _breakProgress.Reset(cell);
             _currentBreakCell = new(int.MinValue, 0, 0);
 
-            var worldPos = WorldManager.Instance.CellToWorld(cell.x, cell.y) + new Vector3(0.5f, 0.5f, 0);
+            var worldPos = WorldManager.Instance.CellToWorld(cell.x, cell.y)
+                           + new Vector3(0.5f, 0.5f, 0);
 
             if (target == BreakTarget.Block) FinishBreakBlock(cell, worldPos);
             else FinishBreakWall(cell, worldPos);
@@ -68,19 +69,16 @@ public class BreakSystem : MonoBehaviour
         _currentBreakCell = new(int.MinValue, 0, 0);
     }
 
-    private bool TryGetEffectiveHardness(Vector3Int cell, BreakTarget target, out float effectiveHardness)
+    private bool TryGetEffectiveHardness(Vector3Int cell, BreakTarget target,
+                                          out float effectiveHardness)
     {
         effectiveHardness = 0f;
 
         var selected = InventorySystem.Instance.SelectedItem;
-
-        if (selected == null || selected.IsEmpty)
-            return false;
+        if (selected == null || selected.IsEmpty) return false;
 
         var item = selected.item;
-
         if (!item.isTool) return false;
-
         if (item.isWeapon) return false;
 
         var toolType = item.toolType;
@@ -117,13 +115,15 @@ public class BreakSystem : MonoBehaviour
     {
         var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
         var data = blockRegistry.Get(blockType);
+
         WorldManager.Instance.DestroyBlock(cell.x, cell.y);
 
-        if (data.dropType != BlockType.Air)
+        if (data != null && data.dropType != BlockType.Air)
         {
             var itemDef = itemRegistry.GetByBlockType(data.dropType);
             if (itemDef != null)
-                ItemDropSystem.Instance.DropItem(new ItemStack(itemDef, data.dropAmount), worldPos);
+                ItemDropSystem.Instance.DropItem(
+                    new ItemStack(itemDef, data.dropAmount), worldPos);
         }
     }
 
@@ -131,13 +131,15 @@ public class BreakSystem : MonoBehaviour
     {
         var wallType = WorldManager.Instance.GetWall(cell.x, cell.y);
         var data = wallRegistry.Get(wallType);
+
         WorldManager.Instance.DestroyWall(cell.x, cell.y);
 
-        if (data.dropType != WallType.None)
+        if (data != null && data.dropType != WallType.None)
         {
             var itemDef = itemRegistry.GetByWallType(data.dropType);
             if (itemDef != null)
-                ItemDropSystem.Instance.DropItem(new ItemStack(itemDef, data.dropAmount), worldPos);
+                ItemDropSystem.Instance.DropItem(
+                    new ItemStack(itemDef, data.dropAmount), worldPos);
         }
     }
 }
