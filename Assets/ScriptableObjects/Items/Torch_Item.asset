@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
-  m_Name: Furnace_Item
+  m_Name: Torch_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 15
-  displayName: Furnace
-  sprite: {fileID: -5160551831037241196, guid: 43d0add019e25fd46be46c5c57bd75ed, type: 3}
+  itemId: 17
+  displayName: Torch
+  sprite: {fileID: 7509860518518112746, guid: 7e6b3c2014928b948adab504c6c30ad9, type: 3}
   maxStack: 99
   isBlock: 0
-  blockType: 8
+  blockType: 0
   isWall: 0
-  wallType: 2
+  wallType: 0
   isMultitileObject: 1
-  multitileObjectDefinition: {fileID: 11400000, guid: 3937095b43be710488274a264083a0a3, type: 2}
+  multitileObjectDefinition: {fileID: 11400000, guid: a05b6bbd6f67b92478921b85d09a12db, type: 2}
   isTool: 0
   toolType: 0
   breakingSpeed: 1

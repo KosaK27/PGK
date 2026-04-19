@@ -30,31 +30,7 @@ public class MultitileObjectSystem : MonoBehaviour
 
         if (!HasAllSupportBelow(origin, def.size)) return false;
 
-        GameObject go;
-        MultitileObject obj;
-
-        if (def is CraftingStationDefinition stationDef)
-        {
-            go = new GameObject($"CraftingStation_{stationDef.stationType}_{origin.x}_{origin.y}");
-            var station = go.AddComponent<CraftingStationObject>();
-            station.InitializeStation(stationDef, origin);
-            obj = station;
-        }
-        else if (def is ChestDefinition chestDef)
-        {
-            go = new GameObject($"Chest_{origin.x}_{origin.y}");
-            var chest = go.AddComponent<ChestObject>();
-            chest.InitializeChest(chestDef, origin);
-            obj = chest;
-        }
-        else
-        {
-            go = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
-            obj = go.AddComponent<MultitileObject>();
-            obj.Initialize(def, origin);
-        }
-
-        Register(obj);
+        Register(CreateObject(def, origin));
         return true;
     }
 
@@ -131,6 +107,41 @@ public class MultitileObjectSystem : MonoBehaviour
         return false;
     }
 
+    public void PlaceDirect(Vector2Int origin, MultitileObjectDefinition def)
+    {
+        Register(CreateObject(def, origin));
+    }
+
+    private MultitileObject CreateObject(MultitileObjectDefinition def, Vector2Int origin)
+    {
+        if (def is TorchDefinition torchDef)
+        {
+            var go = new GameObject($"Torch_{origin.x}_{origin.y}");
+            var torch = go.AddComponent<TorchObject>();
+            torch.InitializeTorch(torchDef, origin);
+            return torch;
+        }
+        if (def is CraftingStationDefinition stationDef)
+        {
+            var go = new GameObject($"CraftingStation_{stationDef.stationType}_{origin.x}_{origin.y}");
+            var station = go.AddComponent<CraftingStationObject>();
+            station.InitializeStation(stationDef, origin);
+            return station;
+        }
+        if (def is ChestDefinition chestDef)
+        {
+            var go = new GameObject($"Chest_{origin.x}_{origin.y}");
+            var chest = go.AddComponent<ChestObject>();
+            chest.InitializeChest(chestDef, origin);
+            return chest;
+        }
+
+        var defaultGo = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
+        var obj = defaultGo.AddComponent<MultitileObject>();
+        obj.Initialize(def, origin);
+        return obj;
+    }
+
     private void Register(MultitileObject obj)
     {
         var def = obj.Definition;
@@ -159,34 +170,5 @@ public class MultitileObjectSystem : MonoBehaviour
             if (WorldManager.Instance.GetBlock(below.x, below.y) == BlockType.Air) return false;
         }
         return true;
-    }
-
-    public void PlaceDirect(Vector2Int origin, MultitileObjectDefinition def)
-    {
-        GameObject go;
-        MultitileObject obj;
-
-        if (def is CraftingStationDefinition stationDef)
-        {
-            go = new GameObject($"CraftingStation_{stationDef.stationType}_{origin.x}_{origin.y}");
-            var station = go.AddComponent<CraftingStationObject>();
-            station.InitializeStation(stationDef, origin);
-            obj = station;
-        }
-        else if (def is ChestDefinition chestDef)
-        {
-            go = new GameObject($"Chest_{origin.x}_{origin.y}");
-            var chest = go.AddComponent<ChestObject>();
-            chest.InitializeChest(chestDef, origin);
-            obj = chest;
-        }
-        else
-        {
-            go = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
-            obj = go.AddComponent<MultitileObject>();
-            obj.Initialize(def, origin);
-        }
-
-        Register(obj);
     }
 }

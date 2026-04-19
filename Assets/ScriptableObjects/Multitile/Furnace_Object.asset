@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CraftingStationDefinition
   displayName: Furnace
   size: {x: 2, y: 2}
-  sprite: {fileID: 712035800519618848, guid: 44a9b63cd97d4844e91f323d147046a1, type: 3}
+  sprite: {fileID: -5160551831037241196, guid: 43d0add019e25fd46be46c5c57bd75ed, type: 3}
   hardness: 3
   requiredTool: 1
   dropItem: {fileID: 11400000, guid: 24aca1424333d3149ab5c59b9e0efae3, type: 2}

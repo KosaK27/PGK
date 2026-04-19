@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f734de1624cce1469ea66f0e3ddce66, type: 3}
+  m_Name: Torch_Object
+  m_EditorClassIdentifier: Assembly-CSharp::TorchDefinition
+  displayName: Torch
+  size: {x: 1, y: 1}
+  sprite: {fileID: 7509860518518112746, guid: 7e6b3c2014928b948adab504c6c30ad9, type: 3}
+  hardness: 1
+  requiredTool: 0
+  dropItem: {fileID: 11400000, guid: 68c1f1411c5fba141811aa1b159f1710, type: 2}
+  dropAmount: 1
+  sortingOrder: 0
+  hasCollision: 0
+  lightColor: {r: 1, g: 0.78, b: 0.35, a: 1}
+  lightStrength: 1
