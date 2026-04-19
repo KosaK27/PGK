@@ -63,7 +63,7 @@ public class CharacterPanel : MonoBehaviour
     {
         string name = _nameInput.text.Trim();
         if (string.IsNullOrEmpty(name)) { _errorLabel.text = "Name cannot be empty."; return; }
-        if (name.Length > 24) { _errorLabel.text = "Max 24 characters."; return; }
+        if (name.Length > 12) { _errorLabel.text = "Max 12 characters."; return; }
         var c = SaveManager.Instance.CreateCharacter(name);
         SaveManager.Instance.SelectCharacter(c.id);
         _menu.RefreshLabels();

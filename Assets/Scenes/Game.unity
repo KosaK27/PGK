@@ -1692,16 +1692,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxBackground
   cam: {fileID: 519420032}
-  tilePrefab: {fileID: 8959517516165116133, guid: 7c7b8f28a519a16499fc317a04f355b5, type: 3}
   surfaceSprite: {fileID: -7443756053782179069, guid: d368130d7c723714a859d2b5aa0209af, type: 3}
   undergroundSprite: {fileID: 2637568282973435956, guid: 20bc421fc1ec4f54da3e2a727b6c2565, type: 3}
-  surfaceEndY: -30
-  gridSize: 3
+  surfaceThresholdY: -30
   tileWidth: 60
   tileHeight: 33.75
   surfaceParallaxX: 0.1
-  surfaceParallaxY: 0.003
-  undergroundParallax: 0.6
+  surfaceParallaxY: 0.05
+  undergroundParallaxX: 0.8
+  undergroundParallaxY: 0.8
 --- !u!222 &813728469
 CanvasRenderer:
   m_ObjectHideFlags: 0

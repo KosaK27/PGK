@@ -43,12 +43,14 @@ public class MenuController : MonoBehaviour
 
     public void OnCharacterClicked()
     {
+        _worldPanel.SetActive(false);
         _characterPanel.SetActive(true);
         _characterPanel.GetComponent<CharacterPanel>().Open(this);
     }
 
     public void OnWorldClicked()
     {
+        _characterPanel.SetActive(false);
         _worldPanel.SetActive(true);
         _worldPanel.GetComponent<WorldPanel>().Open(this);
     }
