@@ -14,7 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 4
   displayName: Stone
-  sprite: {fileID: 1500119896, guid: 1753fe6939a46774cb487cfece009717, type: 3}
+  sprite: {fileID: 1657586890500803012, guid: b44d82ffebbd64a41bc74bd85e2fe43d, type: 3}
   maxStack: 99
   isBlock: 1
   blockType: 2
+  isWall: 0
+  wallType: 0
+  isMultitileObject: 0
+  multitileObjectDefinition: {fileID: 0}
+  isTool: 0
+  toolType: 0
+  breakingSpeed: 1
+  isWeapon: 0
+  weaponType: 0
+  damage: 10
+  hitboxSize: {x: 2.5, y: 0.6}
+  hitboxDistance: 1.2
+  projectileSpeed: 14
+  shootCooldown: 0.8
+  holdPositionUp: {x: 0, y: 0}
+  holdPositionForward: {x: 0, y: 0}
+  holdPositionDown: {x: 0, y: 0}

@@ -9,4 +9,7 @@ public enum BlockType : byte
     CopperOre = 6,
     IronOre = 7,
     CoalOre = 8,
+    Leaves = 9,
+    Log = 10,
+    Plank = 11,
 }

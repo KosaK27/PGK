@@ -14,7 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 7
   displayName: IronOre
-  sprite: {fileID: 5103231540499187363, guid: 5e905a7c1d6c6a446ba9114d386845b1, type: 3}
+  sprite: {fileID: 481038650588770461, guid: e4a77fe0c66e498459dbaa9192f93f62, type: 3}
   maxStack: 99
   isBlock: 1
   blockType: 7
+  isWall: 0
+  wallType: 0
+  isMultitileObject: 0
+  multitileObjectDefinition: {fileID: 0}
+  isTool: 0
+  toolType: 0
+  breakingSpeed: 1
+  isWeapon: 0
+  weaponType: 0
+  damage: 10
+  hitboxSize: {x: 2.5, y: 0.6}
+  hitboxDistance: 1.2
+  projectileSpeed: 14
+  shootCooldown: 0.8
+  holdPositionUp: {x: 0, y: 0}
+  holdPositionForward: {x: 0, y: 0}
+  holdPositionDown: {x: 0, y: 0}

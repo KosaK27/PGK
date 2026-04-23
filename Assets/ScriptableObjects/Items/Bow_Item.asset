@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 99
   displayName: Bow
-  sprite: {fileID: -415446080585258355, guid: 6a73f6baae0cd934ca6fdff7ffcad159, type: 3}
+  sprite: {fileID: -7997439479626426851, guid: 5426c3017aa559b4c90a98c23b9d9987, type: 3}
   maxStack: 1
   isBlock: 0
   blockType: 0

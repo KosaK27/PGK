@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 16
   displayName: Copper Ingot
-  sprite: {fileID: -8801845800345047390, guid: cbf98aea49074e74a943a97182e531fd, type: 3}
+  sprite: {fileID: 8620221339321906432, guid: 023142680f160db408e43eb84f46891e, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 8
@@ -30,6 +30,8 @@ MonoBehaviour:
   damage: 10
   hitboxSize: {x: 2.5, y: 0.6}
   hitboxDistance: 1.2
+  projectileSpeed: 14
+  shootCooldown: 0.8
   holdPositionUp: {x: 0, y: 0}
   holdPositionForward: {x: 0, y: 0}
   holdPositionDown: {x: 0, y: 0}

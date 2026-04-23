@@ -17,6 +17,13 @@ public class WorldGenerator : ScriptableObject
     public float caveThreshold  = 0.45f;
     public int   caveStartDepth = 10;
 
+    [Header("Trees")]
+    public float treeChance = 0.08f;
+    public int minTreeHeight = 4;
+    public int maxTreeHeight = 7;
+    public BlockType trunkBlock = BlockType.Log;
+    public BlockType leafBlock = BlockType.Leaves;
+
     [Header("Wall Generation")]
     public List<BlockToWall> wallMappings = new();
 
@@ -43,6 +50,7 @@ public class WorldGenerator : ScriptableObject
         GenerateCaves(world, width, height, surface);
         GenerateOres(world, width, height, biomeMap, surface);
         GenerateStructures(world, width, height, biomeMap, surface);
+        GenerateTrees(world, width, height, biomeMap, surface); 
     }
 
     private void GenerateWalls(WorldData world, int width, int height, int[] surface)
@@ -265,6 +273,40 @@ public class WorldGenerator : ScriptableObject
             var block = template.GetBlock(x, y);
             if (block != BlockType.Air)
                 world.SetBlock(originX + x, originY + y, block);
+        }
+    }
+
+    private void GenerateTrees(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface)
+    {
+        for (int x = 2; x < width - 2; x++)
+        {
+            if (Random.value > treeChance) continue;
+
+            int groundY = surface[x] + 1;
+
+            if (world.GetBlock(x, surface[x]) != BlockType.Grass)
+                continue;
+
+            int treeHeight = Random.Range(minTreeHeight, maxTreeHeight + 1);
+
+            for (int y = 0; y < treeHeight; y++)
+            {
+                world.SetBlock(x, groundY + y, trunkBlock);
+            }
+
+            int leafStart = groundY + treeHeight - 2;
+
+            for (int lx = -2; lx <= 2; lx++)
+            for (int ly = 0; ly <= 3; ly++)
+            {
+                int ax = x + lx;
+                int ay = leafStart + ly;
+
+                if (Mathf.Abs(lx) + ly > 3) continue;
+
+                if (world.GetBlock(ax, ay) == BlockType.Air)
+                    world.SetBlock(ax, ay, leafBlock);
+            }
         }
     }
 }

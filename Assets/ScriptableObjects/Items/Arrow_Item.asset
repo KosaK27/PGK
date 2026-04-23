@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 98
   displayName: Arrow
-  sprite: {fileID: -765150924802650856, guid: 75dc528fd59a8fc4ca4522938e42c1fa, type: 3}
+  sprite: {fileID: -3497705377561342267, guid: 40d9761845c045c44a6e5de32f5a7846, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 0

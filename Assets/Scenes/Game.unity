@@ -1250,7 +1250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.8283019, b: 0.8283019, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1332,10 +1332,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Save&Exit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1365,7 +1365,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1701,6 +1701,7 @@ MonoBehaviour:
   surfaceParallaxY: 0.05
   undergroundParallaxX: 0.8
   undergroundParallaxY: 0.8
+  backgroundOffsetY: 0
 --- !u!222 &813728469
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5142,7 +5143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.583321, g: 1, b: 0.48867923, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5204,10 +5205,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c6e46751f3e037447b80201805d2f86c, type: 2}
   - {fileID: 11400000, guid: 24aca1424333d3149ab5c59b9e0efae3, type: 2}
   - {fileID: 11400000, guid: b282ab5d7399ab749b870d1c9ec577f0, type: 2}
-  - {fileID: 11400000, guid: 68c1f1411c5fba141811aa1b159f1710, type: 2}
-  - {fileID: 11400000, guid: 68c1f1411c5fba141811aa1b159f1710, type: 2}
-  - {fileID: 11400000, guid: 68c1f1411c5fba141811aa1b159f1710, type: 2}
-  - {fileID: 11400000, guid: 68c1f1411c5fba141811aa1b159f1710, type: 2}
+  - {fileID: 11400000, guid: 0180cd01ad4ed6f40bee6f3ca106d138, type: 2}
+  - {fileID: 11400000, guid: 0180cd01ad4ed6f40bee6f3ca106d138, type: 2}
+  - {fileID: 11400000, guid: 0180cd01ad4ed6f40bee6f3ca106d138, type: 2}
+  - {fileID: 11400000, guid: f8f85dc33f702eb488973ce0c9175eaf, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
+  - {fileID: 11400000, guid: 25bb836b27eee1e488cb0f92639f5611, type: 2}
+  - {fileID: 11400000, guid: 25bb836b27eee1e488cb0f92639f5611, type: 2}
+  - {fileID: 11400000, guid: 9daf2b0ba7b276841a01b6a04fb6839f, type: 2}
+  - {fileID: 11400000, guid: 9daf2b0ba7b276841a01b6a04fb6839f, type: 2}
+  - {fileID: 11400000, guid: 8d177589c192ae44986b9405d0fa6ef1, type: 2}
+  - {fileID: 11400000, guid: 8d177589c192ae44986b9405d0fa6ef1, type: 2}
+  - {fileID: 11400000, guid: 0361cd9039f5acb4394699ce63c75d95, type: 2}
+  - {fileID: 11400000, guid: a58e67551af49c6438e9a4f4c4279fbf, type: 2}
+  - {fileID: 11400000, guid: a58e67551af49c6438e9a4f4c4279fbf, type: 2}
+  - {fileID: 11400000, guid: 5ebded21b3acffa4c800138a2193c91c, type: 2}
+  - {fileID: 11400000, guid: 8a930f258ef17ed4d83a0a78aa638444, type: 2}
+  - {fileID: 11400000, guid: 8a930f258ef17ed4d83a0a78aa638444, type: 2}
 --- !u!4 &2036512532
 Transform:
   m_ObjectHideFlags: 0
@@ -5353,10 +5372,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Resume
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5386,7 +5405,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535

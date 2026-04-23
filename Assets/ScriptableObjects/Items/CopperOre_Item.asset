@@ -14,7 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 6
   displayName: CopperOre
-  sprite: {fileID: 6398492527668056779, guid: 7d214616892c3024fb775fa246022313, type: 3}
+  sprite: {fileID: -2363985677339941807, guid: d38f818ae2ce6a144987a1d41108993e, type: 3}
   maxStack: 99
   isBlock: 1
   blockType: 6
+  isWall: 0
+  wallType: 0
+  isMultitileObject: 0
+  multitileObjectDefinition: {fileID: 0}
+  isTool: 0
+  toolType: 0
+  breakingSpeed: 1
+  isWeapon: 0
+  weaponType: 0
+  damage: 10
+  hitboxSize: {x: 2.5, y: 0.6}
+  hitboxDistance: 1.2
+  projectileSpeed: 14
+  shootCooldown: 0.8
+  holdPositionUp: {x: 0, y: 0}
+  holdPositionForward: {x: 0, y: 0}
+  holdPositionDown: {x: 0, y: 0}

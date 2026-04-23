@@ -26,7 +26,7 @@ public class Projectile : MonoBehaviour
         _spawnTime = Time.time;
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        _rb.MoveRotation(angle - 90f);
 
         if (shooter != null)
         {
@@ -47,7 +47,7 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"Pocisk trafi³: {other.gameObject.name}");
+        Debug.Log($"Pocisk trafiï¿½: {other.gameObject.name}");
 
         if (other.GetComponent<Projectile>() != null) return;
 

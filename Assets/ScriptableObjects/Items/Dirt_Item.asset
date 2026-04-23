@@ -14,7 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 1
   displayName: Dirt
-  sprite: {fileID: -3931065676038115036, guid: 4cc92acda8bfa474d960901bcf5af72d, type: 3}
+  sprite: {fileID: 1576158643719745964, guid: d89cabf1f05dc35448b91a8cc3451960, type: 3}
   maxStack: 99
   isBlock: 1
   blockType: 1
+  isWall: 0
+  wallType: 0
+  isMultitileObject: 0
+  multitileObjectDefinition: {fileID: 0}
+  isTool: 0
+  toolType: 0
+  breakingSpeed: 1
+  isWeapon: 0
+  weaponType: 0
+  damage: 10
+  hitboxSize: {x: 2.5, y: 0.6}
+  hitboxDistance: 1.2
+  projectileSpeed: 14
+  shootCooldown: 0.8
+  holdPositionUp: {x: 0, y: 0}
+  holdPositionForward: {x: 0, y: 0}
+  holdPositionDown: {x: 0, y: 0}
