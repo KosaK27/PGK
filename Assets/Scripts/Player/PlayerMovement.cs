@@ -4,17 +4,26 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
-
     [SerializeField] private int maxJumps = 2;
 
+    [Header("Dash Settings")]
     [SerializeField] private float dashSpeed = 18f;
     [SerializeField] private float dashDuration = 0.15f;
     [SerializeField] private float dashCooldown = 0.8f;
 
+    [Header("Water Settings")]
+    [SerializeField] private float swimUpSpeed = 2f;
+    [SerializeField] private float waterGravityScale = 0.4f;
+    [SerializeField] private float waterMoveSpeedMultiplier = 0.6f;
+    [SerializeField] private float waterLeapForce = 10f;
+
     public bool isGrounded;
     public bool IsDashing { get; private set; }
+    private bool _isInWater; // Nowa zmienna
+
     public PlayerLocomotionState LocomotionState { get; private set; }
     public PlayerAirState AirState { get; private set; }
     public PlayerActionState ActionState { get; set; }
@@ -23,23 +32,13 @@ public class PlayerMovement : MonoBehaviour
     {
         get
         {
-            if (ActionState == PlayerActionState.Dead)
-                return PlayerState.Dead;
+            if (ActionState == PlayerActionState.Dead) return PlayerState.Dead;
+            if (ActionState == PlayerActionState.UsingWeapon) return PlayerState.UseWeapon;
+            if (ActionState == PlayerActionState.UsingTool) return PlayerState.UseTool;
+            if (IsDashing) return PlayerState.Dash;
 
-            if (ActionState == PlayerActionState.UsingWeapon)
-                return PlayerState.UseWeapon;
-
-            if (ActionState == PlayerActionState.UsingTool)
-                return PlayerState.UseTool;
-
-            if (IsDashing)
-                return PlayerState.Dash;
-
-            if (AirState == PlayerAirState.Jumping)
-                return PlayerState.Jump;
-
-            if (LocomotionState == PlayerLocomotionState.Walk)
-                return PlayerState.Walk;
+            if (AirState == PlayerAirState.Jumping) return PlayerState.Jump;
+            if (LocomotionState == PlayerLocomotionState.Walk) return PlayerState.Walk;
 
             return PlayerState.Idle;
         }
@@ -51,17 +50,21 @@ public class PlayerMovement : MonoBehaviour
     private float _dashCooldownTimer;
     private float _dashDir;
     private float _groundedTimer;
+    private float _defaultGravityScale;
     private const float GROUNDED_COOLDOWN = 0.1f;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
         _jumpsLeft = maxJumps;
+        _defaultGravityScale = _rb.gravityScale;
     }
 
     void Update()
     {
         if (ActionState == PlayerActionState.Dead) return;
+
+        CheckWater();
 
         if (_groundedTimer > 0) { _groundedTimer -= Time.deltaTime; isGrounded = true; }
         _dashCooldownTimer -= Time.deltaTime;
@@ -75,11 +78,41 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             Move();
-            Jump();
-            TryDash();
+
+            if (_isInWater)
+            {
+                Swim();
+                IsDashing = false;
+            }
+            else
+            {
+                Jump();
+                TryDash();
+            }
         }
 
         UpdateStates();
+    }
+
+    private void CheckWater()
+    {
+        Vector3Int feetCell = WorldManager.Instance.WorldToCell(transform.position + new Vector3(0, 0.1f, 0));
+        Vector3Int bodyCell = WorldManager.Instance.WorldToCell(transform.position + new Vector3(0, 0.8f, 0));
+
+        BlockType feetBlock = WorldManager.Instance.GetBlock(feetCell.x, feetCell.y);
+        BlockType bodyBlock = WorldManager.Instance.GetBlock(bodyCell.x, bodyCell.y);
+
+        _isInWater = (feetBlock == BlockType.Water || bodyBlock == BlockType.Water);
+
+        if (_isInWater)
+        {
+            _rb.gravityScale = waterGravityScale;
+            _jumpsLeft = maxJumps;
+        }
+        else
+        {
+            _rb.gravityScale = _defaultGravityScale;
+        }
     }
 
     private void Move()
@@ -87,7 +120,29 @@ public class PlayerMovement : MonoBehaviour
         float move = 0;
         if (Keyboard.current.aKey.isPressed) move = -1;
         if (Keyboard.current.dKey.isPressed) move = 1;
-        _rb.linearVelocity = new Vector2(move * moveSpeed, _rb.linearVelocity.y);
+
+        float currentSpeed = _isInWater ? moveSpeed * waterMoveSpeedMultiplier : moveSpeed;
+        _rb.linearVelocity = new Vector2(move * currentSpeed, _rb.linearVelocity.y);
+    }
+
+    private void Swim()
+    {
+        if (Keyboard.current.spaceKey.isPressed)
+        {
+            Vector3Int cellAbove = WorldManager.Instance.WorldToCell(transform.position + new Vector3(0, 1.5f, 0));
+            BlockType blockAbove = WorldManager.Instance.GetBlock(cellAbove.x, cellAbove.y);
+
+            if (blockAbove == BlockType.Air)
+            {
+                _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, waterLeapForce);
+
+                _isInWater = false;
+            }
+            else
+            {
+                _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, swimUpSpeed);
+            }
+        }
     }
 
     private void Jump()
@@ -96,6 +151,8 @@ public class PlayerMovement : MonoBehaviour
         {
             _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
             _jumpsLeft--;
+            isGrounded = false;
+            _groundedTimer = 0;
         }
     }
 
@@ -107,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
         float dir = 0f;
         if (Keyboard.current.dKey.isPressed) dir = 1f;
         else if (Keyboard.current.aKey.isPressed) dir = -1f;
-        else dir = transform.localScale.x > 0 ? -1f : 1f;
+        else dir = transform.localScale.x > 0 ? 1f : -1f;
 
         _dashDir = dir;
         _dashTimer = dashDuration;
@@ -117,7 +174,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateStates()
     {
-        AirState = isGrounded ? PlayerAirState.Grounded : PlayerAirState.Jumping;
+        if (_isInWater)
+        {
+            AirState = PlayerAirState.Jumping;
+        }
+        else
+        {
+            AirState = isGrounded ? PlayerAirState.Grounded : PlayerAirState.Jumping;
+        }
+
         float vx = Mathf.Abs(_rb.linearVelocity.x);
         LocomotionState = vx > 0.05f ? PlayerLocomotionState.Walk : PlayerLocomotionState.Idle;
     }
@@ -129,6 +194,8 @@ public class PlayerMovement : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D col)
     {
+        if (_isInWater) return;
+
         foreach (ContactPoint2D c in col.contacts)
         {
             if (c.normal.y > 0.5f)
