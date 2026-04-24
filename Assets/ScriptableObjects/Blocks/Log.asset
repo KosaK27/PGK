@@ -15,6 +15,7 @@ MonoBehaviour:
   blockType: 10
   displayName: Log
   tile: {fileID: 11400000, guid: 99e898d879202384a835e749a470089b, type: 2}
+  isSolid: 0
   destructible: 1
   hardness: 2
   requiredTool: 1

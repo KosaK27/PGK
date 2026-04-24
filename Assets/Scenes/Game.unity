@@ -2711,7 +2711,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldManager
   worldGenerator: {fileID: 11400000, guid: cbed6ef41f6e2c34fb0cc5ff009d1599, type: 2}
-  worldWidth: 8192
+  worldWidth: 2048
   worldHeight: 1000
   blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
   wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}

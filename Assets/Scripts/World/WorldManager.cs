@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance { get; private set; }
@@ -7,9 +8,11 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private int worldHeight = 100;
     [SerializeField] private BlockRegistry blockRegistry;
     [SerializeField] private WallRegistry wallRegistry;
+
     public WorldData Data { get; private set; }
     public int OffsetX => -Data.Width / 2;
     public int OffsetY => -Data.Height / 2;
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
@@ -35,28 +38,33 @@ public class WorldManager : MonoBehaviour
             worldGenerator.Generate(Data);
         }
     }
+
     public BlockType GetBlock(int x, int y) => Data.GetBlock(x - OffsetX, y - OffsetY);
     public WallType GetWall(int x, int y) => Data.GetWall(x - OffsetX, y - OffsetY);
+
     public void PlaceBlock(int x, int y, BlockType type)
     {
         int lx = x - OffsetX;
         int ly = y - OffsetY;
         if (!Data.SetBlock(lx, ly, type)) return;
         var data = blockRegistry.Get(type);
-        ChunkManager.Instance.RefreshBlock(lx, ly, OffsetX, OffsetY, data?.tile);
+        ChunkManager.Instance.RefreshBlock(lx, ly, OffsetX, OffsetY, data?.tile, data?.isSolid ?? true);
         if (GravityBlockSystem.Instance != null)
             GravityBlockSystem.Instance.NotifyNeighbors(x, y);
     }
+
     public void DestroyBlock(int x, int y)
     {
         int lx = x - OffsetX;
         int ly = y - OffsetY;
         if (Data.GetBlock(lx, ly) == BlockType.Air) return;
+        var oldData = blockRegistry.Get(Data.GetBlock(lx, ly));
         Data.SetBlock(lx, ly, BlockType.Air);
-        ChunkManager.Instance.RefreshBlock(lx, ly, OffsetX, OffsetY, null);
+        ChunkManager.Instance.RefreshBlock(lx, ly, OffsetX, OffsetY, null, oldData?.isSolid ?? true);
         if (GravityBlockSystem.Instance != null)
             GravityBlockSystem.Instance.NotifyNeighbors(x, y);
     }
+
     public void PlaceWall(int x, int y, WallType type)
     {
         int lx = x - OffsetX;
@@ -65,6 +73,7 @@ public class WorldManager : MonoBehaviour
         var data = wallRegistry.Get(type);
         ChunkManager.Instance.RefreshWall(lx, ly, OffsetX, OffsetY, data?.tile);
     }
+
     public void DestroyWall(int x, int y)
     {
         int lx = x - OffsetX;
@@ -73,13 +82,16 @@ public class WorldManager : MonoBehaviour
         Data.SetWall(lx, ly, WallType.None);
         ChunkManager.Instance.RefreshWall(lx, ly, OffsetX, OffsetY, null);
     }
+
     public Vector3Int WorldToCell(Vector3 worldPos)
     {
         int x = Mathf.FloorToInt(worldPos.x);
         int y = Mathf.FloorToInt(worldPos.y);
         return new Vector3Int(x, y, 0);
     }
+
     public Vector3 CellToWorld(int x, int y) => new Vector3(x, y, 0);
+
     public int GetSurfaceWorldY(int worldX)
     {
         int lx = worldX - OffsetX;

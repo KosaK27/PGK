@@ -15,6 +15,7 @@ MonoBehaviour:
   blockType: 9
   displayName: Leaves
   tile: {fileID: 11400000, guid: 88ab756857f00074e8991f87664f71b3, type: 2}
+  isSolid: 0
   destructible: 1
   hardness: 2
   requiredTool: 1

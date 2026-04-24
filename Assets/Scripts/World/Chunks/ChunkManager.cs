@@ -35,11 +35,11 @@ public class ChunkManager : MonoBehaviour
         FlushDirtyChunks();
     }
 
-    public void RefreshBlock(int lx, int ly, int offsetX, int offsetY, TileBase tile)
+    public void RefreshBlock(int lx, int ly, int offsetX, int offsetY, TileBase tile, bool isSolid = true)
     {
         var chunkPos = GetChunkPos(lx, ly);
         if (_loadedChunks.TryGetValue(chunkPos, out var chunk))
-            chunk.RefreshTile(lx, ly, offsetX, offsetY, tile);
+            chunk.RefreshTile(lx, ly, offsetX, offsetY, tile, isSolid);
     }
 
     private void UpdateChunks()
@@ -70,7 +70,7 @@ public class ChunkManager : MonoBehaviour
 
     private void LoadChunk(Vector2Int chunkPos, WorldManager world)
     {
-        var go    = new GameObject($"Chunk_{chunkPos.x}_{chunkPos.y}");
+        var go = new GameObject($"Chunk_{chunkPos.x}_{chunkPos.y}");
         var chunk = go.AddComponent<Chunk>();
         chunk.Initialize(chunkPos, blockRegistry, wallRegistry, chunkParent);
         chunk.RenderAll(world.Data, world.OffsetX, world.OffsetY);
@@ -108,7 +108,7 @@ public class ChunkManager : MonoBehaviour
 
     private bool IsValidChunk(Vector2Int cp, WorldManager world)
     {
-        int maxX = world.Data.Width  / Chunk.SIZE;
+        int maxX = world.Data.Width / Chunk.SIZE;
         int maxY = world.Data.Height / Chunk.SIZE;
         return cp.x >= 0 && cp.x < maxX && cp.y >= 0 && cp.y < maxY;
     }
@@ -135,10 +135,9 @@ public class ChunkManager : MonoBehaviour
         if (world == null) return;
 
         foreach (var chunk in _loadedChunks.Values)
-        {
             chunk.RenderAll(world.Data, offsetX, offsetY);
-        }
     }
+
     void OnDrawGizmos()
     {
         if (_loadedChunks == null) return;
@@ -159,6 +158,4 @@ public class ChunkManager : MonoBehaviour
             );
         }
     }
-
-
 }

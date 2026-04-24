@@ -10,6 +10,7 @@ public class BlockData : ScriptableObject
     public TileBase tile;
 
     [Header("Properties")]
+    public bool isSolid = true;
     public bool destructible = true;
     public float hardness = 1f;
     public ToolType requiredTool = ToolType.None;

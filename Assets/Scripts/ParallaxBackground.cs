@@ -38,12 +38,7 @@ public class ParallaxBackground : MonoBehaviour
         float px = underground ? undergroundParallaxX : surfaceParallaxX;
         float py = underground ? undergroundParallaxY : surfaceParallaxY;
 
-        float parallaxOffsetX = cam.position.x * px;
-        float parallaxOffsetY = cam.position.y * py;
-
-        int centerX = underground
-            ? Mathf.RoundToInt((cam.position.x - parallaxOffsetX) / tileWidth)
-            : Mathf.RoundToInt(cam.position.x / tileWidth);
+        int centerX = Mathf.RoundToInt(cam.position.x / tileWidth);
         int centerY = underground ? Mathf.RoundToInt(cam.position.y / tileHeight) : 0;
 
         HashSet<Vector2Int> needed = new HashSet<Vector2Int>();
@@ -74,26 +69,17 @@ public class ParallaxBackground : MonoBehaviour
                 go.transform.SetParent(transform);
                 SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = underground ? undergroundSprite : surfaceSprite;
-                sr.sortingOrder = -100;
+                sr.sortingOrder = -200;
                 tiles[key] = sr;
             }
         }
 
         foreach (var kvp in tiles)
         {
-            float wx;
-            float wy;
-
-            if (underground)
-            {
-                wx = cam.position.x + (kvp.Key.x - centerX) * tileWidth - parallaxOffsetX;
-                wy = cam.position.y + (kvp.Key.y - centerY) * tileHeight - parallaxOffsetY + backgroundOffsetY;
-            }
-            else
-            {
-                wx = cam.position.x + (kvp.Key.x - centerX) * tileWidth - (parallaxOffsetX % tileWidth);
-                wy = cam.position.y - parallaxOffsetY + backgroundOffsetY;
-            }
+            float wx = cam.position.x + (kvp.Key.x - centerX) * tileWidth - (cam.position.x * px % tileWidth);
+            float wy = underground
+                ? cam.position.y + (kvp.Key.y - centerY) * tileHeight - (cam.position.y * py % tileHeight) + backgroundOffsetY
+                : cam.position.y - (cam.position.y * py) + backgroundOffsetY;
 
             kvp.Value.transform.position = new Vector3(wx, wy, 10f);
         }
