@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
   blockType: 12
   displayName: Water
-  tile: {fileID: 11400000, guid: 7d98f6148f28bc1469a6f1a117fd4388, type: 2}
-  isSolid: 0
+  tile: {fileID: 11400000, guid: e2fb523bd47f65342bb69d44c32d718c, type: 2}
+  isSolid: 1
   destructible: 0
   hardness: 0
   requiredTool: 0

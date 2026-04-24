@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7bed6f043df8694e838330173f9d9b7, type: 3}
   m_Name: Water_TIle
   m_EditorClassIdentifier: Assembly-CSharp::CustomRuleTile
-  m_DefaultSprite: {fileID: 0}
+  m_DefaultSprite: {fileID: 6049605792901559095, guid: fe814bae07682a34cbd9f0960afbd5ad, type: 3}
   m_DefaultGameObject: {fileID: 0}
   m_DefaultColliderType: 1
   m_TilingRules: []

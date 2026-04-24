@@ -10,8 +10,8 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private WallRegistry wallRegistry;
 
     public WorldData Data { get; private set; }
-    public int OffsetX => -Data.Width / 2;
-    public int OffsetY => -Data.Height / 2;
+    public int OffsetX => Data != null ? -Data.Width / 2 : 0;
+    public int OffsetY => Data != null ? -Data.Height / 2 : 0;
 
     void Awake()
     {
@@ -39,6 +39,28 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        if (LiquidManager.Instance != null && Data != null)
+        {
+            InitializeLiquids();
+        }
+    }
+
+    public void InitializeLiquids()
+    {
+        for (int x = 0; x < Data.Width; x++)
+        {
+            for (int y = 0; y < Data.Height; y++)
+            {
+                if (Data.GetBlock(x, y) == BlockType.Water)
+                {
+                    LiquidManager.Instance.AddActiveWater(x + OffsetX, y + OffsetY);
+                }
+            }
+        }
+    }
+
     public BlockType GetBlock(int x, int y) => Data.GetBlock(x - OffsetX, y - OffsetY);
     public WallType GetWall(int x, int y) => Data.GetWall(x - OffsetX, y - OffsetY);
 
@@ -51,6 +73,9 @@ public class WorldManager : MonoBehaviour
         ChunkManager.Instance.RefreshBlock(lx, ly, OffsetX, OffsetY, data?.tile, data?.isSolid ?? true);
         if (GravityBlockSystem.Instance != null)
             GravityBlockSystem.Instance.NotifyNeighbors(x, y);
+
+        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating)
+            LiquidManager.Instance.NotifyBlockChanged(x, y);
     }
 
     public void DestroyBlock(int x, int y)
@@ -63,6 +88,9 @@ public class WorldManager : MonoBehaviour
         ChunkManager.Instance.RefreshBlock(lx, ly, OffsetX, OffsetY, null, oldData?.isSolid ?? true);
         if (GravityBlockSystem.Instance != null)
             GravityBlockSystem.Instance.NotifyNeighbors(x, y);
+
+        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating)
+            LiquidManager.Instance.NotifyBlockChanged(x, y);
     }
 
     public void PlaceWall(int x, int y, WallType type)
