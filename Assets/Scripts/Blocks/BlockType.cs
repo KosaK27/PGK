@@ -12,4 +12,5 @@ public enum BlockType : byte
     Leaves = 9,
     Log = 10,
     Plank = 11,
+    Water = 12,
 }

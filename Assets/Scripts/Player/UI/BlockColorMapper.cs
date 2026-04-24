@@ -10,6 +10,7 @@ public static class BlockColorMapper
     private static readonly Color Copper = new(0.80f, 0.45f, 0.20f, 1f);
     private static readonly Color Iron = new(0.75f, 0.75f, 0.80f, 1f);
     private static readonly Color Coal = new(0.20f, 0.20f, 0.20f, 1f);
+    private static readonly Color Water = new(0.2f, 0.4f, 0.9f, 0.6f);
 
     public static Color Get(BlockType block) => block switch
     {
@@ -21,6 +22,7 @@ public static class BlockColorMapper
         BlockType.CopperOre => Copper,
         BlockType.IronOre => Iron,
         BlockType.CoalOre => Coal,
+        BlockType.Water => Water,
         _ => Air,
     };
 }

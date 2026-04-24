@@ -40,7 +40,12 @@ public class BlockIndicator : MonoBehaviour
         bool inReach = InReach(cell);
         var cellV2 = new Vector2Int(cell.x, cell.y);
 
-        bool cellHasBlock = WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air;
+        var currentBlock = WorldManager.Instance.GetBlock(cell.x, cell.y);
+
+        bool canPlaceHere = currentBlock == BlockType.Air || currentBlock == BlockType.Water;
+
+        bool cellHasBlock = currentBlock != BlockType.Air && currentBlock != BlockType.Water;
+
         bool cellHasWall = WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None;
         bool cellHasObject = MultitileObjectSystem.Instance != null && MultitileObjectSystem.Instance.IsOccupied(cellV2);
         bool cellIsSupporting = MultitileObjectSystem.Instance != null && MultitileObjectSystem.Instance.IsSupporting(cellV2);
@@ -59,7 +64,7 @@ public class BlockIndicator : MonoBehaviour
                 _placeGo.transform.position = new Vector3(cell.x + def.size.x * 0.5f, cell.y + def.size.y * 0.5f);
             }
         }
-        else if (inReach && hasBlock && !cellHasBlock && !cellHasObject && HasNeighbor(cell))
+        else if (inReach && hasBlock && canPlaceHere && !cellHasObject && HasSolidNeighbor(cell))
         {
             _placeSr.enabled = true;
             _placeSr.sprite = item.item.sprite;
@@ -132,12 +137,14 @@ public class BlockIndicator : MonoBehaviour
     private bool MultitileAreaIsClear(Vector3Int origin, Vector2Int size)
     {
         for (int y = 0; y < size.y; y++)
-        for (int x = 0; x < size.x; x++)
-        {
-            var c = new Vector2Int(origin.x + x, origin.y + y);
-            if (MultitileObjectSystem.Instance.IsOccupied(c)) return false;
-            if (WorldManager.Instance.GetBlock(c.x, c.y) != BlockType.Air) return false;
-        }
+            for (int x = 0; x < size.x; x++)
+            {
+                var c = new Vector2Int(origin.x + x, origin.y + y);
+                if (MultitileObjectSystem.Instance.IsOccupied(c)) return false;
+
+                var b = WorldManager.Instance.GetBlock(c.x, c.y);
+                if (b != BlockType.Air && b != BlockType.Water) return false;
+            }
         return true;
     }
 
@@ -146,7 +153,8 @@ public class BlockIndicator : MonoBehaviour
         for (int x = 0; x < size.x; x++)
         {
             var below = new Vector2Int(origin.x + x, origin.y - 1);
-            if (WorldManager.Instance.GetBlock(below.x, below.y) == BlockType.Air) return false;
+            var b = WorldManager.Instance.GetBlock(below.x, below.y);
+            if (b == BlockType.Air || b == BlockType.Water) return false;
         }
         return true;
     }
@@ -172,11 +180,14 @@ public class BlockIndicator : MonoBehaviour
         return WorldManager.Instance.WorldToCell(_cam.ScreenToWorldPoint(new Vector3(mp.x, mp.y, 0)));
     }
 
-    private bool HasNeighbor(Vector3Int cell)
+    private bool HasSolidNeighbor(Vector3Int cell)
     {
         Vector3Int[] n = { cell + Vector3Int.up, cell + Vector3Int.down, cell + Vector3Int.left, cell + Vector3Int.right };
         foreach (var nb in n)
-            if (WorldManager.Instance.GetBlock(nb.x, nb.y) != BlockType.Air) return true;
+        {
+            var b = WorldManager.Instance.GetBlock(nb.x, nb.y);
+            if (b != BlockType.Air && b != BlockType.Water) return true;
+        }
         return false;
     }
 
