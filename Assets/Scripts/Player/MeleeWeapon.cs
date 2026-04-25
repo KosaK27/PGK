@@ -27,6 +27,7 @@ public class MeleeWeapon : MonoBehaviour
     private int _currentDamage;
     private Vector2 _currentHitboxSize;
     private float _currentHitboxDistance;
+    private bool _slashEmitted;
 
     void Awake()
     {
@@ -66,7 +67,6 @@ public class MeleeWeapon : MonoBehaviour
         if (_isSwinging)
         {
             _arm.SetArmSprite();
-
             _swingTimer += Time.deltaTime;
             float t = Mathf.Clamp01(_swingTimer / swingDuration);
             float localAngle = Mathf.Lerp(_localStartAngle, _localEndAngle, t);
@@ -75,7 +75,15 @@ public class MeleeWeapon : MonoBehaviour
                 _toolRoot.localRotation = Quaternion.Euler(0, 0, localAngle + SPRITE_ANGLE_OFFSET);
 
             if (t >= 0.5f && _activeHitbox == null)
+            {
                 SpawnHitbox(_hitboxAngle);
+                if (!_slashEmitted)
+                {
+                    _slashEmitted = true;
+                    ParticleManager.Instance.EmitSlash(
+                        transform.position + _hitboxOffset, _hitboxAngle);
+                }
+            }
 
             if (_activeHitbox != null)
                 _activeHitbox.transform.position = transform.position + _hitboxOffset;
@@ -83,28 +91,23 @@ public class MeleeWeapon : MonoBehaviour
             if (t >= 1f)
             {
                 _isSwinging = false;
+                _slashEmitted = false;
                 ClearHitbox();
                 if (_toolRenderer != null) _toolRenderer.enabled = false;
-
-                if (_chainSwing)
-                {
-                    _chainSwing = false;
-                    StartSwing(item);
-                }
+                if (_chainSwing) { _chainSwing = false; StartSwing(item); }
             }
             return;
         }
 
         if (_toolRenderer != null) _toolRenderer.enabled = false;
-
-        if (lmbPressed)
-            StartSwing(item);
+        if (lmbPressed) StartSwing(item);
     }
 
     public void Cancel()
     {
         _isSwinging = false;
         _chainSwing = false;
+        _slashEmitted = false;
         ClearHitbox();
         if (_toolRenderer != null) _toolRenderer.enabled = false;
     }
@@ -112,6 +115,7 @@ public class MeleeWeapon : MonoBehaviour
     private void StartSwing(ItemDefinition item)
     {
         _chainSwing = false;
+        _slashEmitted = false;
         _arm.FaceTowardCursor();
 
         Vector3 mouseWorld = _cam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
@@ -139,18 +143,18 @@ public class MeleeWeapon : MonoBehaviour
     private void SpawnHitbox(float worldAngle)
     {
         if (hitboxPrefab == null) return;
-
-        Vector2 worldDir = new Vector2(Mathf.Cos(worldAngle * Mathf.Deg2Rad), Mathf.Sin(worldAngle * Mathf.Deg2Rad));
+        Vector2 worldDir = new Vector2(
+            Mathf.Cos(worldAngle * Mathf.Deg2Rad),
+            Mathf.Sin(worldAngle * Mathf.Deg2Rad));
         _hitboxOffset = (Vector3)(worldDir * (_currentHitboxDistance + _currentHitboxSize.x * 0.5f));
-
-        _activeHitbox = Instantiate(hitboxPrefab, transform.position + _hitboxOffset, Quaternion.Euler(0, 0, worldAngle));
+        _activeHitbox = Instantiate(hitboxPrefab,
+            transform.position + _hitboxOffset,
+            Quaternion.Euler(0, 0, worldAngle));
         _activeHitbox.transform.localScale = new Vector3(_currentHitboxSize.x, _currentHitboxSize.y, 1f);
-
         var col = _activeHitbox.GetComponent<BoxCollider2D>();
         if (col != null) col.size = Vector2.one;
-
         var hitbox = _activeHitbox.GetComponent<SwordHitbox>();
-        if (hitbox != null) hitbox.Init(_currentDamage);
+        if (hitbox != null) hitbox.Init(_currentDamage, transform);
     }
 
     private void ClearHitbox()

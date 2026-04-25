@@ -21,3 +21,4 @@ MonoBehaviour:
   requiredTool: 1
   dropType: 11
   dropAmount: 4
+  particleColor: {r: 0.4792453, g: 0.31456864, b: 0.18717691, a: 1}

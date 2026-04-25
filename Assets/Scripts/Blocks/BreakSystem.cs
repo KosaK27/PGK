@@ -33,10 +33,8 @@ public class BreakSystem : MonoBehaviour
         }
 
         if (target == BreakTarget.Block)
-        {
             if (MultitileObjectSystem.Instance.IsSupporting(new Vector2Int(cell.x, cell.y)))
                 return false;
-        }
 
         _breakProgress.Add(cell, deltaTime);
 
@@ -44,13 +42,9 @@ public class BreakSystem : MonoBehaviour
         {
             _breakProgress.Reset(cell);
             _currentBreakCell = new(int.MinValue, 0, 0);
-
-            var worldPos = WorldManager.Instance.CellToWorld(cell.x, cell.y)
-                           + new Vector3(0.5f, 0.5f, 0);
-
+            Vector3 worldPos = WorldManager.Instance.CellToWorld(cell.x, cell.y) + new Vector3(0.5f, 0.5f, 0f);
             if (target == BreakTarget.Block) FinishBreakBlock(cell, worldPos);
             else FinishBreakWall(cell, worldPos);
-
             return true;
         }
 
@@ -69,28 +63,22 @@ public class BreakSystem : MonoBehaviour
         _currentBreakCell = new(int.MinValue, 0, 0);
     }
 
-    private bool TryGetEffectiveHardness(Vector3Int cell, BreakTarget target,
-                                          out float effectiveHardness)
+    private bool TryGetEffectiveHardness(Vector3Int cell, BreakTarget target, out float effectiveHardness)
     {
         effectiveHardness = 0f;
-
         var selected = InventorySystem.Instance.SelectedItem;
         if (selected == null || selected.IsEmpty) return false;
-
         var item = selected.item;
         if (!item.isTool) return false;
         if (item.isWeapon) return false;
-
         var toolType = item.toolType;
 
         if (target == BreakTarget.Block)
         {
             var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
             if (blockType == BlockType.Air) return false;
-
             var data = blockRegistry.Get(blockType);
             if (data == null || !data.destructible) return false;
-
             effectiveHardness = toolType == data.requiredTool
                 ? data.hardness / selected.item.breakingSpeed
                 : data.hardness * 2f;
@@ -99,10 +87,8 @@ public class BreakSystem : MonoBehaviour
         {
             var wallType = WorldManager.Instance.GetWall(cell.x, cell.y);
             if (wallType == WallType.None) return false;
-
             var data = wallRegistry.Get(wallType);
             if (data == null || !data.destructible) return false;
-
             effectiveHardness = toolType != ToolType.None && toolType == data.requiredTool
                 ? data.hardness / selected.item.breakingSpeed
                 : data.hardness * 2f;
@@ -116,14 +102,15 @@ public class BreakSystem : MonoBehaviour
         var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
         var data = blockRegistry.Get(blockType);
 
+        ParticleManager.Instance.EmitBlockBreak(cell, blockType);
+
         WorldManager.Instance.DestroyBlock(cell.x, cell.y);
 
         if (data != null && data.dropType != BlockType.Air)
         {
             var itemDef = itemRegistry.GetByBlockType(data.dropType);
             if (itemDef != null)
-                ItemDropSystem.Instance.DropItem(
-                    new ItemStack(itemDef, data.dropAmount), worldPos);
+                ItemDropSystem.Instance.DropItem(new ItemStack(itemDef, data.dropAmount), worldPos);
         }
     }
 
@@ -132,14 +119,15 @@ public class BreakSystem : MonoBehaviour
         var wallType = WorldManager.Instance.GetWall(cell.x, cell.y);
         var data = wallRegistry.Get(wallType);
 
+        ParticleManager.Instance.EmitWallBreak(cell, wallType);
+
         WorldManager.Instance.DestroyWall(cell.x, cell.y);
 
         if (data != null && data.dropType != WallType.None)
         {
             var itemDef = itemRegistry.GetByWallType(data.dropType);
             if (itemDef != null)
-                ItemDropSystem.Instance.DropItem(
-                    new ItemStack(itemDef, data.dropAmount), worldPos);
+                ItemDropSystem.Instance.DropItem(new ItemStack(itemDef, data.dropAmount), worldPos);
         }
     }
 }

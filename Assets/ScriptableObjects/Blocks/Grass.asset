@@ -15,8 +15,10 @@ MonoBehaviour:
   blockType: 4
   displayName: Grass
   tile: {fileID: 11400000, guid: 5e785ecc1e5c2554c9f3146ae4eaf329, type: 2}
+  isSolid: 1
   destructible: 1
   hardness: 0.1
   requiredTool: 3
   dropType: 4
   dropAmount: 1
+  particleColor: {r: 0.35853505, g: 0.6603774, b: 0.25792095, a: 1}

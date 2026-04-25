@@ -18,4 +18,7 @@ public class BlockData : ScriptableObject
     [Header("Drop")]
     public BlockType dropType;
     public int dropAmount = 1;
+
+    [Header("Particles")]
+    public Color particleColor = Color.gray;
 }

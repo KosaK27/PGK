@@ -15,8 +15,10 @@ MonoBehaviour:
   blockType: 6
   displayName: CopperOre
   tile: {fileID: 11400000, guid: 5b4c0a8dfc9df9d42bb8433c47546c4b, type: 2}
+  isSolid: 1
   destructible: 1
   hardness: 2.5
   requiredTool: 1
   dropType: 6
   dropAmount: 1
+  particleColor: {r: 0.7509433, g: 0.36095598, b: 0.038255543, a: 1}

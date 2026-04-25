@@ -15,8 +15,10 @@ MonoBehaviour:
   blockType: 8
   displayName: CoalOre
   tile: {fileID: 11400000, guid: c999a34cfe893fe438d57ec656631d8d, type: 2}
+  isSolid: 1
   destructible: 1
   hardness: 2.5
   requiredTool: 1
   dropType: 8
   dropAmount: 1
+  particleColor: {r: 0.17735851, g: 0.1522606, b: 0.1522606, a: 1}

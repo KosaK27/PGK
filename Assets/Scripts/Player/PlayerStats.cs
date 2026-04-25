@@ -47,6 +47,8 @@ public class PlayerStats : MonoBehaviour
             _hitEffect.StartIframes();
         }
 
+        ParticleManager.Instance.EmitHit(transform.position);
+
         if (sourcePosition.HasValue && knockbackForce > 0f)
         {
             var rb = GetComponent<Rigidbody2D>();
@@ -55,7 +57,6 @@ public class PlayerStats : MonoBehaviour
                 Vector2 horizontal = new Vector2(transform.position.x - sourcePosition.Value.x, 0f);
                 if (horizontal.sqrMagnitude < 0.001f) horizontal = Vector2.right;
                 else horizontal.Normalize();
-
                 Vector2 force = new Vector2(horizontal.x * knockbackForce, knockbackForce);
                 rb.linearVelocity = Vector2.zero;
                 rb.AddForce(force, ForceMode2D.Impulse);

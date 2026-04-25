@@ -128,9 +128,6 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.aKey.isPressed) move = -1;
         if (Keyboard.current.dKey.isPressed) move = 1;
 
-        float currentSpeed = _isInWater ? moveSpeed * waterMoveSpeedMultiplier : moveSpeed;
-        _rb.linearVelocity = new Vector2(move * currentSpeed, _rb.linearVelocity.y);
-
         if (_knockbackTimer > 0f)
         {
             _knockbackTimer -= Time.deltaTime;
@@ -139,7 +136,8 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        _rb.linearVelocity = new Vector2(move * moveSpeed, _rb.linearVelocity.y);
+        float currentSpeed = _isInWater ? moveSpeed * waterMoveSpeedMultiplier : moveSpeed;
+        _rb.linearVelocity = new Vector2(move * currentSpeed, _rb.linearVelocity.y);
     }
 
     private void Swim()

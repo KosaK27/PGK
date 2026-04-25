@@ -15,8 +15,10 @@ MonoBehaviour:
   blockType: 7
   displayName: IronOre
   tile: {fileID: 11400000, guid: 2dabd4c2823358b4eab67ec924b91b3b, type: 2}
+  isSolid: 1
   destructible: 1
   hardness: 3
   requiredTool: 1
   dropType: 7
   dropAmount: 1
+  particleColor: {r: 0.6150943, g: 0.5305734, b: 0.33307937, a: 1}

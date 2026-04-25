@@ -16,8 +16,7 @@ public class EntityStats : MonoBehaviour
 
     void Awake()
     {
-        if (data != null)
-            CurrentHP = data.maxHP;
+        if (data != null) CurrentHP = data.maxHP;
         _hitEffect = GetComponent<HitEffect>();
         _ai = GetComponent<EntityAI>();
     }
@@ -37,8 +36,8 @@ public class EntityStats : MonoBehaviour
 
         if (sourcePosition.HasValue)
         {
-            if (_hitEffect != null)
-                _hitEffect.TriggerHit(sourcePosition.Value);
+            _hitEffect?.TriggerHit(sourcePosition.Value);
+            ParticleManager.Instance.EmitHit(transform.position);
 
             float resistance = Mathf.Clamp(data.knockbackResistance, 0f, 10f);
             float multiplier = 1f - resistance / 10f;
@@ -50,12 +49,8 @@ public class EntityStats : MonoBehaviour
                 {
                     Vector2 horizontal = new Vector2(
                         transform.position.x - sourcePosition.Value.x, 0f);
-
-                    if (horizontal.sqrMagnitude < 0.001f)
-                        horizontal = Vector2.right;
-                    else
-                        horizontal.Normalize();
-
+                    if (horizontal.sqrMagnitude < 0.001f) horizontal = Vector2.right;
+                    else horizontal.Normalize();
                     Vector2 force = new Vector2(horizontal.x * knockbackForce, knockbackForce) * multiplier;
                     rb.linearVelocity = Vector2.zero;
                     rb.AddForce(force, ForceMode2D.Impulse);
@@ -64,8 +59,7 @@ public class EntityStats : MonoBehaviour
             }
         }
 
-        if (CurrentHP <= 0)
-            Die();
+        if (CurrentHP <= 0) Die();
     }
 
     public void Heal(int amount)

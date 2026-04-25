@@ -18,7 +18,7 @@ public class WorldGenerator : ScriptableObject
     public int caveStartDepth = 10;
 
     [Header("Surface Ravines")]
-    public float ravineChance = 0.006f;
+    public float ravineChance = 0.002f;
     public int ravineMinWidth = 3;
     public int ravineMaxWidth = 10;
     public int ravineMinDepth = 15;
@@ -41,11 +41,11 @@ public class WorldGenerator : ScriptableObject
     public BlockType leafBlock = BlockType.Leaves;
 
     [Header("Lakes")]
-    public int minLakeWidth = 14;
-    public int maxLakeWidth = 28;
+    public int minLakeWidth = 8;
+    public int maxLakeWidth = 32;
     public int minLakeDepth = 5;
     public int maxLakeDepth = 10;
-    public int lakeSpacing = 45;
+    public int lakeSpacing = 200;
 
     [Header("Wall Generation")]
     public List<BlockToWall> wallMappings = new();
@@ -86,7 +86,7 @@ public class WorldGenerator : ScriptableObject
 
     private void GenerateLakes(WorldData world, int width, int height, int[] surface)
     {
-        int attempts = width / 20;
+        int attempts = width / 100;
         WallType dirtWall = WallType.None;
         foreach (var m in wallMappings) if (m.blockType == BlockType.Dirt) dirtWall = m.wallType;
 

@@ -15,8 +15,10 @@ MonoBehaviour:
   blockType: 11
   displayName: Plank
   tile: {fileID: 11400000, guid: f4df7721364f0b34eb79201c306c69f0, type: 2}
+  isSolid: 1
   destructible: 1
   hardness: 2
   requiredTool: 1
   dropType: 11
   dropAmount: 1
+  particleColor: {r: 0.7056604, g: 0.5417061, b: 0.33951584, a: 1}

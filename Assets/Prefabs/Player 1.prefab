@@ -348,7 +348,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 8452868397695827223, guid: cc68cc8ceeaa23240b8baabdcc27f103, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -385,6 +385,7 @@ GameObject:
   - component: {fileID: 3878274592790930452}
   - component: {fileID: 1527234593803233811}
   - component: {fileID: 5439477180617477063}
+  - component: {fileID: -5613597596296873650}
   m_Layer: 6
   m_Name: Player 1
   m_TagString: Player
@@ -519,6 +520,10 @@ MonoBehaviour:
   dashSpeed: 18
   dashDuration: 0.3
   dashCooldown: 0.8
+  swimUpSpeed: 2
+  waterGravityScale: 0.4
+  waterMoveSpeedMultiplier: 0.6
+  waterLeapForce: 10
   isGrounded: 0
 --- !u!114 &8586743150569446516
 MonoBehaviour:
@@ -741,6 +746,20 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0180cd01ad4ed6f40bee6f3ca106d138, type: 2}
   - {fileID: 11400000, guid: 0180cd01ad4ed6f40bee6f3ca106d138, type: 2}
   - {fileID: 11400000, guid: 0180cd01ad4ed6f40bee6f3ca106d138, type: 2}
+--- !u!114 &-5613597596296873650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edbb267eb24281648a75df966d426cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WalkingDustEffect
+  emitInterval: 0.13
+  spawnOffset: {x: 0, y: -1.5}
 --- !u!1 &5291934614461029377
 GameObject:
   m_ObjectHideFlags: 0
