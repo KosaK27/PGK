@@ -11,6 +11,8 @@ public abstract class EntityAI : MonoBehaviour
     protected SpriteRenderer sr;
 
     public EntityState State { get; protected set; } = EntityState.Patrol;
+    protected float knockbackTimer;
+    private const float KNOCKBACK_DURATION = 0.3f;
 
     protected float distanceToPlayer =>
         player != null ? Vector2.Distance(transform.position, player.position) : float.MaxValue;
@@ -25,15 +27,26 @@ public abstract class EntityAI : MonoBehaviour
     protected virtual void Start()
     {
         var playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null) player = playerObj.transform;
+        if (playerObj != null)
+            player = playerObj.transform;
         stats.OnDeath += OnDeath;
     }
 
     protected virtual void Update()
     {
         if (State == EntityState.Dead) return;
+        if (knockbackTimer > 0f)
+        {
+            knockbackTimer -= Time.deltaTime;
+            return;
+        }
         UpdateState();
         Tick();
+    }
+
+    public void ApplyKnockback()
+    {
+        knockbackTimer = KNOCKBACK_DURATION;
     }
 
     protected abstract void UpdateState();

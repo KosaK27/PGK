@@ -11,20 +11,21 @@ public class ContactDamage : MonoBehaviour
 
     void Update() => _damageCooldown -= Time.deltaTime;
 
-    void OnCollisionStay2D(Collision2D col)
+    void OnTriggerStay2D(Collider2D other)
     {
         if (_stats.IsDead) return;
         if (_damageCooldown > 0f) return;
 
-        var playerStats = col.gameObject.GetComponent<PlayerStats>();
+        var playerStats = other.GetComponent<PlayerStats>();
         if (playerStats != null)
         {
+            if (playerStats.IsInIframes) return;
             playerStats.TakeDamage(_stats.data.contactDamage, transform.position);
             _damageCooldown = DAMAGE_INTERVAL;
             return;
         }
 
-        var entityStats = col.gameObject.GetComponent<EntityStats>();
+        var entityStats = other.GetComponent<EntityStats>();
         if (entityStats != null && entityStats != _stats)
         {
             entityStats.TakeDamage(_stats.data.contactDamage, transform.position);

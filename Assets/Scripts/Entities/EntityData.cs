@@ -17,6 +17,9 @@ public class EntityData : ScriptableObject
     public float attackRange = 0.8f;
     public float patrolChangeInterval = 2f;
 
+    [Header("Knockback")]
+    public float knockbackResistance = 0f;
+
     [Header("Spawn")]
     public GameObject prefab;
     public float spawnWeight = 1f;

@@ -51,7 +51,14 @@ public class PlayerMovement : MonoBehaviour
     private float _dashDir;
     private float _groundedTimer;
     private float _defaultGravityScale;
+    private float _knockbackTimer;
     private const float GROUNDED_COOLDOWN = 0.1f;
+    private const float KNOCKBACK_DURATION = 0.15f;
+
+    public void ApplyKnockback()
+    {
+        _knockbackTimer = KNOCKBACK_DURATION;
+    }
 
     void Start()
     {
@@ -123,6 +130,16 @@ public class PlayerMovement : MonoBehaviour
 
         float currentSpeed = _isInWater ? moveSpeed * waterMoveSpeedMultiplier : moveSpeed;
         _rb.linearVelocity = new Vector2(move * currentSpeed, _rb.linearVelocity.y);
+
+        if (_knockbackTimer > 0f)
+        {
+            _knockbackTimer -= Time.deltaTime;
+            if (move != 0)
+                _rb.linearVelocity = new Vector2(move * moveSpeed, _rb.linearVelocity.y);
+            return;
+        }
+
+        _rb.linearVelocity = new Vector2(move * moveSpeed, _rb.linearVelocity.y);
     }
 
     private void Swim()
