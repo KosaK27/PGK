@@ -15,8 +15,8 @@ TagManager:
   - Enemy
   - Item
   - ChunkColliders
-  - 
-  - 
+  - Boss
+  - BossProjectile
   - 
   - 
   - 
