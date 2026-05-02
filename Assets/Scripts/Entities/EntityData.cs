@@ -26,4 +26,5 @@ public class EntityData : ScriptableObject
 
     [Header("Drop")]
     public float xpDrop = 10f;
+    public DropTable dropTable;
 }

@@ -20,6 +20,8 @@ MonoBehaviour:
   detectionRange: 8
   attackRange: 0.8
   patrolChangeInterval: 2
+  knockbackResistance: 0
   prefab: {fileID: 5036973930710842147, guid: eea37406d2e4ff348905d24bb2c90d59, type: 3}
   spawnWeight: 1
   xpDrop: 10
+  dropTable: {fileID: 11400000, guid: 7c09bbac875f7bc488beedba92c82552, type: 2}

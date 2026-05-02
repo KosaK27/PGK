@@ -24,7 +24,5 @@ MonoBehaviour:
   stationType: 1
   recipes:
   - {fileID: 11400000, guid: 254d0032e81ace448aeb8ae2d76552e5, type: 2}
-  - {fileID: 11400000, guid: 254d0032e81ace448aeb8ae2d76552e5, type: 2}
-  - {fileID: 11400000, guid: 254d0032e81ace448aeb8ae2d76552e5, type: 2}
-  - {fileID: 11400000, guid: 254d0032e81ace448aeb8ae2d76552e5, type: 2}
-  - {fileID: 11400000, guid: 254d0032e81ace448aeb8ae2d76552e5, type: 2}
+  - {fileID: 11400000, guid: 4030b16502e93bd4d861308cd99991c7, type: 2}
+  - {fileID: 11400000, guid: fd52e122eb37df04e90469f78c083771, type: 2}

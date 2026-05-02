@@ -73,7 +73,15 @@ public class EntityStats : MonoBehaviour
     {
         if (IsDead) return;
         IsDead = true;
-        OnDeath?.Invoke();
+        OnDeath?.Invoke(); 
+
+        if (data?.dropTable != null)
+        {
+            var drops = data.dropTable.Roll();
+            foreach (var stack in drops)
+                ItemDropSystem.Instance.DropItem(stack, transform.position);
+        }
+        
         Destroy(gameObject, 0.3f);
     }
 }

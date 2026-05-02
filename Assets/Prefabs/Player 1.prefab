@@ -700,8 +700,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2b24b6805f0ab745a15ab4fe1fae500, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeleeWeapon
-  swingDuration: 0.3
-  arcDegrees: 120
+  swingDuration: 0.8
+  arcDegrees: 150
   hitboxPrefab: {fileID: 7383180676380536301, guid: 96f7dc6411655b742993af124cd85aec, type: 3}
 --- !u!114 &1527234593803233811
 MonoBehaviour:

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e1ccd444a9a80a42bae05b20bf66656, type: 3}
+  m_Name: Workbench_Object
+  m_EditorClassIdentifier: Assembly-CSharp::CraftingStationDefinition
+  displayName: 
+  size: {x: 1, y: 1}
+  sprite: {fileID: 0}
+  hardness: 3
+  requiredTool: 0
+  dropItem: {fileID: 0}
+  dropAmount: 1
+  sortingOrder: 0
+  hasCollision: 1
+  stationType: 0
+  recipes:
+  - {fileID: 11400000, guid: 94f51d198173d724798422abeb96704e, type: 2}
+  - {fileID: 11400000, guid: 8fa32e9e9e9f28b45bb11648d95adc8d, type: 2}
+  - {fileID: 11400000, guid: bce072a3ff7c3c84f912320a0063552a, type: 2}
+  - {fileID: 11400000, guid: 9e9a8507c903c3b46b97ad5e8b57e833, type: 2}
+  - {fileID: 11400000, guid: 4d3a1205fd0d38c41a1a197c8e7ea56e, type: 2}
+  - {fileID: 11400000, guid: 78f11e989a0304d4e8f7087126eb1344, type: 2}

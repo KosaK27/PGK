@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
-  m_Name: Torch_Item
+  m_Name: LightningBoots_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 17
-  displayName: Torch
-  sprite: {fileID: 7509860518518112746, guid: 7e6b3c2014928b948adab504c6c30ad9, type: 3}
+  itemId: 36
+  displayName: Lightning Boots
+  sprite: {fileID: 120030935451547106, guid: 7f652749b806a4447b0431ff50d92ad1, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 0
   isWall: 0
   wallType: 0
-  isMultitileObject: 1
+  isMultitileObject: 0
   multitileObjectDefinition: {fileID: 11400000, guid: a05b6bbd6f67b92478921b85d09a12db, type: 2}
   isTool: 0
   toolType: 0
