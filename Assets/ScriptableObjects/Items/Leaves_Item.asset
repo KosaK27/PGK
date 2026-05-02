@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 18
   displayName: Leaves
-  sprite: {fileID: 7509860518518112746, guid: 7e6b3c2014928b948adab504c6c30ad9, type: 3}
+  sprite: {fileID: 3664983861114067704, guid: 9c508a114bebc3448a412b2c3f2f7149, type: 3}
   maxStack: 99
   isBlock: 1
   blockType: 9

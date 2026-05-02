@@ -25,7 +25,7 @@ public class ParallaxBackground : MonoBehaviour
         wasUnderground = cam.position.y < surfaceThresholdY;
     }
 
-    void Update()
+    void LateUpdate()
     {
         bool underground = cam.position.y < surfaceThresholdY;
 

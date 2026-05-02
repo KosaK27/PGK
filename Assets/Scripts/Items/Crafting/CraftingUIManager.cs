@@ -26,7 +26,8 @@ public class CraftingUIManager : MonoBehaviour
         if (!IsOpen) return;
         if (_player == null)
             _player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        if (_openObject == null) { CloseStation(); return; }
+         if (_openObject == null && _openStation != null) return;
+         if (_openObject == null) { CloseStation(); return; }
 
         var center = new Vector2(
             _openObject.Origin.x + _openObject.Definition.size.x * 0.5f,

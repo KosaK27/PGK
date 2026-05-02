@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0885b8dbd510ac840919b32f042420ec, type: 3}
   m_Name: Torch_Recipe
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
-  outputItem: {fileID: 11400000, guid: 24aca1424333d3149ab5c59b9e0efae3, type: 2}
+  outputItem: {fileID: 11400000, guid: 68c1f1411c5fba141811aa1b159f1710, type: 2}
   outputAmount: 2
   ingredients:
   - item: {fileID: 11400000, guid: a58e67551af49c6438e9a4f4c4279fbf, type: 2}

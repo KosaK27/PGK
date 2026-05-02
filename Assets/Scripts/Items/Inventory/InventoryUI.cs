@@ -22,6 +22,10 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private Color normalSlotColor = new Color(0.2f, 0.2f, 0.2f, 0.8f);
     [SerializeField] private Color selectedSlotColor = new Color(0.6f, 0.5f, 0.1f, 1f);
 
+    [Header("Inventory Crafting")]
+    [SerializeField] private Button inventoryCraftButton;
+    [SerializeField] private CraftingStationDefinition inventoryCraftingDef;
+
     private List<InventorySlotUI> _hotbarSlots = new();
     private List<InventorySlotUI> _mainSlots = new();
     private bool _isOpen = false;
@@ -49,6 +53,12 @@ public class InventoryUI : MonoBehaviour
         PositionInventoryBelowHotbar();
         mainInventoryPanel.SetActive(false);
 
+        if (inventoryCraftButton != null)
+        {
+            inventoryCraftButton.gameObject.SetActive(false);
+            inventoryCraftButton.onClick.AddListener(OnInventoryCraftButtonClicked);
+        }
+
         InventorySystem.Instance.OnInventoryChanged += RefreshAll;
         InventorySystem.Instance.OnHotbarSelectionChanged += OnHotbarSelectionChanged;
 
@@ -73,6 +83,7 @@ public class InventoryUI : MonoBehaviour
     {
         _isOpen = true;
         mainInventoryPanel.SetActive(true);
+        inventoryCraftButton?.gameObject.SetActive(true);
     }
 
     private void PositionInventoryBelowHotbar()
@@ -238,12 +249,21 @@ public class InventoryUI : MonoBehaviour
 
         _isOpen = !_isOpen;
         mainInventoryPanel.SetActive(_isOpen);
+        inventoryCraftButton?.gameObject.SetActive(_isOpen);
 
         if (!_isOpen && _isHolding)
         {
             SetSlotIconVisible(_holdFromIndex, _holdFromContainer, true);
             CancelHold();
         }
+    }
+
+    private void OnInventoryCraftButtonClicked()
+    {
+        if (CraftingUIManager.Instance.IsOpen)
+            CraftingUIManager.Instance.CloseStation();
+        else
+            CraftingUIManager.Instance.OpenStation(inventoryCraftingDef, null);
     }
 
     private void HandleHotbarKeys()
@@ -301,7 +321,9 @@ public class InventoryUI : MonoBehaviour
     public void OpenMainPanel()
     {
         mainInventoryPanel.SetActive(true);
+        inventoryCraftButton?.gameObject.SetActive(true);
     }
+
     private InventorySlotUI GetPlayerSlotUI(int index)
     {
         var inv = InventorySystem.Instance;

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0885b8dbd510ac840919b32f042420ec, type: 3}
   m_Name: Arrow_Recipe
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
-  outputItem: {fileID: 11400000, guid: f8f85dc33f702eb488973ce0c9175eaf, type: 2}
+  outputItem: {fileID: 11400000, guid: 1bc0062a82985b0499b3aee07ceffc2a, type: 2}
   outputAmount: 10
   ingredients:
   - item: {fileID: 11400000, guid: 9daf2b0ba7b276841a01b6a04fb6839f, type: 2}

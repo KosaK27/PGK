@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
   m_Name: Workbench_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 17
-  displayName: Torch
-  sprite: {fileID: 7509860518518112746, guid: 7e6b3c2014928b948adab504c6c30ad9, type: 3}
+  itemId: 39
+  displayName: Workbench
+  sprite: {fileID: 3911900145115944293, guid: 9c50190aa71b0e64b9d341ee616e6596, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 0
   isWall: 0
   wallType: 0
-  isMultitileObject: 0
+  isMultitileObject: 1
   multitileObjectDefinition: {fileID: 11400000, guid: ea871628d2ad94d48afebb0740c7e3d6, type: 2}
   isTool: 0
   toolType: 0
