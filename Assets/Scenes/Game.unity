@@ -386,6 +386,56 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0, y: 1}
+--- !u!1 &253483240
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 253483242}
+  - component: {fileID: 253483241}
+  m_Layer: 0
+  m_Name: DayNightSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &253483241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253483240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a7a9715ff09f6d4cbefae2c2f025985, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DayNightSystem
+  dayLengthSeconds: 120
+  timeOfDay: 0.25
+  autoAdvanceTime: 1
+  dayColor: {r: 0.53, g: 0.81, b: 0.98, a: 1}
+  nightColor: {r: 0.02, g: 0.02, b: 0.08, a: 1}
+  dawnColor: {r: 0.9, g: 0.55, b: 0.25, a: 1}
+--- !u!4 &253483242
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253483240}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 521.99365, y: 613.9617, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &301228290 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9219313601656426754, guid: 12d33ceabeb748f4c8749d1d165d1bb6, type: 3}
@@ -6953,3 +7003,4 @@ SceneRoots:
   - {fileID: 1150588883}
   - {fileID: 352358354}
   - {fileID: 981007878}
+  - {fileID: 253483242}
