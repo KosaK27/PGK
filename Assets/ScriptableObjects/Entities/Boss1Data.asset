@@ -22,5 +22,11 @@ MonoBehaviour:
   patrolChangeInterval: 2
   knockbackResistance: 10
   prefab: {fileID: 8153806310597004330, guid: 283daf0759f9d4b459e63ac0ebe5a22c, type: 3}
-  spawnWeight: 1
   xpDrop: 10
+  dropTable: {fileID: 0}
+  spawnInDay: 1
+  spawnInNight: 1
+  spawnOnSurface: 1
+  spawnInCaves: 0
+  spawnWeight: 1
+  allowedBiomes: 
