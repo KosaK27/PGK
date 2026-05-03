@@ -50,14 +50,14 @@ public class ChunkManager : MonoBehaviour
         var toLoad = new HashSet<Vector2Int>();
 
         for (int cy = playerChunk.y - viewDistanceY; cy <= playerChunk.y + viewDistanceY; cy++)
-        for (int cx = playerChunk.x - viewDistanceX; cx <= playerChunk.x + viewDistanceX; cx++)
-        {
-            var cp = new Vector2Int(cx, cy);
-            if (!IsValidChunk(cp, world)) continue;
-            toLoad.Add(cp);
-            if (!_loadedChunks.ContainsKey(cp))
-                LoadChunk(cp, world);
-        }
+            for (int cx = playerChunk.x - viewDistanceX; cx <= playerChunk.x + viewDistanceX; cx++)
+            {
+                var cp = new Vector2Int(cx, cy);
+                if (!IsValidChunk(cp, world)) continue;
+                toLoad.Add(cp);
+                if (!_loadedChunks.ContainsKey(cp))
+                    LoadChunk(cp, world);
+            }
 
         var toUnload = new List<Vector2Int>();
         foreach (var cp in _loadedChunks.Keys)
@@ -75,6 +75,8 @@ public class ChunkManager : MonoBehaviour
         chunk.Initialize(chunkPos, blockRegistry, wallRegistry, chunkParent);
         chunk.RenderAll(world.Data, world.OffsetX, world.OffsetY);
         _loadedChunks[chunkPos] = chunk;
+
+        FindFirstObjectByType<LightingMaterialController>()?.RefreshRenderers();
     }
 
     private void UnloadChunk(Vector2Int chunkPos)

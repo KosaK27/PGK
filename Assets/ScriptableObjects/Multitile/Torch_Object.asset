@@ -22,5 +22,5 @@ MonoBehaviour:
   sortingOrder: 0
   hasCollision: 0
   editorTile: {fileID: 11400000, guid: 0bf4368fff2d8444fa14d034c0a27499, type: 2}
-  lightColor: {r: 1, g: 0.78, b: 0.35, a: 1}
+  lightColor: {r: 2.828427, g: 2.828427, b: 2.828427, a: 1}
   lightStrength: 1
