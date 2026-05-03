@@ -4,4 +4,5 @@ using UnityEngine;
 public class ChestDefinition : MultitileObjectDefinition
 {
     public int slotCount = 20;
+    public DropTable lootTable;
 }

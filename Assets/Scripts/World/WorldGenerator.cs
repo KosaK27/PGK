@@ -48,6 +48,9 @@ public class WorldGenerator : ScriptableObject
     public int maxLakeDepth = 10;
     public int lakeSpacing = 200;
 
+    [Header("Structures")]
+    public int structureMinSpacing = 150;
+
     [Header("Wall Generation")]
     public List<BlockToWall> wallMappings = new();
 
@@ -458,15 +461,37 @@ public class WorldGenerator : ScriptableObject
 
     private void GenerateStructures(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface)
     {
-        GenerateStructuresInRange(world, width, height, biomeMap, surface, 0, width / 2);
-        GenerateStructuresInRange(world, width, height, biomeMap, surface, width / 2, width);
+        var placedRanges = new List<(int from, int to)>();
+        GenerateStructuresInRange(world, width, height, biomeMap, surface, 0, width / 2, placedRanges);
+        GenerateStructuresInRange(world, width, height, biomeMap, surface, width / 2, width, placedRanges);
     }
 
-    private void GenerateStructuresInRange(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface, int fromX, int toX)
+    private void GenerateStructuresInRange(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface, int fromX, int toX, List<(int from, int to)> placedRanges)
     {
         var counts = new Dictionary<StructureTemplate, int>();
-        int lastPlacedX = fromX - 999;
-        int minSpacing = 200;
+        int minSpacing = structureMinSpacing;
+
+        bool Overlaps(int x, int structWidth)
+        {
+            foreach (var r in placedRanges)
+                if (x < r.to + minSpacing && x + structWidth > r.from - minSpacing) return true;
+            return false;
+        }
+
+        bool IsGrounded(WorldData w, int startX, int startY, int structWidth)
+        {
+            int solidCount = 0;
+            int required = Mathf.CeilToInt(structWidth * 0.5f);
+            for (int x = startX; x < startX + structWidth; x++)
+            {
+                if (!w.InBounds(x, startY)) continue;
+                if (w.GetBlock(x, startY) == BlockType.Water) return false;
+                if (w.GetBlock(x, startY - 1) != BlockType.Air &&
+                    w.GetBlock(x, startY - 1) != BlockType.Water)
+                    solidCount++;
+            }
+            return solidCount >= required;
+        }
 
         for (int x = fromX; x < toX; x++)
         {
@@ -476,15 +501,26 @@ public class WorldGenerator : ScriptableObject
             var template = biome.structures[Random.Range(0, biome.structures.Count)];
             if (template?.blocks == null) continue;
 
-            if (x - lastPlacedX < minSpacing) continue;
-            if (!IsAreaStable(world, x, surface[x], template.size.x)) continue;
+            if (Overlaps(x, template.size.x)) continue;
+
+            int groundY = surface[x];
+            if (!IsGrounded(world, x, groundY, template.size.x)) continue;
+
+            bool allGrounded = true;
+            for (int bx = x; bx < x + template.size.x; bx++)
+            {
+                if (!world.InBounds(bx, surface[bx])) { allGrounded = false; break; }
+                if (Mathf.Abs(surface[bx] - groundY) > 2) { allGrounded = false; break; }
+                if (world.GetBlock(bx, surface[bx]) == BlockType.Water) { allGrounded = false; break; }
+            }
+            if (!allGrounded) continue;
 
             if (!counts.ContainsKey(template)) counts[template] = 0;
             if (counts[template] >= template.maxCount) continue;
 
-            PlaceStructure(world, template, x, surface[x] + 1);
+            PlaceStructure(world, template, x, groundY + 1);
             counts[template]++;
-            lastPlacedX = x;
+            placedRanges.Add((x, x + template.size.x));
         }
 
         foreach (var biome in biomes)
@@ -498,8 +534,33 @@ public class WorldGenerator : ScriptableObject
 
                 var cols = new List<int>();
                 for (int x = fromX; x < toX; x++)
-                    if (biomeMap[x] == biome && IsAreaStable(world, x, surface[x], template.size.x))
-                        cols.Add(x);
+                {
+                    if (biomeMap[x] != biome) continue;
+                    if (Overlaps(x, template.size.x)) continue;
+
+                    int groundY = surface[x];
+                    bool flat = true;
+                    for (int bx = x; bx < x + template.size.x; bx++)
+                    {
+                        if (!world.InBounds(bx, surface[bx])) { flat = false; break; }
+                        if (Mathf.Abs(surface[bx] - groundY) > 2) { flat = false; break; }
+                        if (world.GetBlock(bx, surface[bx]) == BlockType.Water) { flat = false; break; }
+                    }
+                    if (!flat) continue;
+
+                    bool solidBelow = false;
+                    for (int bx = x; bx < x + template.size.x; bx++)
+                    {
+                        if (world.InBounds(bx, groundY - 1) &&
+                            world.GetBlock(bx, groundY - 1) != BlockType.Air &&
+                            world.GetBlock(bx, groundY - 1) != BlockType.Water)
+                        {
+                            solidBelow = true;
+                            break;
+                        }
+                    }
+                    if (solidBelow) cols.Add(x);
+                }
 
                 for (int i = cols.Count - 1; i > 0; i--)
                 {
@@ -509,34 +570,31 @@ public class WorldGenerator : ScriptableObject
 
                 while (counts[template] < halfMin && cols.Count > 0)
                 {
-                    if (Mathf.Abs(cols[0] - lastPlacedX) >= minSpacing)
-                    {
-                        PlaceStructure(world, template, cols[0], surface[cols[0]] + 1);
-                        lastPlacedX = cols[0];
-                        counts[template]++;
-                    }
+                    int cx = cols[0];
                     cols.RemoveAt(0);
+                    if (Overlaps(cx, template.size.x)) continue;
+                    PlaceStructure(world, template, cx, surface[cx] + 1);
+                    placedRanges.Add((cx, cx + template.size.x));
+                    counts[template]++;
                 }
             }
         }
     }
 
-    private bool IsAreaStable(WorldData world, int startX, int surfaceY, int structWidth)
+private bool IsAreaStable(WorldData world, int startX, int surfaceY, int structWidth)
+{
+    int solidCount = 0;
+    int required = Mathf.CeilToInt(structWidth * 0.5f);
+    for (int x = startX; x < startX + structWidth; x++)
     {
-        int solidCount = 0;
-        int required = Mathf.CeilToInt(structWidth * 0.5f);
-
-        for (int x = startX; x < startX + structWidth; x++)
-        {
-            if (!world.InBounds(x, surfaceY)) continue;
-            if (world.GetBlock(x, surfaceY) == BlockType.Water) return false;
-            if (world.GetBlock(x, surfaceY - 1) != BlockType.Air &&
-                world.GetBlock(x, surfaceY - 1) != BlockType.Water)
-                solidCount++;
-        }
-
-        return solidCount >= required;
+        if (!world.InBounds(x, surfaceY)) continue;
+        if (world.GetBlock(x, surfaceY) == BlockType.Water) return false;
+        if (world.GetBlock(x, surfaceY - 1) != BlockType.Air &&
+            world.GetBlock(x, surfaceY - 1) != BlockType.Water)
+            solidCount++;
     }
+    return solidCount >= required;
+}
 
     private void PlaceStructure(WorldData world, StructureTemplate template, int originX, int originY)
     {
@@ -556,7 +614,9 @@ public class WorldGenerator : ScriptableObject
             var worldPos = new Vector2Int(
                 originX + placement.localOrigin.x + _offsetX,
                 originY + placement.localOrigin.y + _offsetY);
-            MultitileObjectSystem.Instance.PlaceDirect(worldPos, placement.definition);
+            var obj = MultitileObjectSystem.Instance.PlaceDirect(worldPos, placement.definition);
+            if (obj is ChestObject chest)
+                chest.FillWithLoot();
         }
     }
 

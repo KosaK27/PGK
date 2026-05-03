@@ -23,3 +23,4 @@ MonoBehaviour:
   hasCollision: 0
   editorTile: {fileID: 11400000, guid: 6a1804dfb163bcd49b88f2fba149d090, type: 2}
   slotCount: 20
+  lootTable: {fileID: 11400000, guid: 47815cec994bdb847b96c11de2728d4c, type: 2}
