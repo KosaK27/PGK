@@ -21,6 +21,7 @@ MonoBehaviour:
   dropAmount: 1
   sortingOrder: 0
   hasCollision: 0
+  editorTile: {fileID: 11400000, guid: cf68d7ade43c1144f8ef1a296db7fa41, type: 2}
   stationType: 1
   recipes:
   - {fileID: 11400000, guid: 254d0032e81ace448aeb8ae2d76552e5, type: 2}

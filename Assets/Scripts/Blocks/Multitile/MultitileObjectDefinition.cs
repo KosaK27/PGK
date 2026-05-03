@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 [CreateAssetMenu(fileName = "MultitileObjectDefinition", menuName = "World/MultitileObjectDefinition")]
 public class MultitileObjectDefinition : ScriptableObject
@@ -12,4 +13,5 @@ public class MultitileObjectDefinition : ScriptableObject
     public int dropAmount = 1;
     public int sortingOrder = 0;
     public bool hasCollision = true;
+    public TileBase editorTile;
 }

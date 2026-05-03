@@ -21,4 +21,11 @@ public class WallRegistry : ScriptableObject
         _lookup.TryGetValue(type, out var data);
         return data;
     }
+
+    public WallType GetWallType(UnityEngine.Tilemaps.TileBase tile)
+    {
+        foreach (var wall in _lookup.Values)
+            if (wall.tile == tile) return wall.wallType;
+        return WallType.None;
+    }
 }

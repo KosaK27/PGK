@@ -13,5 +13,19 @@ MonoBehaviour:
   m_Name: House_Structure
   m_EditorClassIdentifier: Assembly-CSharp::StructureTemplate
   structureName: House
-  size: {x: 9, y: 7}
-  blocks: 020202020202020202000202020202020200000002020202020000000000010001000000000000010001000000000000010001000000000004040404040000
+  size: {x: 10, y: 6}
+  minCount: 1
+  maxCount: 3
+  blocks: 020202020202020202020b0000000000000000000b0000000000000000000b0000000000000000000b00000000000000000b0b0b0b0b0b0b0b0b0b0b
+  walls: 020202020202020202020002020202020202020200020202020202020202000202020202020202020002020202020202020000000000000000000000
+  objects:
+  - localOrigin: {x: 1, y: 1}
+    definition: {fileID: 11400000, guid: 3937095b43be710488274a264083a0a3, type: 2}
+  - localOrigin: {x: 5, y: 1}
+    definition: {fileID: 11400000, guid: f6cf02992790dba4d8315d75e14028db, type: 2}
+  - localOrigin: {x: 2, y: 3}
+    definition: {fileID: 11400000, guid: a05b6bbd6f67b92478921b85d09a12db, type: 2}
+  - localOrigin: {x: 7, y: 3}
+    definition: {fileID: 11400000, guid: a05b6bbd6f67b92478921b85d09a12db, type: 2}
+  - localOrigin: {x: 3, y: 1}
+    definition: {fileID: 11400000, guid: ea871628d2ad94d48afebb0740c7e3d6, type: 2}

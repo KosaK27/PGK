@@ -21,4 +21,5 @@ MonoBehaviour:
   dropAmount: 1
   sortingOrder: 0
   hasCollision: 0
+  editorTile: {fileID: 11400000, guid: 6a1804dfb163bcd49b88f2fba149d090, type: 2}
   slotCount: 20

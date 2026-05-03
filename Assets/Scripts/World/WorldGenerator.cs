@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WorldGenerator", menuName = "World/WorldGenerator")]
@@ -50,6 +51,8 @@ public class WorldGenerator : ScriptableObject
     [Header("Wall Generation")]
     public List<BlockToWall> wallMappings = new();
 
+    private int _offsetX;
+    private int _offsetY;
     [System.Serializable]
     public class BlockToWall
     {
@@ -67,6 +70,9 @@ public class WorldGenerator : ScriptableObject
 
         int width = world.Width;
         int height = world.Height;
+        _offsetX = -world.Width / 2;
+        _offsetY = -world.Height / 2;
+        
 
         var biomeMap = GenerateBiomeMap(width);
         var baseSurface = GenerateSurface(width, height, biomeMap);
@@ -80,8 +86,8 @@ public class WorldGenerator : ScriptableObject
         CarveHillEntrances(world, width, height, surface, hillMap);
         GenerateLakes(world, width, height, surface);
         GenerateOres(world, width, height, biomeMap, surface);
-        GenerateStructures(world, width, height, biomeMap, surface);
         GenerateTrees(world, width, height, biomeMap, surface);
+        GenerateStructures(world, width, height, biomeMap, surface);
     }
 
     private void GenerateLakes(WorldData world, int width, int height, int[] surface)
@@ -161,7 +167,6 @@ public class WorldGenerator : ScriptableObject
                     {
                         if (world.GetBlock(x, y) == BlockType.Air || world.GetBlock(x, y) == BlockType.Dirt)
                             world.SetBlock(x, y, BlockType.Stone);
-
                         break;
                     }
                 }
@@ -453,9 +458,17 @@ public class WorldGenerator : ScriptableObject
 
     private void GenerateStructures(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface)
     {
-        var counts = new Dictionary<StructureTemplate, int>();
+        GenerateStructuresInRange(world, width, height, biomeMap, surface, 0, width / 2);
+        GenerateStructuresInRange(world, width, height, biomeMap, surface, width / 2, width);
+    }
 
-        for (int x = 0; x < width; x++)
+    private void GenerateStructuresInRange(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface, int fromX, int toX)
+    {
+        var counts = new Dictionary<StructureTemplate, int>();
+        int lastPlacedX = fromX - 999;
+        int minSpacing = 200;
+
+        for (int x = fromX; x < toX; x++)
         {
             var biome = biomeMap[x];
             if (biome.structures.Count == 0 || Random.value > biome.structureChance) continue;
@@ -463,15 +476,15 @@ public class WorldGenerator : ScriptableObject
             var template = biome.structures[Random.Range(0, biome.structures.Count)];
             if (template?.blocks == null) continue;
 
+            if (x - lastPlacedX < minSpacing) continue;
             if (!IsAreaStable(world, x, surface[x], template.size.x)) continue;
 
             if (!counts.ContainsKey(template)) counts[template] = 0;
+            if (counts[template] >= template.maxCount) continue;
 
-            if (counts[template] < template.maxCount)
-            {
-                PlaceStructure(world, template, x, surface[x]);
-                counts[template]++;
-            }
+            PlaceStructure(world, template, x, surface[x] + 1);
+            counts[template]++;
+            lastPlacedX = x;
         }
 
         foreach (var biome in biomes)
@@ -480,16 +493,13 @@ public class WorldGenerator : ScriptableObject
             {
                 if (template?.blocks == null) continue;
                 if (!counts.ContainsKey(template)) counts[template] = 0;
-                if (counts[template] >= template.minCount) continue;
+                int halfMin = template.minCount / 2;
+                if (counts[template] >= halfMin) continue;
 
                 var cols = new List<int>();
-                for (int x = 0; x < width; x++)
-                {
+                for (int x = fromX; x < toX; x++)
                     if (biomeMap[x] == biome && IsAreaStable(world, x, surface[x], template.size.x))
-                    {
                         cols.Add(x);
-                    }
-                }
 
                 for (int i = cols.Count - 1; i > 0; i--)
                 {
@@ -497,11 +507,15 @@ public class WorldGenerator : ScriptableObject
                     (cols[i], cols[j]) = (cols[j], cols[i]);
                 }
 
-                while (counts[template] < template.minCount && cols.Count > 0)
+                while (counts[template] < halfMin && cols.Count > 0)
                 {
-                    PlaceStructure(world, template, cols[0], surface[cols[0]]);
+                    if (Mathf.Abs(cols[0] - lastPlacedX) >= minSpacing)
+                    {
+                        PlaceStructure(world, template, cols[0], surface[cols[0]] + 1);
+                        lastPlacedX = cols[0];
+                        counts[template]++;
+                    }
                     cols.RemoveAt(0);
-                    counts[template]++;
                 }
             }
         }
@@ -509,27 +523,41 @@ public class WorldGenerator : ScriptableObject
 
     private bool IsAreaStable(WorldData world, int startX, int surfaceY, int structWidth)
     {
+        int solidCount = 0;
+        int required = Mathf.CeilToInt(structWidth * 0.5f);
+
         for (int x = startX; x < startX + structWidth; x++)
         {
-            if (!world.InBounds(x, surfaceY)) return false;
-
-            BlockType blockAtSurface = world.GetBlock(x, surfaceY);
-            BlockType blockBelow = world.GetBlock(x, surfaceY - 1);
-
-            if (blockAtSurface == BlockType.Water || blockAtSurface == BlockType.Air) return false;
-            if (blockBelow == BlockType.Air || blockBelow == BlockType.Water) return false;
+            if (!world.InBounds(x, surfaceY)) continue;
+            if (world.GetBlock(x, surfaceY) == BlockType.Water) return false;
+            if (world.GetBlock(x, surfaceY - 1) != BlockType.Air &&
+                world.GetBlock(x, surfaceY - 1) != BlockType.Water)
+                solidCount++;
         }
-        return true;
+
+        return solidCount >= required;
     }
 
     private void PlaceStructure(WorldData world, StructureTemplate template, int originX, int originY)
     {
         for (int y = 0; y < template.size.y; y++)
-            for (int x = 0; x < template.size.x; x++)
-            {
-                var block = template.GetBlock(x, y);
-                if (block != BlockType.Air) world.SetBlock(originX + x, originY + y, block);
-            }
+        for (int x = 0; x < template.size.x; x++)
+        {
+            world.SetBlock(originX + x, originY + y, template.GetBlock(x, y));
+
+            var wall = template.GetWall(x, y);
+            if (wall != WallType.None)
+                world.SetWall(originX + x, originY + y, wall);
+        }
+
+        foreach (var placement in template.objects)
+        {
+            if (placement.definition == null) continue;
+            var worldPos = new Vector2Int(
+                originX + placement.localOrigin.x + _offsetX,
+                originY + placement.localOrigin.y + _offsetY);
+            MultitileObjectSystem.Instance.PlaceDirect(worldPos, placement.definition);
+        }
     }
 
     private void GenerateTrees(WorldData world, int width, int height, BiomeData[] biomeMap, int[] surface)
