@@ -7,10 +7,9 @@ public class DayNightSystem : MonoBehaviour
     [Header("Czas dnia")]
     public float dayLengthSeconds = 120f;
 
-    [Header("reczne sterowanie")]
+    [Header("Reczne sterowanie")]
     [Range(0f, 1f)]
     public float timeOfDay = 0.25f;
-
     public bool autoAdvanceTime = true;
 
     [Header("Kolory nieba")]
@@ -21,10 +20,11 @@ public class DayNightSystem : MonoBehaviour
     public bool IsDay => timeOfDay >= 0.22f && timeOfDay < 0.78f;
     public bool IsNight => !IsDay;
     public float AmbientBrightness { get; private set; }
-
     public event System.Action<bool> OnDayNightChanged;
+
     private bool _wasDayLastFrame;
     private Camera _mainCamera;
+
 
     void Awake()
     {
@@ -51,6 +51,8 @@ public class DayNightSystem : MonoBehaviour
             OnDayNightChanged?.Invoke(isNowDay);
             _wasDayLastFrame = isNowDay;
         }
+
+        LightingSystem.Instance?.UpdateAmbientOnly();
     }
 
     private void ApplySkyColor()
