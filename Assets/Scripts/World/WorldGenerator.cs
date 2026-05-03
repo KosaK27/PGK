@@ -509,6 +509,7 @@ public class WorldGenerator : ScriptableObject
             bool allGrounded = true;
             for (int bx = x; bx < x + template.size.x; bx++)
             {
+                if (bx < 0 || bx >= width) { allGrounded = false; break; }
                 if (!world.InBounds(bx, surface[bx])) { allGrounded = false; break; }
                 if (Mathf.Abs(surface[bx] - groundY) > 2) { allGrounded = false; break; }
                 if (world.GetBlock(bx, surface[bx]) == BlockType.Water) { allGrounded = false; break; }
@@ -542,6 +543,7 @@ public class WorldGenerator : ScriptableObject
                     bool flat = true;
                     for (int bx = x; bx < x + template.size.x; bx++)
                     {
+                        if (bx < 0 || bx >= width) { flat = false; break; }
                         if (!world.InBounds(bx, surface[bx])) { flat = false; break; }
                         if (Mathf.Abs(surface[bx] - groundY) > 2) { flat = false; break; }
                         if (world.GetBlock(bx, surface[bx]) == BlockType.Water) { flat = false; break; }
