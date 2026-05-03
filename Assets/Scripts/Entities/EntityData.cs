@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "EntityData", menuName = "Entities/EntityData")]
 public class EntityData : ScriptableObject
@@ -20,11 +21,22 @@ public class EntityData : ScriptableObject
     [Header("Knockback")]
     public float knockbackResistance = 0f;
 
-    [Header("Spawn")]
+    [Header("Spawn Prefab")]
     public GameObject prefab;
-    public float spawnWeight = 1f;
 
     [Header("Drop")]
     public float xpDrop = 10f;
     public DropTable dropTable;
+
+    [Header("Spawn Conditions")]
+    public bool spawnInDay = true;
+    public bool spawnInNight = false;
+    public bool spawnOnSurface = true;
+    public bool spawnInCaves = false;
+
+    [Tooltip("Waga losowania tego moba")]
+    public float spawnWeight = 1f;
+
+    [Header("Biomes")]
+    public List<BiomeType> allowedBiomes = new List<BiomeType>();
 }

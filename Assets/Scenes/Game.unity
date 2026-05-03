@@ -2869,10 +2869,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c0d3c1ddd845fbc42848177db2fd15df, type: 2}
   - {fileID: 11400000, guid: 58abb826655c1404cba705471ccdccdc, type: 2}
   - {fileID: 11400000, guid: 10dc1cd63d2e2cd47afdb468b88fb9e1, type: 2}
-  maxEntities: 2
-  spawnInterval: 1
+  maxEntitiesCap: 20
+  baseSpawnInterval: 5
   spawnMinDist: 12
-  spawnMaxDist: 20
+  spawnMaxDist: 40
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!4 &1290673902
 Transform:
   m_ObjectHideFlags: 0
