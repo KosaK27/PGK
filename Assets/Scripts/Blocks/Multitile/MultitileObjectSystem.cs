@@ -107,9 +107,11 @@ public class MultitileObjectSystem : MonoBehaviour
         return false;
     }
 
-    public void PlaceDirect(Vector2Int origin, MultitileObjectDefinition def)
+    public MultitileObject PlaceDirect(Vector2Int origin, MultitileObjectDefinition def)
     {
-        Register(CreateObject(def, origin));
+        var obj = CreateObject(def, origin);
+        Register(obj);
+        return obj;
     }
 
     private MultitileObject CreateObject(MultitileObjectDefinition def, Vector2Int origin)

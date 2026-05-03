@@ -17,4 +17,13 @@ public class ChestObject : MultitileObject
     {
         ContainerUIManager.Instance.OpenContainer(Container, this);
     }
+
+    public void FillWithLoot()
+    {
+        var def = Definition as ChestDefinition;
+        if (def?.lootTable == null) return;
+        var loot = def.lootTable.Roll();
+        foreach (var stack in loot)
+            Container.AddItem(stack);
+    }
 }

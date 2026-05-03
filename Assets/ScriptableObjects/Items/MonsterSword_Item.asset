@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MonsterSword_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 36
-  displayName: Lightning Boots
+  displayName: Monster Sword
   sprite: {fileID: -8654076859120194568, guid: cfe6d9ad2df96884e944b9ad663722d6, type: 3}
   maxStack: 99
   isBlock: 0
