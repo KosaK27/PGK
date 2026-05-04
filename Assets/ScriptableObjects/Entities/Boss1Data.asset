@@ -23,7 +23,7 @@ MonoBehaviour:
   knockbackResistance: 10
   prefab: {fileID: 8153806310597004330, guid: 283daf0759f9d4b459e63ac0ebe5a22c, type: 3}
   xpDrop: 10
-  dropTable: {fileID: 0}
+  dropTable: {fileID: 11400000, guid: 0411ad896bd23224d98f8bac3170e505, type: 2}
   spawnInDay: 1
   spawnInNight: 1
   spawnOnSurface: 1
