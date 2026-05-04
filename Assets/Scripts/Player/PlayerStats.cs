@@ -40,6 +40,8 @@ public class PlayerStats : MonoBehaviour
         currentHP -= damage;
         currentHP = Mathf.Max(0, currentHP);
 
+        PlayerAudioManager.Instance?.PlayPlayerHit();
+
         _iframeTimer = iframeDuration;
         if (_hitEffect != null)
         {

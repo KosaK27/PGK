@@ -14,6 +14,8 @@ public class ToolSwing : MonoBehaviour
 
     private float _mineTimer;
     private bool _mineForward = true;
+    private bool _wasHeld;
+    private float _swingSoundTimer;
 
     void Awake() => _arm = GetComponent<PlayerArmAnimator>();
 
@@ -52,8 +54,26 @@ public class ToolSwing : MonoBehaviour
         {
             _mineTimer = 0f;
             _mineForward = true;
+            _wasHeld = false;
+            _swingSoundTimer = 0f;
             if (_toolRenderer != null) _toolRenderer.enabled = false;
             return;
+        }
+
+        if (!_wasHeld)
+        {
+            PlayerAudioManager.Instance?.PlayToolSwing();
+            _wasHeld = true;
+            _swingSoundTimer = 1f / item.breakingSpeed;
+        }
+        else
+        {
+            _swingSoundTimer -= Time.deltaTime;
+            if (_swingSoundTimer <= 0f)
+            {
+                PlayerAudioManager.Instance?.PlayToolSwing();
+                _swingSoundTimer = 1f / item.breakingSpeed;
+            }
         }
 
         if (_toolRenderer != null)
@@ -86,6 +106,8 @@ public class ToolSwing : MonoBehaviour
     {
         _mineTimer = 0f;
         _mineForward = true;
+        _wasHeld = false;
+        _swingSoundTimer = 0f;
         if (_toolRenderer != null) _toolRenderer.enabled = false;
     }
 }

@@ -34,7 +34,7 @@ public class BowShooter : MonoBehaviour
 
         if (arrowItemDef != null && !InventorySystem.Instance.HasItem(arrowItemDef, 1))
         {
-            Debug.Log("Brak strza≥!");
+            Debug.Log("Brak strza≈Ç!");
             return;
         }
 
@@ -44,8 +44,7 @@ public class BowShooter : MonoBehaviour
     void Shoot(ItemDefinition bowDef)
     {
         var mousePos = Mouse.current.position.ReadValue();
-        var worldPos = mainCamera.ScreenToWorldPoint(
-                           new Vector3(mousePos.x, mousePos.y, 0));
+        var worldPos = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
         worldPos.z = 0;
 
         Vector2 dir = ((Vector2)worldPos - (Vector2)transform.position).normalized;
@@ -54,11 +53,12 @@ public class BowShooter : MonoBehaviour
         var go = Instantiate(arrowPrefab, origin, Quaternion.identity);
         var p = go.GetComponent<Projectile>();
         if (p != null)
-            p.Init(dir, bowDef.damage, bowDef.projectileSpeed,
-                   false, true, gameObject);
+            p.Init(dir, bowDef.damage, bowDef.projectileSpeed, false, true, gameObject);
 
         if (arrowItemDef != null)
             InventorySystem.Instance.RemoveItem(arrowItemDef, 1);
+
+        PlayerAudioManager.Instance?.PlayBowShoot();
 
         _cooldownTimer = bowDef.shootCooldown;
     }

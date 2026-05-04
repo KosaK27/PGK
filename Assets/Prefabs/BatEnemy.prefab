@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1404142127712309032}
   - component: {fileID: 7178929792493729165}
   - component: {fileID: -8273433114951826492}
+  - component: {fileID: 1504565143840810233}
   m_Layer: 7
   m_Name: BatEnemy
   m_TagString: Untagged
@@ -86,7 +87,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2183197417649841194, guid: 4914979460d137d43a235e5a85ff5a74, type: 3}
+  m_Sprite: {fileID: -3685644493221375052, guid: 82aac53d7ad615941bad246dd50928d0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -162,13 +163,13 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2, y: 2}
+    oldSize: {x: 3.125, y: 1.5}
     newSize: {x: 1.5, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 2, y: 1.5}
   m_EdgeRadius: 0
 --- !u!114 &7983402026297257457
 MonoBehaviour:
@@ -261,15 +262,32 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.0000019073486}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2, y: 2}
+    oldSize: {x: 3.125, y: 1.5}
     newSize: {x: 1.5, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 2, y: 1.5}
   m_EdgeRadius: 0
+--- !u!114 &1504565143840810233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1437335698542309438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c083be2979feeed4caf2fc5829068541, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  spriteRenderer: {fileID: 4123703642163677764}
+  wingsUp: {fileID: -125164288524404143, guid: 10abc5d3d31a59249a918cd627cd02c5, type: 3}
+  wingsMiddle: {fileID: -3685644493221375052, guid: 82aac53d7ad615941bad246dd50928d0, type: 3}
+  wingsDown: {fileID: 394267731516017603, guid: d9f17def003034848b1f9e3f717feb3a, type: 3}
+  framesPerSecond: 10

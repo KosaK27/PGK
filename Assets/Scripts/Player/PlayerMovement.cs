@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isGrounded;
     public bool IsDashing { get; private set; }
-    private bool _isInWater; // Nowa zmienna
+    private bool _isInWater;
 
     public PlayerLocomotionState LocomotionState { get; private set; }
     public PlayerAirState AirState { get; private set; }
@@ -36,10 +36,8 @@ public class PlayerMovement : MonoBehaviour
             if (ActionState == PlayerActionState.UsingWeapon) return PlayerState.UseWeapon;
             if (ActionState == PlayerActionState.UsingTool) return PlayerState.UseTool;
             if (IsDashing) return PlayerState.Dash;
-
             if (AirState == PlayerAirState.Jumping) return PlayerState.Jump;
             if (LocomotionState == PlayerLocomotionState.Walk) return PlayerState.Walk;
-
             return PlayerState.Idle;
         }
     }
@@ -99,6 +97,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         UpdateStates();
+
+        bool isMoving = LocomotionState == PlayerLocomotionState.Walk;
+        PlayerAudioManager.Instance?.TryPlayFootstep(isMoving, isGrounded);
     }
 
     private void CheckWater()
@@ -150,7 +151,6 @@ public class PlayerMovement : MonoBehaviour
             if (blockAbove == BlockType.Air)
             {
                 _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, waterLeapForce);
-
                 _isInWater = false;
             }
             else
@@ -165,6 +165,12 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame && _jumpsLeft > 0)
         {
             _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
+
+            if (_jumpsLeft == maxJumps)
+                PlayerAudioManager.Instance?.PlayJump();
+            else
+                PlayerAudioManager.Instance?.PlayDoubleJump();
+
             _jumpsLeft--;
             isGrounded = false;
             _groundedTimer = 0;
@@ -185,18 +191,16 @@ public class PlayerMovement : MonoBehaviour
         _dashTimer = dashDuration;
         _dashCooldownTimer = dashCooldown;
         IsDashing = true;
+
+        PlayerAudioManager.Instance?.PlayDash();
     }
 
     private void UpdateStates()
     {
         if (_isInWater)
-        {
             AirState = PlayerAirState.Jumping;
-        }
         else
-        {
             AirState = isGrounded ? PlayerAirState.Grounded : PlayerAirState.Jumping;
-        }
 
         float vx = Mathf.Abs(_rb.linearVelocity.x);
         LocomotionState = vx > 0.05f ? PlayerLocomotionState.Walk : PlayerLocomotionState.Idle;

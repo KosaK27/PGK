@@ -21,7 +21,6 @@ public abstract class EntityAI : MonoBehaviour
     {
         stats = GetComponent<EntityStats>();
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
     }
 
     protected virtual void Start()
@@ -61,7 +60,12 @@ public abstract class EntityAI : MonoBehaviour
 
     protected void FlipTowards(float directionX)
     {
-        if (Mathf.Abs(directionX) > 0.01f && sr != null)
-            sr.flipX = directionX < 0;
+        if (Mathf.Abs(directionX) > 0.01f)
+        {
+            if (directionX > 0f)
+                transform.localScale = new Vector3(1f, 1f, 1f);
+            else
+                transform.localScale = new Vector3(-1f, 1f, 1f);
+        }
     }
 }

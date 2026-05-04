@@ -8,6 +8,10 @@ public class BossAttack_Tornado : MonoBehaviour
     [SerializeField] private GameObject tornadoPrefab;
     [SerializeField] private float spawnOffset = 1f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip tornadoSound;
+    [SerializeField] private AudioSource audioSource;
+
     public IEnumerator Execute(Transform boss, Transform player, Rigidbody2D rb)
     {
         Vector2 targetPos = new Vector2(player.position.x, player.position.y + heightAbovePlayer);
@@ -21,6 +25,9 @@ public class BossAttack_Tornado : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
         yield return new WaitForSeconds(0.4f);
+
+        if (tornadoSound != null && audioSource != null)
+            audioSource.PlayOneShot(tornadoSound, 5f);
 
         if (tornadoPrefab != null)
         {

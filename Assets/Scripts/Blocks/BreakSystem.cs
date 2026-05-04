@@ -99,6 +99,7 @@ public class BreakSystem : MonoBehaviour
 
     private void FinishBreakBlock(Vector3Int cell, Vector3 worldPos)
     {
+        BlockAudioManager.Instance?.PlayBreak();
         var blockType = WorldManager.Instance.GetBlock(cell.x, cell.y);
         var data = blockRegistry.Get(blockType);
 
@@ -116,6 +117,7 @@ public class BreakSystem : MonoBehaviour
 
     private void FinishBreakWall(Vector3Int cell, Vector3 worldPos)
     {
+        BlockAudioManager.Instance?.PlayBreak();
         var wallType = WorldManager.Instance.GetWall(cell.x, cell.y);
         var data = wallRegistry.Get(wallType);
 

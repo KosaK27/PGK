@@ -74,14 +74,13 @@ public class MeleeWeapon : MonoBehaviour
             if (_toolRoot != null)
                 _toolRoot.localRotation = Quaternion.Euler(0, 0, localAngle + SPRITE_ANGLE_OFFSET);
 
-            if (t >= 0.5f && _activeHitbox == null)
+            if (t >= 0.1f && _activeHitbox == null)
             {
                 SpawnHitbox(_hitboxAngle);
                 if (!_slashEmitted)
                 {
                     _slashEmitted = true;
-                    ParticleManager.Instance.EmitSlash(
-                        transform.position + _hitboxOffset, _hitboxAngle);
+                    ParticleManager.Instance.EmitSlash(transform.position + _hitboxOffset, _hitboxAngle);
                 }
             }
 
@@ -118,6 +117,8 @@ public class MeleeWeapon : MonoBehaviour
         _slashEmitted = false;
         _arm.FaceTowardCursor();
 
+        PlayerAudioManager.Instance?.PlaySwordSwing();
+
         Vector3 mouseWorld = _cam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         mouseWorld.z = 0f;
 
@@ -147,9 +148,7 @@ public class MeleeWeapon : MonoBehaviour
             Mathf.Cos(worldAngle * Mathf.Deg2Rad),
             Mathf.Sin(worldAngle * Mathf.Deg2Rad));
         _hitboxOffset = (Vector3)(worldDir * (_currentHitboxDistance + _currentHitboxSize.x * 0.5f));
-        _activeHitbox = Instantiate(hitboxPrefab,
-            transform.position + _hitboxOffset,
-            Quaternion.Euler(0, 0, worldAngle));
+        _activeHitbox = Instantiate(hitboxPrefab, transform.position + _hitboxOffset, Quaternion.Euler(0, 0, worldAngle));
         _activeHitbox.transform.localScale = new Vector3(_currentHitboxSize.x, _currentHitboxSize.y, 1f);
         var col = _activeHitbox.GetComponent<BoxCollider2D>();
         if (col != null) col.size = Vector2.one;

@@ -20,14 +20,18 @@ MonoBehaviour:
   blockType: 0
   isWall: 0
   wallType: 0
+  isMultitileObject: 0
+  multitileObjectDefinition: {fileID: 0}
   isTool: 0
   toolType: 0
   breakingSpeed: 1
   isWeapon: 1
   weaponType: 1
   damage: 10
-  hitboxSize: {x: 3, y: 2}
+  hitboxSize: {x: 4, y: 2}
   hitboxDistance: 0
+  projectileSpeed: 14
+  shootCooldown: 0.8
   holdPositionUp: {x: -0.75, y: 1}
   holdPositionForward: {x: -0.7, y: 0}
   holdPositionDown: {x: -0.6, y: -1}

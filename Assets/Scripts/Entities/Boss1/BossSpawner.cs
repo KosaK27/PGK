@@ -9,6 +9,7 @@ public class BossSpawner : MonoBehaviour
 
     private GameObject _activeBoss;
 
+
     void Update()
     {
         if (Keyboard.current[Key.B].wasPressedThisFrame)
@@ -25,9 +26,15 @@ public class BossSpawner : MonoBehaviour
         Vector3 spawnPos = playerObj.transform.position + new Vector3(spawnOffsetX, spawnOffsetY, 0f);
         _activeBoss = Instantiate(bossPrefab, spawnPos, Quaternion.identity);
 
+        MusicManager.Instance?.PlayBoss();
+
         var stats = _activeBoss.GetComponent<EntityStats>();
         if (stats != null)
-            stats.OnDeath += () => _activeBoss = null;
+            stats.OnDeath += () =>
+            {
+                _activeBoss = null;
+                MusicManager.Instance?.PlayNormal();
+            };
 
         var playerStats = playerObj.GetComponent<PlayerStats>();
         if (playerStats != null)
@@ -40,6 +47,7 @@ public class BossSpawner : MonoBehaviour
         {
             Destroy(_activeBoss);
             _activeBoss = null;
+            MusicManager.Instance?.PlayNormal(); // <- i tu na wypadek śmierci gracza
         }
     }
 }

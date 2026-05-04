@@ -20,6 +20,7 @@ public class PlaceSystem : MonoBehaviour
 
         if (MultitileObjectSystem.Instance.IsOccupied(new Vector2Int(cell.x, cell.y))) return false;
         WorldManager.Instance.PlaceBlock(cell.x, cell.y, blockType);
+        BlockAudioManager.Instance?.PlayPlace();
         return true;
     }
 
@@ -29,6 +30,7 @@ public class PlaceSystem : MonoBehaviour
         if (WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None) return false;
 
         WorldManager.Instance.PlaceWall(cell.x, cell.y, wallType);
+        BlockAudioManager.Instance?.PlayPlace();
         return true;
     }
 

@@ -34,6 +34,8 @@ public class EntityStats : MonoBehaviour
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
         OnHPChanged?.Invoke(CurrentHP, data.maxHP);
 
+        PlayerAudioManager.Instance?.PlayEnemyHit();
+
         if (sourcePosition.HasValue)
         {
             _hitEffect?.TriggerHit(sourcePosition.Value);
@@ -47,8 +49,7 @@ public class EntityStats : MonoBehaviour
                 var rb = GetComponent<Rigidbody2D>();
                 if (rb != null)
                 {
-                    Vector2 horizontal = new Vector2(
-                        transform.position.x - sourcePosition.Value.x, 0f);
+                    Vector2 horizontal = new Vector2(transform.position.x - sourcePosition.Value.x, 0f);
                     if (horizontal.sqrMagnitude < 0.001f) horizontal = Vector2.right;
                     else horizontal.Normalize();
                     Vector2 force = new Vector2(horizontal.x * knockbackForce, knockbackForce) * multiplier;
@@ -73,7 +74,7 @@ public class EntityStats : MonoBehaviour
     {
         if (IsDead) return;
         IsDead = true;
-        OnDeath?.Invoke(); 
+        OnDeath?.Invoke();
 
         if (data?.dropTable != null)
         {
@@ -81,7 +82,7 @@ public class EntityStats : MonoBehaviour
             foreach (var stack in drops)
                 ItemDropSystem.Instance.DropItem(stack, transform.position);
         }
-        
+
         Destroy(gameObject, 0.3f);
     }
 }
