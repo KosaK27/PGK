@@ -14,9 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
   blockType: 2
   displayName: Stone
-  tile: {fileID: 11400000, guid: 7d98f6148f28bc1469a6f1a117fd4388, type: 2}
+  tile: {fileID: 0}
+  connectedTile: {fileID: 11400000, guid: 36f6c3343660d5e4b90782f234b63f08, type: 2}
+  isSolid: 1
   destructible: 1
   hardness: 2
   requiredTool: 1
   dropType: 2
   dropAmount: 1
+  particleColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

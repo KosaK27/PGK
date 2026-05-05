@@ -8,6 +8,7 @@ public class BlockData : ScriptableObject
 
     [Header("Tile")]
     public TileBase tile;
+    public ConnectedTile connectedTile;
 
     [Header("Properties")]
     public bool isSolid = true;

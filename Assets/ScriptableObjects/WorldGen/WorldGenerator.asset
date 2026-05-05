@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a3819a99fb858e40880b321253b54d6, type: 3}
   m_Name: WorldGenerator
   m_EditorClassIdentifier: Assembly-CSharp::WorldGenerator
-  seed: 0
+  seed: 767783
   randomSeed: 1
   defaultBiome: {fileID: 11400000, guid: ee18ce399cb7764459468d097234c667, type: 2}
   biomes:
@@ -22,6 +22,29 @@ MonoBehaviour:
   caveScale: 0.05
   caveThreshold: 0.45
   caveStartDepth: 10
+  ravineChance: 0.002
+  ravineMinWidth: 3
+  ravineMaxWidth: 10
+  ravineMinDepth: 15
+  ravineMaxDepth: 35
+  hillScale: 0.025
+  hillHeight: 55
+  hillThreshold: 0.4
+  hillSafeZone: 200
+  hillEntranceChance: 0.6
+  hillEntranceMinSize: 4
+  hillEntranceMaxSize: 9
+  treeChance: 0.08
+  minTreeHeight: 4
+  maxTreeHeight: 7
+  trunkBlock: 10
+  leafBlock: 9
+  minLakeWidth: 8
+  maxLakeWidth: 32
+  minLakeDepth: 5
+  maxLakeDepth: 10
+  lakeSpacing: 200
+  structureMinSpacing: 150
   wallMappings:
   - blockType: 1
     wallType: 1
@@ -32,4 +55,4 @@ MonoBehaviour:
   - blockType: 5
     wallType: 1
   - blockType: 4
-    wallType: 1
+    wallType: 0
