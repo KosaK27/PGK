@@ -1,0 +1,91 @@
+using System;
+using UnityEngine;
+
+public class SettingsManager : MonoBehaviour
+{
+    public static SettingsManager Instance { get; private set; }
+
+    public SettingsData Current => SaveManager.Instance.Settings;
+
+    public event Action<float> OnMusicVolumeChanged;
+    public event Action<float> OnGameSoundVolumeChanged;
+    public event Action<float> OnMenuSoundVolumeChanged;
+    public event Action<float> OnCameraZoomChanged;
+
+    void Awake()
+    {
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    void Start()
+    {
+        Apply();
+    }
+
+    public void Apply()
+    {
+        SetResolutionDirect(Current.resolutionIndex, Current.fullscreen);
+        OnMusicVolumeChanged?.Invoke(Current.musicVolume);
+        OnGameSoundVolumeChanged?.Invoke(Current.gameSoundVolume);
+        OnMenuSoundVolumeChanged?.Invoke(Current.menuSoundVolume);
+        OnCameraZoomChanged?.Invoke(Current.cameraZoom);
+    }
+
+    public void SetFullscreen(bool value)
+    {
+        Current.fullscreen = value;
+        Screen.fullScreen = value;
+        SaveManager.Instance.SaveSettings();
+    }
+
+    public void SetResolution(int index, bool fullscreen)
+    {
+        var resolutions = Screen.resolutions;
+        if (resolutions.Length == 0) return;
+        index = Mathf.Clamp(index, 0, resolutions.Length - 1);
+        Current.resolutionIndex = index;
+        Current.fullscreen = fullscreen;
+        var r = resolutions[index];
+        Screen.SetResolution(r.width, r.height, fullscreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed);
+        SaveManager.Instance.SaveSettings();
+    }
+
+    private void SetResolutionDirect(int index, bool fullscreen)
+    {
+        var resolutions = Screen.resolutions;
+        if (resolutions.Length == 0) return;
+        index = Mathf.Clamp(index, 0, resolutions.Length - 1);
+        var r = resolutions[index];
+        Screen.SetResolution(r.width, r.height, fullscreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed);
+    }
+
+    public void SetMusicVolume(float value)
+    {
+        Current.musicVolume = value;
+        OnMusicVolumeChanged?.Invoke(value);
+        SaveManager.Instance.SaveSettings();
+    }
+
+    public void SetGameSoundVolume(float value)
+    {
+        Current.gameSoundVolume = value;
+        OnGameSoundVolumeChanged?.Invoke(value);
+        SaveManager.Instance.SaveSettings();
+    }
+
+    public void SetMenuSoundVolume(float value)
+    {
+        Current.menuSoundVolume = value;
+        OnMenuSoundVolumeChanged?.Invoke(value);
+        SaveManager.Instance.SaveSettings();
+    }
+
+    public void SetCameraZoom(float value)
+    {
+        Current.cameraZoom = value;
+        OnCameraZoomChanged?.Invoke(value);
+        SaveManager.Instance.SaveSettings();
+    }
+}

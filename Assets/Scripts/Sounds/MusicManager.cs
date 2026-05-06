@@ -21,19 +21,23 @@ public class MusicManager : MonoBehaviour
 
     void Start()
     {
+        if (SettingsManager.Instance != null)
+        {
+            musicSource.volume = SettingsManager.Instance.Current.musicVolume;
+            SettingsManager.Instance.OnMusicVolumeChanged += v => musicSource.volume = v;
+        }
         PlayNormal();
     }
 
     void Update()
     {
         if (!_fading) return;
-
         musicSource.volume -= fadeSpeed * Time.deltaTime;
         if (musicSource.volume <= 0f)
         {
             musicSource.clip = _targetClip;
             musicSource.Play();
-            musicSource.volume = 1f;
+            musicSource.volume = SettingsManager.Instance != null ? SettingsManager.Instance.Current.musicVolume : 1f;
             _fading = false;
         }
     }

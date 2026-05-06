@@ -7,14 +7,20 @@ public class UIAudioManager : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip hoverSound;
     [SerializeField] private AudioClip clickSound;
-    [SerializeField] private float volume = 1f;
+
+    private float _volume = 1f;
 
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
+        if (SettingsManager.Instance != null)
+        {
+            _volume = SettingsManager.Instance.Current.menuSoundVolume;
+            SettingsManager.Instance.OnMenuSoundVolumeChanged += v => _volume = v;
+        }
     }
 
-    public void PlayHover() => audioSource.PlayOneShot(hoverSound, volume);
-    public void PlayClick() => audioSource.PlayOneShot(clickSound, volume);
+    public void PlayHover() => audioSource.PlayOneShot(hoverSound, _volume);
+    public void PlayClick() => audioSource.PlayOneShot(clickSound, _volume);
 }

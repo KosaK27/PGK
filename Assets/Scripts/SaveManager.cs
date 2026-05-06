@@ -11,10 +11,12 @@ public class SaveManager : MonoBehaviour
     private static string CharactersDir => Path.Combine(RootDir, "Characters");
     private static string WorldsDir => Path.Combine(RootDir, "Worlds");
     private static string ProfilePath => Path.Combine(RootDir, "profile.json");
+    private static string SettingsPath => Path.Combine(RootDir, "settings.json");
 
     public GameProfile Profile { get; private set; } = new();
     public List<CharacterSaveData> Characters { get; private set; } = new();
     public List<WorldSaveData> Worlds { get; private set; } = new();
+    public SettingsData Settings { get; private set; } = new();
 
     public CharacterSaveData SelectedCharacter => Characters.Find(c => c.id == Profile.selectedCharacterId);
     public WorldSaveData SelectedWorld => Worlds.Find(w => w.id == Profile.selectedWorldId);
@@ -29,6 +31,7 @@ public class SaveManager : MonoBehaviour
         Profile = LoadJson<GameProfile>(ProfilePath) ?? new GameProfile();
         Characters = LoadAll<CharacterSaveData>(CharactersDir);
         Worlds = LoadAll<WorldSaveData>(WorldsDir);
+        Settings = LoadJson<SettingsData>(SettingsPath) ?? new SettingsData();
         Debug.Log($"[SaveManager] Loaded {Characters.Count} characters, {Worlds.Count} worlds. Path: {RootDir}");
     }
 
@@ -71,6 +74,7 @@ public class SaveManager : MonoBehaviour
     public void SelectCharacter(string id) { Profile.selectedCharacterId = id; SaveProfile(); }
     public void SelectWorld(string id) { Profile.selectedWorldId = id; SaveProfile(); }
     public void SaveProfile() => WriteJson(Profile, ProfilePath);
+    public void SaveSettings() => WriteJson(Settings, SettingsPath);
 
     public void CaptureWorldState(WorldSaveData save, WorldData world)
     {
@@ -105,7 +109,6 @@ public class SaveManager : MonoBehaviour
         }
         var stats = player.GetComponent<PlayerStats>();
         if (stats != null) { save.currentHP = stats.currentHP; save.maxHP = stats.maxHP; }
-
         save.worldPositions.RemoveAll(p => p.worldId == worldId);
         save.worldPositions.Add(new WorldPositionSave { worldId = worldId, positionX = player.transform.position.x, positionY = player.transform.position.y });
     }
@@ -121,10 +124,8 @@ public class SaveManager : MonoBehaviour
             InventorySystem.Instance.SetSlot(entry.slotIndex, new ItemStack(def, entry.amount));
         }
         InventorySystem.Instance.SelectHotbarSlot(save.hotbarSelectedIndex);
-
         var stats = player.GetComponent<PlayerStats>();
         if (stats != null) { stats.currentHP = save.currentHP > 0 ? save.currentHP : save.maxHP; stats.maxHP = save.maxHP > 0 ? save.maxHP : 20; }
-
         var worldPos = save.worldPositions.Find(p => p.worldId == worldId);
         player.transform.position = worldPos != null ? new Vector3(worldPos.positionX, worldPos.positionY, 0f) : fallbackSpawnPos;
     }

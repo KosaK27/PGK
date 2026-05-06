@@ -7,15 +7,20 @@ public class BlockAudioManager : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip placeSound;
     [SerializeField] private AudioClip breakSound;
-    [SerializeField] private float placeVolume = 1f;
-    [SerializeField] private float breakVolume = 1f;
+
+    private float _volume = 1f;
 
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
+        if (SettingsManager.Instance != null)
+        {
+            _volume = SettingsManager.Instance.Current.gameSoundVolume;
+            SettingsManager.Instance.OnGameSoundVolumeChanged += v => _volume = v;
+        }
     }
 
-    public void PlayPlace() => audioSource.PlayOneShot(placeSound, placeVolume);
-    public void PlayBreak() => audioSource.PlayOneShot(breakSound, breakVolume);
+    public void PlayPlace() => audioSource.PlayOneShot(placeSound, _volume);
+    public void PlayBreak() => audioSource.PlayOneShot(breakSound, _volume);
 }

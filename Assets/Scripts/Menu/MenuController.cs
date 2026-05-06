@@ -8,6 +8,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject _hubPanel;
     [SerializeField] private GameObject _characterPanel;
     [SerializeField] private GameObject _worldPanel;
+    [SerializeField] private GameObject _settingsPanel;
     [SerializeField] private TextMeshProUGUI _characterLabel;
     [SerializeField] private TextMeshProUGUI _worldLabel;
     [SerializeField] private Button _playButton;
@@ -23,6 +24,7 @@ public class MenuController : MonoBehaviour
         _hubPanel.SetActive(true);
         _characterPanel.SetActive(false);
         _worldPanel.SetActive(false);
+        _settingsPanel.SetActive(false);
         RefreshLabels();
     }
 
@@ -43,6 +45,7 @@ public class MenuController : MonoBehaviour
 
     public void OnCharacterClicked()
     {
+        _settingsPanel.SetActive(false);
         _worldPanel.SetActive(false);
         _characterPanel.SetActive(true);
         _characterPanel.GetComponent<CharacterPanel>().Open(this);
@@ -50,8 +53,21 @@ public class MenuController : MonoBehaviour
 
     public void OnWorldClicked()
     {
+        _settingsPanel.SetActive(false);
         _characterPanel.SetActive(false);
         _worldPanel.SetActive(true);
         _worldPanel.GetComponent<WorldPanel>().Open(this);
+    }
+
+    public void OnSettingsClicked()
+    {
+        _characterPanel.SetActive(false);
+        _worldPanel.SetActive(false);
+        _settingsPanel.SetActive(!_settingsPanel.activeSelf);
+    }
+
+    public void OnQuitClicked()
+    {
+        Application.Quit();
     }
 }
