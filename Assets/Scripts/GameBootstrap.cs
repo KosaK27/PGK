@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,6 @@ public class GameBootstrap : MonoBehaviour
 {
     [SerializeField] private ItemRegistry _itemRegistry;
     [SerializeField] private MultitileObjectRegistry _multitileRegistry;
-    [SerializeField] private GameObject _loadingScreen;
     [SerializeField] private ItemDefinition[] _startItems;
 
     private bool _saved = false;
@@ -24,11 +24,9 @@ public class GameBootstrap : MonoBehaviour
 
     IEnumerator Initialize()
     {
-        if (_loadingScreen != null) _loadingScreen.SetActive(true);
-
         yield return null;
 
-        _player = GameObject.FindGameObjectWithTag("Player");
+        _player = PlayerSpawner.Instance.SpawnPlayer();
 
         Rigidbody2D rb = null;
         if (_player != null)
@@ -37,14 +35,13 @@ public class GameBootstrap : MonoBehaviour
             if (rb != null) rb.simulated = false;
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitUntil(() => ChunkManager.Instance.IsChunkLoaded(_player.transform.position));
 
         var sm = SaveManager.Instance;
 
         if (sm == null)
         {
             if (rb != null) rb.simulated = true;
-            if (_loadingScreen != null) _loadingScreen.SetActive(false);
             yield break;
         }
 
@@ -52,29 +49,26 @@ public class GameBootstrap : MonoBehaviour
         var charSave = sm.SelectedCharacter;
         bool isNewSession = charSave == null || charSave.inventorySlots.Count == 0;
 
-        if (worldSave != null && worldSave.blocks != null && worldSave.blocks.Count > 0)
+        if (worldSave != null && worldSave.blockDiffs != null && worldSave.blockDiffs.Count > 0)
         {
             sm.RestoreWorldState(worldSave, _worldManager.Data);
             ChunkManager.Instance.RebuildAll(_worldManager.OffsetX, _worldManager.OffsetY);
             yield return null;
             RestoreMultitileObjects(worldSave);
         }
+        else
+        {
+            PlacePendingObjects();
+        }
 
         yield return null;
-
-        if (_player == null) _player = GameObject.FindGameObjectWithTag("Player");
-
-        if (_player == null)
-        {
-            if (_loadingScreen != null) _loadingScreen.SetActive(false);
-            Debug.LogError("[GameBootstrap] No GameObject with tag 'Player' found.");
-            yield break;
-        }
 
         if (charSave != null)
         {
             Vector3 fallback = PlayerSpawner.Instance != null ? PlayerSpawner.Instance.GetSpawnPosition() : _player.transform.position;
             sm.RestoreCharacterState(charSave, _player, _itemRegistry, worldSave?.id ?? "", fallback);
+            yield return new WaitUntil(() => ChunkManager.Instance.IsChunkLoaded(_player.transform.position));
+            ChunkManager.Instance.RebuildAll(_worldManager.OffsetX, _worldManager.OffsetY);
         }
 
         if (isNewSession && _startItems != null)
@@ -84,7 +78,19 @@ public class GameBootstrap : MonoBehaviour
         }
 
         if (rb != null) rb.simulated = true;
-        if (_loadingScreen != null) _loadingScreen.SetActive(false);
+    }
+
+    void PlacePendingObjects()
+    {
+        var pending = WorldDataTransfer.PendingPlacements;
+        if (pending == null) return;
+        foreach (var p in pending)
+        {
+            var obj = MultitileObjectSystem.Instance.PlaceDirect(p.worldPos, p.definition);
+            if (p.fillWithLoot && obj is ChestObject chest)
+                chest.FillWithLoot();
+        }
+        WorldDataTransfer.PendingPlacements = null;
     }
 
     void OnApplicationQuit() => AutoSave();
@@ -111,7 +117,7 @@ public class GameBootstrap : MonoBehaviour
 
         if (worldSave != null && _worldManager != null)
         {
-            sm.CaptureWorldState(worldSave, _worldManager.Data);
+            sm.CaptureWorldState(worldSave, _worldManager.Data, _worldManager.OriginalData);
             CaptureMultitileObjects(worldSave);
             sm.SaveWorld(worldSave);
         }

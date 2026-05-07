@@ -55,7 +55,7 @@ public class SaveManager : MonoBehaviour
 
     public WorldSaveData CreateWorld(string name, int width, int height, int seed)
     {
-        var w = new WorldSaveData { id = Guid.NewGuid().ToString(), worldName = name, width = width, height = height, seed = seed, createdAt = DateTime.UtcNow.Ticks, lastPlayedAt = DateTime.UtcNow.Ticks };
+        var w = new WorldSaveData { id = Guid.NewGuid().ToString(), worldName = name, width = width, height = height, seed = seed, createdAt = DateTime.UtcNow.Ticks, lastPlayedAt = 0 };
         Worlds.Add(w);
         SaveWorld(w);
         return w;
@@ -76,24 +76,29 @@ public class SaveManager : MonoBehaviour
     public void SaveProfile() => WriteJson(Profile, ProfilePath);
     public void SaveSettings() => WriteJson(Settings, SettingsPath);
 
-    public void CaptureWorldState(WorldSaveData save, WorldData world)
+    public void CaptureWorldState(WorldSaveData save, WorldData world, WorldData originalWorld)
     {
-        save.blocks = RLEEncode(world.GetRawData(), world.Width * world.Height);
-        save.walls = RLEEncode(world.GetRawWallData(), world.Width * world.Height);
+        save.blockDiffs.Clear();
+        save.wallDiffs.Clear();
+        for (int x = 0; x < world.Width; x++)
+            for (int y = 0; y < world.Height; y++)
+            {
+                var block = world.GetBlock(x, y);
+                if (block != originalWorld.GetBlock(x, y))
+                    save.blockDiffs.Add(new BlockDiff { x = x, y = y, blockType = (int)block });
+                var wall = world.GetWall(x, y);
+                if (wall != originalWorld.GetWall(x, y))
+                    save.wallDiffs.Add(new WallDiff { x = x, y = y, wallType = (int)wall });
+            }
         save.lastPlayedAt = DateTime.UtcNow.Ticks;
     }
 
     public void RestoreWorldState(WorldSaveData save, WorldData world)
     {
-        int[] blocks = RLEDecode(save.blocks, world.Width * world.Height);
-        int[] walls = RLEDecode(save.walls, world.Width * world.Height);
-        for (int i = 0; i < blocks.Length; i++)
-        {
-            int x = i % world.Width;
-            int y = i / world.Width;
-            world.SetBlock(x, y, (BlockType)blocks[i]);
-            world.SetWall(x, y, (WallType)walls[i]);
-        }
+        foreach (var diff in save.blockDiffs)
+            world.SetBlock(diff.x, diff.y, (BlockType)diff.blockType);
+        foreach (var diff in save.wallDiffs)
+            world.SetWall(diff.x, diff.y, (WallType)diff.wallType);
     }
 
     public void CaptureCharacterState(CharacterSaveData save, GameObject player, string worldId)
@@ -128,31 +133,6 @@ public class SaveManager : MonoBehaviour
         if (stats != null) { stats.currentHP = save.currentHP > 0 ? save.currentHP : save.maxHP; stats.maxHP = save.maxHP > 0 ? save.maxHP : 20; }
         var worldPos = save.worldPositions.Find(p => p.worldId == worldId);
         player.transform.position = worldPos != null ? new Vector3(worldPos.positionX, worldPos.positionY, 0f) : fallbackSpawnPos;
-    }
-
-    private static List<RLEEntry> RLEEncode(Array src, int length)
-    {
-        var result = new List<RLEEntry>();
-        if (length == 0) return result;
-        int cur = Convert.ToInt32(src.GetValue(0)), cnt = 1;
-        for (int i = 1; i < length; i++)
-        {
-            int v = Convert.ToInt32(src.GetValue(i));
-            if (v == cur) cnt++;
-            else { result.Add(new RLEEntry { type = cur, count = cnt }); cur = v; cnt = 1; }
-        }
-        result.Add(new RLEEntry { type = cur, count = cnt });
-        return result;
-    }
-
-    private static int[] RLEDecode(List<RLEEntry> entries, int expectedLength)
-    {
-        var result = new int[expectedLength];
-        int i = 0;
-        foreach (var e in entries)
-            for (int k = 0; k < e.count && i < expectedLength; k++)
-                result[i++] = e.type;
-        return result;
     }
 
     private static void WriteJson<T>(T obj, string path)

@@ -12,7 +12,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _characterLabel;
     [SerializeField] private TextMeshProUGUI _worldLabel;
     [SerializeField] private Button _playButton;
-    [SerializeField] private string _gameSceneName = "Game";
+    [SerializeField] private string _loadingSceneName = "Loading";
 
     void Start()
     {
@@ -40,7 +40,9 @@ public class MenuController : MonoBehaviour
     {
         var sm = SaveManager.Instance;
         if (sm.SelectedCharacter == null || sm.SelectedWorld == null) return;
-        SceneManager.LoadScene(_gameSceneName);
+        var worldSave = sm.SelectedWorld;
+        LoadingContext.IsNewWorld = worldSave.lastPlayedAt == 0;
+        SceneManager.LoadScene(_loadingSceneName);
     }
 
     public void OnCharacterClicked()

@@ -40,9 +40,25 @@ public class WorldSaveData
     public int seed;
     public long createdAt;
     public long lastPlayedAt;
-    public List<RLEEntry> blocks = new();
-    public List<RLEEntry> walls = new();
+    public List<BlockDiff> blockDiffs = new();
+    public List<WallDiff> wallDiffs = new();
     public List<MultitileObjectSave> multitileObjects = new();
+}
+
+[Serializable]
+public class BlockDiff
+{
+    public int x;
+    public int y;
+    public int blockType;
+}
+
+[Serializable]
+public class WallDiff
+{
+    public int x;
+    public int y;
+    public int wallType;
 }
 
 [Serializable]

@@ -9,10 +9,11 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
+        if (target == null) return;
         transform.position = new Vector3(
-        Mathf.Round((target.position.x + offset.x) * pixelsPerUnit) / pixelsPerUnit,
-        Mathf.Round((target.position.y + offset.y) * pixelsPerUnit) / pixelsPerUnit,
-        -10f
-    );
+            Mathf.Round((target.position.x + offset.x) * pixelsPerUnit) / pixelsPerUnit,
+            Mathf.Round((target.position.y + offset.y) * pixelsPerUnit) / pixelsPerUnit,
+            -10f
+        );
     }
 }

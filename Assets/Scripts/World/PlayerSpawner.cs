@@ -11,11 +11,6 @@ public class PlayerSpawner : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
-    {
-        SpawnPlayer();
-    }
-
     public Vector3 GetSpawnPosition()
     {
         var world = WorldManager.Instance;
@@ -24,16 +19,14 @@ public class PlayerSpawner : MonoBehaviour
         return new Vector3(worldX + 1f, surfaceY + 2f, 0f);
     }
 
-    public void SpawnPlayer()
+    public GameObject SpawnPlayer()
     {
-        if (playerPrefab == null) { Debug.LogWarning("Brak Player Prefab!"); return; }
-
+        if (playerPrefab == null) { Debug.LogWarning("Brak Player Prefab!"); return null; }
         var spawnPos = GetSpawnPosition();
         var player = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
-
         var cam = Camera.main.GetComponent<CameraFollow>();
         if (cam != null) cam.target = player.transform;
-
         ChunkManager.Instance.SetPlayer(player.transform);
+        return player;
     }
 }

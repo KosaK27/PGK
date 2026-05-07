@@ -15,9 +15,9 @@ public class WorldPanel : MonoBehaviour
 
     private static readonly (int w, int h)[] _presets =
     {
-        (800, 300),
-        (1600, 500),
-        (3200, 800)
+        (4000, 1000),
+        (6000,1500),
+        (8000, 2000),
     };
 
     private MenuController _menu;

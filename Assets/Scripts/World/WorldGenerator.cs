@@ -1,5 +1,6 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WorldGenerator", menuName = "World/WorldGenerator")]
@@ -56,41 +57,129 @@ public class WorldGenerator : ScriptableObject
 
     private int _offsetX;
     private int _offsetY;
-    [System.Serializable]
+    private List<int> _lakeCenters = new();
+    private List<PendingObjectPlacement> _pendingPlacements = new();
+
+    private float waitTime = 0f;
+
+    public struct PendingObjectPlacement
+    {
+        public MultitileObjectDefinition definition;
+        public Vector2Int worldPos;
+        public bool fillWithLoot;
+    }
+
+    [Serializable]
     public class BlockToWall
     {
         public BlockType blockType;
         public WallType wallType;
     }
 
-    private List<int> _lakeCenters = new List<int>();
-
-    public void Generate(WorldData world)
+    public void Generate(WorldData world, WorldGenerationProgress progress = null)
     {
-        if (randomSeed) seed = Random.Range(0, 999999);
-        Random.InitState(seed);
+        if (randomSeed) seed = UnityEngine.Random.Range(0, 999999);
+        UnityEngine.Random.InitState(seed);
         _lakeCenters.Clear();
+        _pendingPlacements.Clear();
 
         int width = world.Width;
         int height = world.Height;
         _offsetX = -world.Width / 2;
         _offsetY = -world.Height / 2;
-        
 
+        progress?.Report(0f, "Generating biomes...");
         var biomeMap = GenerateBiomeMap(width);
+        progress?.Report(0.05f, "Generating surface...");
         var baseSurface = GenerateSurface(width, height, biomeMap);
+        progress?.Report(0.1f, "Generating hills...");
+        var hillMap = GenerateHillMap(width, height);
+        var surface = MergeSurfaces(baseSurface, hillMap, width, height);
+        progress?.Report(0.2f, "Filling terrain...");
+        FillTerrain(world, width, height, biomeMap, surface);
+        progress?.Report(0.35f, "Generating walls...");
+        GenerateWalls(world, width, height);
+        progress?.Report(0.4f, "Carving ravines...");
+        CarveRavines(world, width, height, surface);
+        progress?.Report(0.5f, "Carving caves...");
+        GenerateCaves(world, width, height, surface);
+        progress?.Report(0.65f, "Carving hill entrances...");
+        CarveHillEntrances(world, width, height, surface, hillMap);
+        progress?.Report(0.7f, "Generating lakes...");
+        GenerateLakes(world, width, height, surface);
+        progress?.Report(0.75f, "Generating ores...");
+        GenerateOres(world, width, height, biomeMap, surface);
+        progress?.Report(0.85f, "Generating trees...");
+        GenerateTrees(world, width, height, biomeMap, surface);
+        progress?.Report(0.9f, "Generating structures...");
+        GenerateStructures(world, width, height, biomeMap, surface);
+        progress?.Report(1f, "Done.");
+    }
+
+    public IEnumerator GenerateCoroutine(WorldData world, Action<float, string> onProgress)
+    {
+        if (randomSeed) seed = UnityEngine.Random.Range(0, 999999);
+        UnityEngine.Random.InitState(seed);
+        _lakeCenters.Clear();
+        _pendingPlacements.Clear();
+
+        int width = world.Width;
+        int height = world.Height;
+        _offsetX = -world.Width / 2;
+        _offsetY = -world.Height / 2;
+
+        onProgress(0f, "Generating biomes...");
+        yield return new WaitForSeconds(waitTime);
+        var biomeMap = GenerateBiomeMap(width);
+
+        onProgress(0.05f, "Generating surface...");
+        yield return new WaitForSeconds(waitTime);
+        var baseSurface = GenerateSurface(width, height, biomeMap);
+
+        onProgress(0.1f, "Generating hills...");
+        yield return new WaitForSeconds(waitTime);
         var hillMap = GenerateHillMap(width, height);
         var surface = MergeSurfaces(baseSurface, hillMap, width, height);
 
+        onProgress(0.2f, "Filling terrain...");
+        yield return new WaitForSeconds(waitTime);
         FillTerrain(world, width, height, biomeMap, surface);
+
+        onProgress(0.35f, "Generating walls...");
+        yield return new WaitForSeconds(waitTime);
         GenerateWalls(world, width, height);
+
+        onProgress(0.4f, "Carving ravines...");
+        yield return new WaitForSeconds(waitTime);
         CarveRavines(world, width, height, surface);
+
+        onProgress(0.5f, "Carving caves...");
+        yield return new WaitForSeconds(waitTime);
         GenerateCaves(world, width, height, surface);
+
+        onProgress(0.65f, "Carving hill entrances...");
+        yield return new WaitForSeconds(waitTime);
         CarveHillEntrances(world, width, height, surface, hillMap);
+
+        onProgress(0.7f, "Generating lakes...");
+        yield return new WaitForSeconds(waitTime);
         GenerateLakes(world, width, height, surface);
+
+        onProgress(0.75f, "Generating ores...");
+        yield return new WaitForSeconds(waitTime);
         GenerateOres(world, width, height, biomeMap, surface);
+
+        onProgress(0.85f, "Generating trees...");
+        yield return new WaitForSeconds(waitTime);
         GenerateTrees(world, width, height, biomeMap, surface);
+
+        onProgress(0.9f, "Generating structures...");
+        yield return new WaitForSeconds(waitTime);
         GenerateStructures(world, width, height, biomeMap, surface);
+
+        onProgress(1f, "Done.");
+
+        WorldDataTransfer.PendingPlacements = new List<PendingObjectPlacement>(_pendingPlacements);
     }
 
     private void GenerateLakes(WorldData world, int width, int height, int[] surface)
@@ -98,78 +187,47 @@ public class WorldGenerator : ScriptableObject
         int attempts = width / 100;
         WallType dirtWall = WallType.None;
         foreach (var m in wallMappings) if (m.blockType == BlockType.Dirt) dirtWall = m.wallType;
-
         for (int i = 0; i < attempts; i++)
         {
-            int startX = Random.Range(20, width - 20);
+            int startX = UnityEngine.Random.Range(20, width - 20);
             int surfaceY = surface[startX];
-
-            int lWidth = Random.Range(10, 20);
-            int lDepth = Random.Range(4, 7);
+            int lWidth = UnityEngine.Random.Range(10, 20);
+            int lDepth = UnityEngine.Random.Range(4, 7);
             int halfW = lWidth / 2;
-
             int leftEdgeX = Mathf.Clamp(startX - halfW, 0, width - 1);
             int rightEdgeX = Mathf.Clamp(startX + halfW, 0, width - 1);
-
             if (Mathf.Abs(surface[leftEdgeX] - surface[rightEdgeX]) > 3) continue;
-
             bool caveBelow = false;
             for (int x = startX - halfW; x <= startX + halfW; x += 3)
             {
                 for (int y = surfaceY - 4; y >= surfaceY - 8; y--)
                 {
-                    if (world.InBounds(x, y) && world.GetBlock(x, y) == BlockType.Air)
-                    {
-                        caveBelow = true;
-                        break;
-                    }
+                    if (world.InBounds(x, y) && world.GetBlock(x, y) == BlockType.Air) { caveBelow = true; break; }
                 }
                 if (caveBelow) break;
             }
             if (caveBelow) continue;
-
             bool tooClose = false;
             foreach (int c in _lakeCenters) if (Mathf.Abs(startX - c) < 30) tooClose = true;
             if (tooClose) continue;
-
             _lakeCenters.Add(startX);
             int waterLevelY = surfaceY - 1;
-
             for (int x = startX - halfW; x <= startX + halfW; x++)
             {
                 if (!world.InBounds(x, 0)) continue;
-
                 float dist = Mathf.Abs(x - startX) / (float)halfW;
                 int currentDepth = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Clamp01(1 - dist * dist)) * lDepth);
                 int bottomY = waterLevelY - currentDepth;
-
                 for (int y = waterLevelY + 8; y >= bottomY - 5; y--)
                 {
                     if (!world.InBounds(x, y)) continue;
-
-                    if (y > waterLevelY)
-                    {
-                        world.SetBlock(x, y, BlockType.Air);
-                        world.SetWall(x, y, WallType.None);
-                    }
-                    else if (y <= waterLevelY && y > bottomY)
-                    {
-                        world.SetBlock(x, y, BlockType.Water);
-                        world.SetWall(x, y, dirtWall);
-                    }
-                    else if (y == bottomY)
-                    {
-                        world.SetBlock(x, y, BlockType.Sand);
-                        world.SetWall(x, y, dirtWall);
-                    }
-                    else if (y < bottomY && y >= bottomY - 2)
-                    {
-                        world.SetBlock(x, y, BlockType.Dirt);
-                    }
+                    if (y > waterLevelY) { world.SetBlock(x, y, BlockType.Air); world.SetWall(x, y, WallType.None); }
+                    else if (y <= waterLevelY && y > bottomY) { world.SetBlock(x, y, BlockType.Water); world.SetWall(x, y, dirtWall); }
+                    else if (y == bottomY) { world.SetBlock(x, y, BlockType.Sand); world.SetWall(x, y, dirtWall); }
+                    else if (y < bottomY && y >= bottomY - 2) { world.SetBlock(x, y, BlockType.Dirt); }
                     else if (y < bottomY - 2)
                     {
-                        if (world.GetBlock(x, y) == BlockType.Air || world.GetBlock(x, y) == BlockType.Dirt)
-                            world.SetBlock(x, y, BlockType.Stone);
+                        if (world.GetBlock(x, y) == BlockType.Air || world.GetBlock(x, y) == BlockType.Dirt) world.SetBlock(x, y, BlockType.Stone);
                         break;
                     }
                 }
@@ -231,10 +289,10 @@ public class WorldGenerator : ScriptableObject
             if (hillMap[x] < 20) continue;
             int distFromCenter = Mathf.Abs(x - centerX);
             if (distFromCenter < hillSafeZone) continue;
-            if (Random.value > hillEntranceChance) continue;
-            int entranceSize = Random.Range(hillEntranceMinSize, hillEntranceMaxSize + 1);
+            if (UnityEngine.Random.value > hillEntranceChance) continue;
+            int entranceSize = UnityEngine.Random.Range(hillEntranceMinSize, hillEntranceMaxSize + 1);
             int surfaceY = surface[x];
-            int entranceY = Random.Range(surfaceY - hillMap[x] + 4, surfaceY - entranceSize / 2);
+            int entranceY = UnityEngine.Random.Range(surfaceY - hillMap[x] + 4, surfaceY - entranceSize / 2);
             entranceY = Mathf.Clamp(entranceY, 5, height - 5);
             for (int ey = entranceY - entranceSize / 2; ey <= entranceY + entranceSize / 2; ey++)
                 for (int ex = x - entranceSize * 2; ex <= x + 3; ex++)
@@ -243,11 +301,7 @@ public class WorldGenerator : ScriptableObject
                     float dy = Mathf.Abs(ey - entranceY) / (entranceSize / 2f);
                     if (dy > 1f) continue;
                     float halfW = entranceSize * Mathf.Sqrt(1f - dy * dy);
-                    if (ex >= x - halfW && ex <= x + 2)
-                    {
-                        world.SetBlock(ex, ey, BlockType.Air);
-                        world.SetWall(ex, ey, WallType.None);
-                    }
+                    if (ex >= x - halfW && ex <= x + 2) { world.SetBlock(ex, ey, BlockType.Air); world.SetWall(ex, ey, WallType.None); }
                 }
             x += entranceSize + 5;
         }
@@ -258,10 +312,10 @@ public class WorldGenerator : ScriptableObject
         int x = 10;
         while (x < width - 10)
         {
-            if (Random.value < ravineChance)
+            if (UnityEngine.Random.value < ravineChance)
             {
-                int ravWidth = Random.Range(ravineMinWidth, ravineMaxWidth + 1);
-                int ravDepth = Random.Range(ravineMinDepth, ravineMaxDepth + 1);
+                int ravWidth = UnityEngine.Random.Range(ravineMinWidth, ravineMaxWidth + 1);
+                int ravDepth = UnityEngine.Random.Range(ravineMinDepth, ravineMaxDepth + 1);
                 for (int rx = x; rx < Mathf.Min(x + ravWidth, width - 1); rx++)
                 {
                     float edge = (float)(rx - x) / ravWidth;
@@ -269,13 +323,9 @@ public class WorldGenerator : ScriptableObject
                     int localDepth = Mathf.RoundToInt(ravDepth * taper);
                     int top = surface[rx];
                     int bottom = Mathf.Max(top - localDepth, 2);
-                    for (int ry = bottom; ry <= top + 1; ry++)
-                    {
-                        world.SetBlock(rx, ry, BlockType.Air);
-                        world.SetWall(rx, ry, WallType.None);
-                    }
+                    for (int ry = bottom; ry <= top + 1; ry++) { world.SetBlock(rx, ry, BlockType.Air); world.SetWall(rx, ry, WallType.None); }
                 }
-                x += ravWidth + Random.Range(20, 60);
+                x += ravWidth + UnityEngine.Random.Range(20, 60);
             }
             else x++;
         }
@@ -306,7 +356,7 @@ public class WorldGenerator : ScriptableObject
         {
             var available = biomes.FindAll(b => counts[b] < b.maxCount);
             if (available.Count == 0) return defaultBiome;
-            return available[Random.Range(0, available.Count)];
+            return available[UnityEngine.Random.Range(0, available.Count)];
         }
         void PlaceSections(int from, int to)
         {
@@ -314,7 +364,7 @@ public class WorldGenerator : ScriptableObject
             foreach (var b in biomes) for (int n = counts[b]; n < b.minCount; n++) guaranteed.Add(b);
             for (int i = guaranteed.Count - 1; i > 0; i--)
             {
-                int j = Random.Range(0, i + 1);
+                int j = UnityEngine.Random.Range(0, i + 1);
                 (guaranteed[i], guaranteed[j]) = (guaranteed[j], guaranteed[i]);
             }
             int x = from;
@@ -322,7 +372,7 @@ public class WorldGenerator : ScriptableObject
             while (x < to)
             {
                 var biome = gIdx < guaranteed.Count ? guaranteed[gIdx++] : PickBiome();
-                int w = Random.Range(biome.minWidth, biome.maxWidth);
+                int w = UnityEngine.Random.Range(biome.minWidth, biome.maxWidth);
                 sections.Add((Mathf.Min(x + w, to), biome));
                 counts[biome]++;
                 x += w;
@@ -397,20 +447,20 @@ public class WorldGenerator : ScriptableObject
         int minDepth = caveStartDepth + 4;
         int segmentWidth = width / Mathf.Max(numWorms, 1);
         var longWormIndices = new HashSet<int>();
-        while (longWormIndices.Count < numLongWorms) longWormIndices.Add(Random.Range(0, numWorms));
+        while (longWormIndices.Count < numLongWorms) longWormIndices.Add(UnityEngine.Random.Range(0, numWorms));
         for (int i = 0; i < numWorms; i++)
         {
-            int startX = segmentWidth * i + Random.Range(0, segmentWidth);
+            int startX = segmentWidth * i + UnityEngine.Random.Range(0, segmentWidth);
             startX = Mathf.Clamp(startX, 10, width - 10);
             int maxY = surface[startX] - minDepth;
             if (maxY <= 5) continue;
-            int startY = Random.Range(5, maxY);
+            int startY = UnityEngine.Random.Range(5, maxY);
             bool isLong = longWormIndices.Contains(i);
             float wx = startX, wy = startY;
-            float angle = Random.Range(-0.3f, 0.3f) * Mathf.PI;
-            if (Random.value > 0.5f) angle += Mathf.PI;
-            int radius = isLong ? Random.Range(4, 6) : Random.Range(4, 8);
-            int length = isLong ? Random.Range(400, 700) : Random.Range(100, 150);
+            float angle = UnityEngine.Random.Range(-0.3f, 0.3f) * Mathf.PI;
+            if (UnityEngine.Random.value > 0.5f) angle += Mathf.PI;
+            int radius = isLong ? UnityEngine.Random.Range(4, 6) : UnityEngine.Random.Range(4, 8);
+            int length = isLong ? UnityEngine.Random.Range(400, 700) : UnityEngine.Random.Range(100, 150);
             float angleNoise = seed * 0.01f + i * 100f;
             float smoothAngle = angle;
             for (int step = 0; step < length; step++)
@@ -470,14 +520,12 @@ public class WorldGenerator : ScriptableObject
     {
         var counts = new Dictionary<StructureTemplate, int>();
         int minSpacing = structureMinSpacing;
-
         bool Overlaps(int x, int structWidth)
         {
             foreach (var r in placedRanges)
                 if (x < r.to + minSpacing && x + structWidth > r.from - minSpacing) return true;
             return false;
         }
-
         bool IsGrounded(WorldData w, int startX, int startY, int structWidth)
         {
             int solidCount = 0;
@@ -486,26 +534,19 @@ public class WorldGenerator : ScriptableObject
             {
                 if (!w.InBounds(x, startY)) continue;
                 if (w.GetBlock(x, startY) == BlockType.Water) return false;
-                if (w.GetBlock(x, startY - 1) != BlockType.Air &&
-                    w.GetBlock(x, startY - 1) != BlockType.Water)
-                    solidCount++;
+                if (w.GetBlock(x, startY - 1) != BlockType.Air && w.GetBlock(x, startY - 1) != BlockType.Water) solidCount++;
             }
             return solidCount >= required;
         }
-
         for (int x = fromX; x < toX; x++)
         {
             var biome = biomeMap[x];
-            if (biome.structures.Count == 0 || Random.value > biome.structureChance) continue;
-
-            var template = biome.structures[Random.Range(0, biome.structures.Count)];
+            if (biome.structures.Count == 0 || UnityEngine.Random.value > biome.structureChance) continue;
+            var template = biome.structures[UnityEngine.Random.Range(0, biome.structures.Count)];
             if (template?.blocks == null) continue;
-
             if (Overlaps(x, template.size.x)) continue;
-
             int groundY = surface[x];
             if (!IsGrounded(world, x, groundY, template.size.x)) continue;
-
             bool allGrounded = true;
             for (int bx = x; bx < x + template.size.x; bx++)
             {
@@ -515,15 +556,12 @@ public class WorldGenerator : ScriptableObject
                 if (world.GetBlock(bx, surface[bx]) == BlockType.Water) { allGrounded = false; break; }
             }
             if (!allGrounded) continue;
-
             if (!counts.ContainsKey(template)) counts[template] = 0;
             if (counts[template] >= template.maxCount) continue;
-
             PlaceStructure(world, template, x, groundY + 1);
             counts[template]++;
             placedRanges.Add((x, x + template.size.x));
         }
-
         foreach (var biome in biomes)
         {
             foreach (var template in biome.structures)
@@ -532,13 +570,11 @@ public class WorldGenerator : ScriptableObject
                 if (!counts.ContainsKey(template)) counts[template] = 0;
                 int halfMin = template.minCount / 2;
                 if (counts[template] >= halfMin) continue;
-
                 var cols = new List<int>();
                 for (int x = fromX; x < toX; x++)
                 {
                     if (biomeMap[x] != biome) continue;
                     if (Overlaps(x, template.size.x)) continue;
-
                     int groundY = surface[x];
                     bool flat = true;
                     for (int bx = x; bx < x + template.size.x; bx++)
@@ -549,13 +585,10 @@ public class WorldGenerator : ScriptableObject
                         if (world.GetBlock(bx, surface[bx]) == BlockType.Water) { flat = false; break; }
                     }
                     if (!flat) continue;
-
                     bool solidBelow = false;
                     for (int bx = x; bx < x + template.size.x; bx++)
                     {
-                        if (world.InBounds(bx, groundY - 1) &&
-                            world.GetBlock(bx, groundY - 1) != BlockType.Air &&
-                            world.GetBlock(bx, groundY - 1) != BlockType.Water)
+                        if (world.InBounds(bx, groundY - 1) && world.GetBlock(bx, groundY - 1) != BlockType.Air && world.GetBlock(bx, groundY - 1) != BlockType.Water)
                         {
                             solidBelow = true;
                             break;
@@ -563,13 +596,11 @@ public class WorldGenerator : ScriptableObject
                     }
                     if (solidBelow) cols.Add(x);
                 }
-
                 for (int i = cols.Count - 1; i > 0; i--)
                 {
-                    int j = Random.Range(0, i + 1);
+                    int j = UnityEngine.Random.Range(0, i + 1);
                     (cols[i], cols[j]) = (cols[j], cols[i]);
                 }
-
                 while (counts[template] < halfMin && cols.Count > 0)
                 {
                     int cx = cols[0];
@@ -583,42 +614,38 @@ public class WorldGenerator : ScriptableObject
         }
     }
 
-private bool IsAreaStable(WorldData world, int startX, int surfaceY, int structWidth)
-{
-    int solidCount = 0;
-    int required = Mathf.CeilToInt(structWidth * 0.5f);
-    for (int x = startX; x < startX + structWidth; x++)
+    private bool IsAreaStable(WorldData world, int startX, int surfaceY, int structWidth)
     {
-        if (!world.InBounds(x, surfaceY)) continue;
-        if (world.GetBlock(x, surfaceY) == BlockType.Water) return false;
-        if (world.GetBlock(x, surfaceY - 1) != BlockType.Air &&
-            world.GetBlock(x, surfaceY - 1) != BlockType.Water)
-            solidCount++;
+        int solidCount = 0;
+        int required = Mathf.CeilToInt(structWidth * 0.5f);
+        for (int x = startX; x < startX + structWidth; x++)
+        {
+            if (!world.InBounds(x, surfaceY)) continue;
+            if (world.GetBlock(x, surfaceY) == BlockType.Water) return false;
+            if (world.GetBlock(x, surfaceY - 1) != BlockType.Air && world.GetBlock(x, surfaceY - 1) != BlockType.Water) solidCount++;
+        }
+        return solidCount >= required;
     }
-    return solidCount >= required;
-}
 
     private void PlaceStructure(WorldData world, StructureTemplate template, int originX, int originY)
     {
         for (int y = 0; y < template.size.y; y++)
-        for (int x = 0; x < template.size.x; x++)
-        {
-            world.SetBlock(originX + x, originY + y, template.GetBlock(x, y));
-
-            var wall = template.GetWall(x, y);
-            if (wall != WallType.None)
-                world.SetWall(originX + x, originY + y, wall);
-        }
-
+            for (int x = 0; x < template.size.x; x++)
+            {
+                world.SetBlock(originX + x, originY + y, template.GetBlock(x, y));
+                var wall = template.GetWall(x, y);
+                if (wall != WallType.None) world.SetWall(originX + x, originY + y, wall);
+            }
         foreach (var placement in template.objects)
         {
             if (placement.definition == null) continue;
-            var worldPos = new Vector2Int(
-                originX + placement.localOrigin.x + _offsetX,
-                originY + placement.localOrigin.y + _offsetY);
-            var obj = MultitileObjectSystem.Instance.PlaceDirect(worldPos, placement.definition);
-            if (obj is ChestObject chest)
-                chest.FillWithLoot();
+            var worldPos = new Vector2Int(originX + placement.localOrigin.x + _offsetX, originY + placement.localOrigin.y + _offsetY);
+            _pendingPlacements.Add(new PendingObjectPlacement
+            {
+                definition = placement.definition,
+                worldPos = worldPos,
+                fillWithLoot = true
+            });
         }
     }
 
@@ -627,9 +654,9 @@ private bool IsAreaStable(WorldData world, int startX, int surfaceY, int structW
         int lastTreeX = -3;
         for (int x = 2; x < width - 2; x++)
         {
-            if (x - lastTreeX < 3 || Random.value > treeChance || world.GetBlock(x, surface[x]) != BlockType.Grass) continue;
+            if (x - lastTreeX < 3 || UnityEngine.Random.value > treeChance || world.GetBlock(x, surface[x]) != BlockType.Grass) continue;
             int groundY = surface[x] + 1;
-            int treeHeight = Random.Range(minTreeHeight, maxTreeHeight + 1);
+            int treeHeight = UnityEngine.Random.Range(minTreeHeight, maxTreeHeight + 1);
             for (int y = 0; y < treeHeight; y++) world.SetBlock(x, groundY + y, trunkBlock);
             int leafStart = groundY + treeHeight - 2;
             for (int lx = -2; lx <= 2; lx++)

@@ -13,6 +13,7 @@ public class WorldManager : MonoBehaviour
 
     private readonly Dictionary<(ConnectedTile, int), Tile> _tileCache = new();
     public WorldData Data { get; private set; }
+    public WorldData OriginalData { get; private set; }
     public int OffsetX => Data != null ? -Data.Width / 2 : 0;
     public int OffsetY => Data != null ? -Data.Height / 2 : 0;
 
@@ -27,30 +28,25 @@ public class WorldManager : MonoBehaviour
         Instance = this;
         blockRegistry.Initialize();
         wallRegistry.Initialize();
-        var sm = SaveManager.Instance;
-        var worldSave = sm?.SelectedWorld;
-        if (worldSave != null && worldSave.blocks != null && worldSave.blocks.Count > 0)
+
+        if (WorldDataTransfer.Data != null)
         {
-            Data = new WorldData(worldSave.width, worldSave.height);
-        }
-        else if (worldSave != null)
-        {
-            Data = new WorldData(worldSave.width, worldSave.height);
-            worldGenerator.randomSeed = false;
-            worldGenerator.seed = worldSave.seed;
-            worldGenerator.Generate(Data);
+            Data = WorldDataTransfer.Data;
+            OriginalData = WorldDataTransfer.OriginalData;
+            WorldDataTransfer.Data = null;
+            WorldDataTransfer.OriginalData = null;
         }
         else
         {
             Data = new WorldData(worldWidth, worldHeight);
             worldGenerator.Generate(Data);
+            OriginalData = Data.Clone();
         }
     }
 
     void Start()
     {
-        if (LiquidManager.Instance != null && Data != null)
-            InitializeLiquids();
+        if (LiquidManager.Instance != null && Data != null) InitializeLiquids();
         if (LightingSystem.Instance != null)
         {
             LightingSystem.Instance.Initialize(Data.Width, Data.Height);
@@ -76,7 +72,6 @@ public class WorldManager : MonoBehaviour
         bool left = IsSolidBlock(wx - 1, wy);
         bool right = IsSolidBlock(wx + 1, wy);
         int index = (up ? 1 : 0) | (down ? 2 : 0) | (left ? 4 : 0) | (right ? 8 : 0);
-
         var key = (connectedTile, index);
         if (!_tileCache.TryGetValue(key, out var tile))
         {
@@ -99,10 +94,8 @@ public class WorldManager : MonoBehaviour
         int ly = y - OffsetY;
         if (!Data.SetBlock(lx, ly, type)) return;
         RefreshBlockAndNeighbors(x, y);
-        if (GravityBlockSystem.Instance != null)
-            GravityBlockSystem.Instance.NotifyNeighbors(x, y);
-        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating)
-            LiquidManager.Instance.NotifyBlockChanged(x, y);
+        if (GravityBlockSystem.Instance != null) GravityBlockSystem.Instance.NotifyNeighbors(x, y);
+        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating) LiquidManager.Instance.NotifyBlockChanged(x, y);
         LightingSystem.Instance?.RebuildLightMap();
     }
 
@@ -113,10 +106,8 @@ public class WorldManager : MonoBehaviour
         if (Data.GetBlock(lx, ly) == BlockType.Air) return;
         Data.SetBlock(lx, ly, BlockType.Air);
         RefreshBlockAndNeighbors(x, y);
-        if (GravityBlockSystem.Instance != null)
-            GravityBlockSystem.Instance.NotifyNeighbors(x, y);
-        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating)
-            LiquidManager.Instance.NotifyBlockChanged(x, y);
+        if (GravityBlockSystem.Instance != null) GravityBlockSystem.Instance.NotifyNeighbors(x, y);
+        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating) LiquidManager.Instance.NotifyBlockChanged(x, y);
         LightingSystem.Instance?.RebuildLightMap();
     }
 
@@ -143,8 +134,7 @@ public class WorldManager : MonoBehaviour
     public void RefreshBlockAndNeighbors(int wx, int wy)
     {
         RefreshSingleBlock(wx, wy);
-        foreach (var n in _neighbors)
-            RefreshSingleBlock(wx + n.x, wy + n.y);
+        foreach (var n in _neighbors) RefreshSingleBlock(wx + n.x, wy + n.y);
     }
 
     private void RefreshSingleBlock(int wx, int wy)
@@ -170,8 +160,7 @@ public class WorldManager : MonoBehaviour
         int lx = worldX - OffsetX;
         for (int ly = Data.Height - 1; ly >= 0; ly--)
         {
-            if (Data.GetBlock(lx, ly) != BlockType.Air &&
-                Data.GetBlock(lx, ly + 1) == BlockType.Air)
+            if (Data.GetBlock(lx, ly) != BlockType.Air && Data.GetBlock(lx, ly + 1) == BlockType.Air)
                 return ly + OffsetY;
         }
         return OffsetY;
