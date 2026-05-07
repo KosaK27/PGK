@@ -67,8 +67,12 @@ public class GameBootstrap : MonoBehaviour
         {
             Vector3 fallback = PlayerSpawner.Instance != null ? PlayerSpawner.Instance.GetSpawnPosition() : _player.transform.position;
             sm.RestoreCharacterState(charSave, _player, _itemRegistry, worldSave?.id ?? "", fallback);
+
             yield return new WaitUntil(() => ChunkManager.Instance.IsChunkLoaded(_player.transform.position));
             ChunkManager.Instance.RebuildAll(_worldManager.OffsetX, _worldManager.OffsetY);
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
         }
 
         if (isNewSession && _startItems != null)

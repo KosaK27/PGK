@@ -559,8 +559,8 @@ MonoBehaviour:
   gameSoundSlider: {fileID: 561729232}
   menuSoundSlider: {fileID: 1471134142}
   cameraZoomSlider: {fileID: 1107700829}
-  zoomMin: 3
-  zoomMax: 12
+  zoomMin: 5
+  zoomMax: 20
 --- !u!114 &79877951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2221,9 +2221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   target: {fileID: 0}
-  smoothSpeed: 5
-  pixelsPerUnit: 16
-  offset: {x: 0, y: 5, z: 0}
+  offset: {x: 0, y: 0, z: 0}
 --- !u!114 &519420034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4952,7 +4950,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1765442486}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1
+  m_MaxValue: 30
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:

@@ -13,8 +13,12 @@ public class UIAudioManager : MonoBehaviour
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
-        Instance = this;
         DontDestroyOnLoad(gameObject);
+        Instance = this;
+    }
+
+    void Start()
+    {
         if (SettingsManager.Instance != null)
         {
             _volume = SettingsManager.Instance.Current.menuSoundVolume;

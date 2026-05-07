@@ -26,7 +26,7 @@ public class SettingsManager : MonoBehaviour
 
     public void Apply()
     {
-        SetResolutionDirect(Current.resolutionIndex, Current.fullscreen);
+        ApplyResolution(Current.resolutionIndex, Current.fullscreen);
         OnMusicVolumeChanged?.Invoke(Current.musicVolume);
         OnGameSoundVolumeChanged?.Invoke(Current.gameSoundVolume);
         OnMenuSoundVolumeChanged?.Invoke(Current.menuSoundVolume);
@@ -36,29 +36,36 @@ public class SettingsManager : MonoBehaviour
     public void SetFullscreen(bool value)
     {
         Current.fullscreen = value;
-        Screen.fullScreen = value;
+        ApplyResolution(Current.resolutionIndex, value);
         SaveManager.Instance.SaveSettings();
     }
 
     public void SetResolution(int index, bool fullscreen)
     {
-        var resolutions = Screen.resolutions;
-        if (resolutions.Length == 0) return;
-        index = Mathf.Clamp(index, 0, resolutions.Length - 1);
         Current.resolutionIndex = index;
         Current.fullscreen = fullscreen;
-        var r = resolutions[index];
-        Screen.SetResolution(r.width, r.height, fullscreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed);
+        ApplyResolution(index, fullscreen);
         SaveManager.Instance.SaveSettings();
     }
 
-    private void SetResolutionDirect(int index, bool fullscreen)
+    private void ApplyResolution(int index, bool fullscreen)
     {
-        var resolutions = Screen.resolutions;
-        if (resolutions.Length == 0) return;
-        index = Mathf.Clamp(index, 0, resolutions.Length - 1);
-        var r = resolutions[index];
-        Screen.SetResolution(r.width, r.height, fullscreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed);
+        if (fullscreen)
+        {
+            var resolutions = Screen.resolutions;
+            if (resolutions.Length == 0) return;
+            index = Mathf.Clamp(index, 0, resolutions.Length - 1);
+            var r = resolutions[index];
+            Screen.SetResolution(r.width, r.height, FullScreenMode.FullScreenWindow);
+        }
+        else
+        {
+            var resolutions = Screen.resolutions;
+            if (resolutions.Length == 0) return;
+            index = Mathf.Clamp(index, 0, resolutions.Length - 1);
+            var r = resolutions[index];
+            Screen.SetResolution(r.width, r.height, FullScreenMode.Windowed);
+        }
     }
 
     public void SetMusicVolume(float value)

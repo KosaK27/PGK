@@ -2894,8 +2894,8 @@ MonoBehaviour:
   gameSoundSlider: {fileID: 2052222902}
   menuSoundSlider: {fileID: 111502011}
   cameraZoomSlider: {fileID: 830527634}
-  zoomMin: 3
-  zoomMax: 12
+  zoomMin: 5
+  zoomMax: 30
 --- !u!114 &458429400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5177,7 +5177,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 245747835}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1
+  m_MaxValue: 30
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -7051,10 +7051,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

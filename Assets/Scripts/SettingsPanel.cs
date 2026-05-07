@@ -28,18 +28,14 @@ public class SettingsPanel : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] private Slider cameraZoomSlider;
-    [SerializeField] private float zoomMin = 3f;
-    [SerializeField] private float zoomMax = 12f;
+    [SerializeField] private float zoomMin = 5f;
+    [SerializeField] private float zoomMax = 25f;
 
     private List<Vector2Int> _availableResolutions = new();
+    private List<int> _availableResolutionIndices = new();
 
     void Awake()
     {
-        musicSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetMusicVolume(value));
-        gameSoundSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetGameSoundVolume(value));
-        menuSoundSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetMenuSoundVolume(value));
-        cameraZoomSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetCameraZoom(value));
-
         musicSlider.minValue = 0f;
         musicSlider.maxValue = 1f;
         gameSoundSlider.minValue = 0f;
@@ -48,6 +44,10 @@ public class SettingsPanel : MonoBehaviour
         menuSoundSlider.maxValue = 1f;
         cameraZoomSlider.minValue = zoomMin;
         cameraZoomSlider.maxValue = zoomMax;
+        musicSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetMusicVolume(value));
+        gameSoundSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetGameSoundVolume(value));
+        menuSoundSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetMenuSoundVolume(value));
+        cameraZoomSlider.onValueChanged.AddListener(value => SettingsManager.Instance.SetCameraZoom(zoomMax + zoomMin - value));
     }
 
     void OnEnable()
@@ -59,14 +59,20 @@ public class SettingsPanel : MonoBehaviour
     void BuildAvailableResolutions()
     {
         _availableResolutions.Clear();
+        _availableResolutionIndices.Clear();
         var screenResolutions = Screen.resolutions;
-        foreach (var allowed in allowedResolutions)
+        for (int i = 0; i < screenResolutions.Length; i++)
         {
-            foreach (var screen in screenResolutions)
+            var sr = screenResolutions[i];
+            foreach (var allowed in allowedResolutions)
             {
-                if (screen.width == allowed.x && screen.height == allowed.y)
+                if (sr.width == allowed.x && sr.height == allowed.y)
                 {
-                    _availableResolutions.Add(allowed);
+                    if (!_availableResolutions.Contains(allowed))
+                    {
+                        _availableResolutions.Add(allowed);
+                        _availableResolutionIndices.Add(i);
+                    }
                     break;
                 }
             }
@@ -75,6 +81,7 @@ public class SettingsPanel : MonoBehaviour
         {
             var fallback = Screen.currentResolution;
             _availableResolutions.Add(new Vector2Int(fallback.width, fallback.height));
+            _availableResolutionIndices.Add(0);
         }
     }
 
@@ -83,19 +90,20 @@ public class SettingsPanel : MonoBehaviour
         musicSlider.SetValueWithoutNotify(SettingsManager.Instance.Current.musicVolume);
         gameSoundSlider.SetValueWithoutNotify(SettingsManager.Instance.Current.gameSoundVolume);
         menuSoundSlider.SetValueWithoutNotify(SettingsManager.Instance.Current.menuSoundVolume);
-        cameraZoomSlider.SetValueWithoutNotify(SettingsManager.Instance.Current.cameraZoom);
-
+        cameraZoomSlider.SetValueWithoutNotify(zoomMax + zoomMin - SettingsManager.Instance.Current.cameraZoom);
         fullscreenButtonLabel.text = SettingsManager.Instance.Current.fullscreen ? "Fullscreen" : "Windowed";
-
-        int index = Mathf.Clamp(SettingsManager.Instance.Current.resolutionIndex, 0, _availableResolutions.Count - 1);
-        resolutionButtonLabel.text = ResolutionToString(index);
+        resolutionButtonLabel.text = GetCurrentResolutionString();
     }
 
-    private string ResolutionToString(int index)
+    private string GetCurrentResolutionString()
     {
-        index = Mathf.Clamp(index, 0, _availableResolutions.Count - 1);
-        var r = _availableResolutions[index];
-        return $"{r.x}x{r.y}";
+        int savedIndex = SettingsManager.Instance.Current.resolutionIndex;
+        for (int i = 0; i < _availableResolutionIndices.Count; i++)
+            if (_availableResolutionIndices[i] == savedIndex)
+                return $"{_availableResolutions[i].x}x{_availableResolutions[i].y}";
+        if (_availableResolutions.Count > 0)
+            return $"{_availableResolutions[0].x}x{_availableResolutions[0].y}";
+        return "";
     }
 
     public void OnFullscreenButtonClicked()
@@ -108,11 +116,12 @@ public class SettingsPanel : MonoBehaviour
     public void OnResolutionButtonClicked()
     {
         var s = SettingsManager.Instance.Current;
-        int index = (s.resolutionIndex + 1) % _availableResolutions.Count;
-        var r = _availableResolutions[index];
-        Screen.SetResolution(r.x, r.y, s.fullscreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed);
-        s.resolutionIndex = index;
-        SaveManager.Instance.SaveSettings();
-        resolutionButtonLabel.text = ResolutionToString(index);
+        int currentLocalIndex = 0;
+        for (int i = 0; i < _availableResolutionIndices.Count; i++)
+            if (_availableResolutionIndices[i] == s.resolutionIndex) { currentLocalIndex = i; break; }
+        int nextLocalIndex = (currentLocalIndex + 1) % _availableResolutions.Count;
+        int screenIndex = _availableResolutionIndices[nextLocalIndex];
+        SettingsManager.Instance.SetResolution(screenIndex, s.fullscreen);
+        resolutionButtonLabel.text = $"{_availableResolutions[nextLocalIndex].x}x{_availableResolutions[nextLocalIndex].y}";
     }
 }

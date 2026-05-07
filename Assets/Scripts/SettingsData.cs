@@ -8,5 +8,5 @@ public class SettingsData
     public float musicVolume = 1f;
     public float gameSoundVolume = 1f;
     public float menuSoundVolume = 1f;
-    public float cameraZoom = 5f;
+    public float cameraZoom = 16.875f;
 }
