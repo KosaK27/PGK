@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dff50d1aa53e1a49a4c80d3101582bf, type: 3}
+  m_Name: Door_Object
+  m_EditorClassIdentifier: Assembly-CSharp::DoorDefinition
+  displayName: Door
+  size: {x: 1, y: 3}
+  sprite: {fileID: 7569196456447642212, guid: 12ae3830562a20c408d2058b6213bbfe, type: 3}
+  hardness: 3
+  requiredTool: 0
+  dropItem: {fileID: 0}
+  dropAmount: 1
+  sortingOrder: 0
+  hasCollision: 1
+  editorTile: {fileID: 0}
+  closedSize: {x: 1, y: 3}
+  openSize: {x: 2, y: 3}
+  closedSprite: {fileID: 7569196456447642212, guid: 12ae3830562a20c408d2058b6213bbfe, type: 3}
+  openSprite: {fileID: -3683270870248216558, guid: 81ff4b0b887370343875fc08aa131be1, type: 3}
+  openDirection: 1

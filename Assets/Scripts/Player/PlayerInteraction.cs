@@ -15,8 +15,8 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
         HandleBreak();
-        HandlePlaceOrWallBreak();
         HandleInteract();
+        HandlePlaceOrWallBreak();
         HandleDropKey();
     }
 
@@ -91,6 +91,9 @@ public class PlayerInteraction : MonoBehaviour
             var cell = GetCellUnderMouse();
             if (!IsInReach(cell) || selected == null || selected.IsEmpty) return;
 
+            var cellV2 = new Vector2Int(cell.x, cell.y);
+            if (MultitileObjectSystem.Instance.IsOccupied(cellV2)) return;
+
             if (selected.item.isBlock)
             {
                 if (PlaceSystem.Instance.TryPlace(cell, selected.item.blockType))
@@ -104,7 +107,19 @@ public class PlayerInteraction : MonoBehaviour
             else if (selected.item.isMultitileObject && selected.item.multitileObjectDefinition != null)
             {
                 var origin = new Vector2Int(cell.x, cell.y);
-                if (MultitileObjectSystem.Instance.TryPlace(origin, selected.item.multitileObjectDefinition))
+                var def = selected.item.multitileObjectDefinition;
+
+                if (def is DoorDefinition doorDef)
+                {
+                    var cloned = Instantiate(doorDef);
+                    cloned.sourceName = doorDef.name;
+                    cloned.openDirection = transform.localScale.x > 0
+                        ? DoorOpenDirection.Left
+                        : DoorOpenDirection.Right;
+                    def = cloned;
+                }
+
+                if (MultitileObjectSystem.Instance.TryPlace(origin, def))
                     InventorySystem.Instance.ConsumeSelected(1);
             }
         }
@@ -138,8 +153,7 @@ public class PlayerInteraction : MonoBehaviour
         int amount = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
         Vector2 playerPos = transform.position;
         var mousePos = Mouse.current.position.ReadValue();
-        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(
-                                new Vector3(mousePos.x, mousePos.y, 0));
+        Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
         mouseWorld.z = 0;
         Vector2 dir = ((Vector2)mouseWorld - playerPos).normalized;
         if (dir == Vector2.zero) dir = Vector2.right;
@@ -157,8 +171,7 @@ public class PlayerInteraction : MonoBehaviour
     private Vector3Int GetCellUnderMouse()
     {
         var mousePos = Mouse.current.position.ReadValue();
-        var worldPos = mainCamera.ScreenToWorldPoint(
-                           new Vector3(mousePos.x, mousePos.y, 0));
+        var worldPos = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
         return WorldManager.Instance.WorldToCell(worldPos);
     }
 }

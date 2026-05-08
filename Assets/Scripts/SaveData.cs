@@ -74,6 +74,7 @@ public class MultitileObjectSave
     public string definitionName;
     public int originX;
     public int originY;
+    public int openDirection;
     public List<ItemSlotSave> containerSlots = new();
 }
 

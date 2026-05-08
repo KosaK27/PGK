@@ -132,12 +132,29 @@ public class GameBootstrap : MonoBehaviour
         worldSave.multitileObjects.Clear();
         foreach (var obj in MultitileObjectSystem.Instance.GetAllObjects())
         {
+            string defName;
+            int openDir = 0;
+
+            if (obj is DoorObject doorObj)
+            {
+                defName = string.IsNullOrEmpty(doorObj.DoorDefinition.sourceName)
+                    ? doorObj.DoorDefinition.name
+                    : doorObj.DoorDefinition.sourceName;
+                openDir = (int)doorObj.DoorDefinition.openDirection;
+            }
+            else
+            {
+                defName = obj.Definition.name;
+            }
+
             var entry = new MultitileObjectSave
             {
-                definitionName = obj.Definition.name,
+                definitionName = defName,
                 originX = obj.Origin.x,
-                originY = obj.Origin.y
+                originY = obj.Origin.y,
+                openDirection = openDir
             };
+
             if (obj is ChestObject chest)
             {
                 for (int i = 0; i < chest.Container.SlotCount; i++)
@@ -147,6 +164,7 @@ public class GameBootstrap : MonoBehaviour
                     entry.containerSlots.Add(new ItemSlotSave { slotIndex = i, itemId = slot.item.itemId, amount = slot.amount });
                 }
             }
+
             worldSave.multitileObjects.Add(entry);
         }
     }
@@ -157,8 +175,18 @@ public class GameBootstrap : MonoBehaviour
         {
             var def = _multitileRegistry.Get(saved.definitionName);
             if (def == null) { Debug.LogWarning($"[GameBootstrap] Unknown definition '{saved.definitionName}'"); continue; }
+
+            if (def is DoorDefinition doorDef)
+            {
+                var cloned = Instantiate(doorDef);
+                cloned.sourceName = doorDef.name;
+                cloned.openDirection = (DoorOpenDirection)saved.openDirection;
+                def = cloned;
+            }
+
             var origin = new Vector2Int(saved.originX, saved.originY);
             MultitileObjectSystem.Instance.PlaceDirect(origin, def);
+
             if (saved.containerSlots.Count == 0) continue;
             var placed = MultitileObjectSystem.Instance.Get(origin);
             if (placed is not ChestObject chest) continue;

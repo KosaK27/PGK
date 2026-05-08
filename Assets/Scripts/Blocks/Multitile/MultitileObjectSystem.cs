@@ -28,7 +28,14 @@ public class MultitileObjectSystem : MonoBehaviour
             if (WorldManager.Instance.GetBlock(cell.x, cell.y) != BlockType.Air) return false;
         }
 
-        if (!HasAllSupportBelow(origin, def.size)) return false;
+        if (def is DoorDefinition doorDef)
+        {
+            if (!HasAllSupportBelow(origin, doorDef.closedSize)) return false;
+        }
+        else
+        {
+            if (!HasAllSupportBelow(origin, def.size)) return false;
+        }
 
         Register(CreateObject(def, origin));
         return true;
@@ -114,6 +121,24 @@ public class MultitileObjectSystem : MonoBehaviour
         return obj;
     }
 
+    public void UpdateCellMap(DoorObject door, Vector2Int oldSize, Vector2Int newSize)
+    {
+        bool opensLeft = door.DoorDefinition.openDirection == DoorOpenDirection.Left;
+        int extraOld = oldSize.x - door.DoorDefinition.closedSize.x;
+        int extraNew = newSize.x - door.DoorDefinition.closedSize.x;
+
+        int oldOriginX = opensLeft ? door.Origin.x - extraOld : door.Origin.x;
+        int newOriginX = opensLeft ? door.Origin.x - extraNew : door.Origin.x;
+
+        for (int y = 0; y < oldSize.y; y++)
+        for (int x = 0; x < oldSize.x; x++)
+            _cellMap.Remove(new Vector2Int(oldOriginX + x, door.Origin.y + y));
+
+        for (int y = 0; y < newSize.y; y++)
+        for (int x = 0; x < newSize.x; x++)
+            _cellMap[new Vector2Int(newOriginX + x, door.Origin.y + y)] = door;
+    }
+
     private MultitileObject CreateObject(MultitileObjectDefinition def, Vector2Int origin)
     {
         if (def is TorchDefinition torchDef)
@@ -137,6 +162,13 @@ public class MultitileObjectSystem : MonoBehaviour
             chest.InitializeChest(chestDef, origin);
             return chest;
         }
+        if (def is DoorDefinition doorDef)
+        {
+            var go = new GameObject($"Door_{origin.x}_{origin.y}");
+            var door = go.AddComponent<DoorObject>();
+            door.InitializeDoor(doorDef, origin);
+            return door;
+        }
 
         var defaultGo = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
         var obj = defaultGo.AddComponent<MultitileObject>();
@@ -155,10 +187,25 @@ public class MultitileObjectSystem : MonoBehaviour
 
     private void DestroyObject(MultitileObject obj)
     {
-        var def = obj.Definition;
-        for (int y = 0; y < def.size.y; y++)
-        for (int x = 0; x < def.size.x; x++)
-            _cellMap.Remove(new Vector2Int(obj.Origin.x + x, obj.Origin.y + y));
+        if (obj is DoorObject door)
+        {
+            bool opensLeft = door.DoorDefinition.openDirection == DoorOpenDirection.Left;
+            var size = door.CurrentSize;
+            int extra = size.x - door.DoorDefinition.closedSize.x;
+            int originX = opensLeft ? door.Origin.x - extra : door.Origin.x;
+
+            for (int y = 0; y < size.y; y++)
+            for (int x = 0; x < size.x; x++)
+                _cellMap.Remove(new Vector2Int(originX + x, door.Origin.y + y));
+        }
+        else
+        {
+            var def = obj.Definition;
+            for (int y = 0; y < def.size.y; y++)
+            for (int x = 0; x < def.size.x; x++)
+                _cellMap.Remove(new Vector2Int(obj.Origin.x + x, obj.Origin.y + y));
+        }
+
         _objects.Remove(obj);
         if (_currentBreakTarget == obj) _currentBreakTarget = null;
         Destroy(obj.gameObject);
