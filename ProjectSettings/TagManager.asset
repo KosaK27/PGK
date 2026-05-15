@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Boss
   - Water
+  - Background
   layers:
   - Default
   - TransparentFX

@@ -3764,7 +3764,7 @@ GameObject:
   - component: {fileID: 813728467}
   m_Layer: 0
   m_Name: Background
-  m_TagString: Untagged
+  m_TagString: Background
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6293,8 +6293,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96caf677dc8b9c47b15545227180669, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightingSystem
-  falloff: 0.85
-  wallFalloff: 0.7
+  dayFalloff: 0.97
+  dayWallFalloff: 0.95
+  nightFalloff: 0.9
+  nightWallFalloff: 0.9
+  minUndergroundBrightness: 0.03
 --- !u!4 &1381351092
 Transform:
   m_ObjectHideFlags: 0
@@ -9802,7 +9805,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c35604e130b1185428d32541619ab631, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightingMaterialController
-  lightingMaterial: {fileID: 2100000, guid: e84efe36c02a7f140a974fccf58ff4a2, type: 2}
+  baseLightingMaterial: {fileID: 2100000, guid: e84efe36c02a7f140a974fccf58ff4a2, type: 2}
+  refreshInterval: 0.5
 --- !u!4 &1980531996
 Transform:
   m_ObjectHideFlags: 0
