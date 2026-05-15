@@ -96,7 +96,8 @@ public class WorldManager : MonoBehaviour
         RefreshBlockAndNeighbors(x, y);
         if (GravityBlockSystem.Instance != null) GravityBlockSystem.Instance.NotifyNeighbors(x, y);
         if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating) LiquidManager.Instance.NotifyBlockChanged(x, y);
-        LightingSystem.Instance?.RebuildLightMap();
+
+        LightingSystem.Instance?.RebuildLightMapAt(x, y);
     }
 
     public void DestroyBlock(int x, int y)
@@ -108,7 +109,8 @@ public class WorldManager : MonoBehaviour
         RefreshBlockAndNeighbors(x, y);
         if (GravityBlockSystem.Instance != null) GravityBlockSystem.Instance.NotifyNeighbors(x, y);
         if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating) LiquidManager.Instance.NotifyBlockChanged(x, y);
-        LightingSystem.Instance?.RebuildLightMap();
+
+        LightingSystem.Instance?.RebuildLightMapAt(x, y);
     }
 
     public void PlaceWall(int x, int y, WallType type)
@@ -118,7 +120,8 @@ public class WorldManager : MonoBehaviour
         if (!Data.SetWall(lx, ly, type)) return;
         var data = wallRegistry.Get(type);
         ChunkManager.Instance.RefreshWall(lx, ly, OffsetX, OffsetY, data?.tile);
-        LightingSystem.Instance?.RebuildLightMap();
+
+        LightingSystem.Instance?.RebuildLightMapAt(x, y);
     }
 
     public void DestroyWall(int x, int y)
@@ -128,7 +131,8 @@ public class WorldManager : MonoBehaviour
         if (Data.GetWall(lx, ly) == WallType.None) return;
         Data.SetWall(lx, ly, WallType.None);
         ChunkManager.Instance.RefreshWall(lx, ly, OffsetX, OffsetY, null);
-        LightingSystem.Instance?.RebuildLightMap();
+
+        LightingSystem.Instance?.RebuildLightMapAt(x, y);
     }
 
     public void RefreshBlockAndNeighbors(int wx, int wy)

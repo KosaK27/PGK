@@ -25,6 +25,13 @@ public class LightingSystem : MonoBehaviour
     private int _width, _height;
     private List<LightSource> _sources = new();
 
+    private Queue<(int x, int y, Color light)> _queue = new();
+    private Dictionary<int, float> _visited = new();
+    private readonly (int dx, int dy)[] _dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
+
+    private HashSet<int> _columnsToUpdate = new HashSet<int>();
+    private bool _fullRebuildRequested = true;
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
@@ -43,12 +50,39 @@ public class LightingSystem : MonoBehaviour
 
         _lightMap = new RenderTexture(_width, _height, 0, RenderTextureFormat.ARGBFloat);
         _lightMap.filterMode = FilterMode.Bilinear;
+
+        _fullRebuildRequested = true;
     }
 
     public void RegisterSource(LightSource src) => _sources.Add(src);
     public void UnregisterSource(LightSource src) => _sources.Remove(src);
 
     public void RebuildLightMap()
+    {
+        _fullRebuildRequested = true;
+    }
+
+    public void RebuildLightMapAt(int worldX, int worldY)
+    {
+        var wm = WorldManager.Instance;
+        if (wm == null) return;
+
+        int localX = worldX - wm.OffsetX;
+        if (localX >= 0 && localX < _width)
+        {
+            _columnsToUpdate.Add(localX);
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (_fullRebuildRequested || _columnsToUpdate.Count > 0)
+        {
+            ExecuteIncrementalRebuild();
+        }
+    }
+
+    private void ExecuteIncrementalRebuild()
     {
         if (_lightBuffer == null) return;
         var wm = WorldManager.Instance;
@@ -63,31 +97,32 @@ public class LightingSystem : MonoBehaviour
         currentFalloff = Mathf.Lerp(nightFalloff, dayFalloff, dayIntensity);
         currentWallFalloff = Mathf.Lerp(nightWallFalloff, dayWallFalloff, dayIntensity);
 
-        for (int x = 0; x < _width; x++)
+        int offsetX = wm.OffsetX;
+        int offsetY = wm.OffsetY;
+        float airBlockBlockLerp = Mathf.Lerp(0.50f, 0.72f, dayIntensity);
+
+        if (_fullRebuildRequested)
         {
-            float currentSky = dayIntensity;
-            for (int y = _height - 1; y >= 0; y--)
+            _fullRebuildRequested = false;
+            _columnsToUpdate.Clear();
+            for (int x = 0; x < _width; x++)
             {
-                int wx = x + wm.OffsetX;
-                int wy = y + wm.OffsetY;
-
-                if (wm.GetBlock(wx, wy) != BlockType.Air)
-                {
-                    currentSky *= Mathf.Lerp(0.50f, 0.72f, dayIntensity);
-                }
-                else if (wm.GetWall(wx, wy) != WallType.None)
-                {
-                    currentSky *= currentWallFalloff;
-                }
-
-                int idx = y * _width + x;
-                _lightBuffer[idx] = new Color(0f, 0f, 0f, currentSky);
+                UpdateColumn(x, wm, offsetX, offsetY, dayIntensity, airBlockBlockLerp);
             }
         }
-
-        foreach (var src in _sources)
+        else
         {
-            Propagate(src);
+            foreach (int x in _columnsToUpdate)
+            {
+                UpdateColumn(x, wm, offsetX, offsetY, dayIntensity, airBlockBlockLerp);
+            }
+            _columnsToUpdate.Clear();
+        }
+
+        int sourceCount = _sources.Count;
+        for (int i = 0; i < sourceCount; i++)
+        {
+            Propagate(_sources[i], wm, offsetX, offsetY);
         }
 
         _lightTex.SetPixels(_lightBuffer);
@@ -95,8 +130,8 @@ public class LightingSystem : MonoBehaviour
         Graphics.Blit(_lightTex, _lightMap);
 
         Shader.SetGlobalTexture("_LightMap", _lightMap);
-        Shader.SetGlobalFloat("_WorldMinX", wm.OffsetX);
-        Shader.SetGlobalFloat("_WorldMinY", wm.OffsetY);
+        Shader.SetGlobalFloat("_WorldMinX", offsetX);
+        Shader.SetGlobalFloat("_WorldMinY", offsetY);
         Shader.SetGlobalFloat("_WorldWidth", wm.Data.Width);
         Shader.SetGlobalFloat("_WorldHeight", wm.Data.Height);
         Shader.SetGlobalFloat("_MinBrightness", minUndergroundBrightness);
@@ -107,55 +142,84 @@ public class LightingSystem : MonoBehaviour
         }
     }
 
-    public void UpdateAmbientOnly()
+    private void UpdateColumn(int x, WorldManager wm, int offsetX, int offsetY, float dayIntensity, float airBlockBlockLerp)
     {
-        RebuildLightMap();
+        float currentSky = dayIntensity;
+        int wx = x + offsetX;
+
+        for (int y = _height - 1; y >= 0; y--)
+        {
+            int wy = y + offsetY;
+            BlockType block = wm.GetBlock(wx, wy);
+
+            if (block != BlockType.Air && block != BlockType.Water)
+            {
+                currentSky *= airBlockBlockLerp;
+            }
+            else if (wm.GetWall(wx, wy) != WallType.None)
+            {
+                currentSky *= currentWallFalloff;
+            }
+
+            _lightBuffer[y * _width + x] = new Color(0f, 0f, 0f, currentSky);
+        }
     }
 
-    private void Propagate(LightSource src)
+    public void UpdateAmbientOnly()
     {
-        var wm = WorldManager.Instance;
-        if (wm == null || wm.Data == null) return;
+        _fullRebuildRequested = true;
+    }
 
-        int startX = Mathf.RoundToInt(src.WorldPosition.x) - wm.OffsetX;
-        int startY = Mathf.RoundToInt(src.WorldPosition.y) - wm.OffsetY;
+    private void Propagate(LightSource src, WorldManager wm, int offsetX, int offsetY)
+    {
+        int startX = Mathf.RoundToInt(src.WorldPosition.x) - offsetX;
+        int startY = Mathf.RoundToInt(src.WorldPosition.y) - offsetY;
 
         if (startX < 0 || startX >= _width || startY < 0 || startY >= _height) return;
 
-        var queue = new Queue<(int x, int y, Color light)>();
-        var visited = new Dictionary<int, float>();
+        _queue.Clear();
+        _visited.Clear();
 
-        Color seedLight = new Color(src.LightColor.r * src.Strength, src.LightColor.g * src.Strength, src.LightColor.b * src.Strength, 1f);
+        float strength = src.Strength;
+        Color srcColor = src.LightColor;
+        Color seedLight = new Color(srcColor.r * strength, srcColor.g * strength, srcColor.b * strength, 1f);
 
-        queue.Enqueue((startX, startY, seedLight));
-        visited[startY * _width + startX] = seedLight.grayscale;
+        _queue.Enqueue((startX, startY, seedLight));
+        _visited[startY * _width + startX] = seedLight.grayscale;
 
-        while (queue.Count > 0)
+        while (_queue.Count > 0)
         {
-            var (x, y, light) = queue.Dequeue();
+            var (x, y, light) = _queue.Dequeue();
 
             int idx = y * _width + x;
-            _lightBuffer[idx] = Max(_lightBuffer[idx], light);
+            Color currentBuffer = _lightBuffer[idx];
+
+            _lightBuffer[idx] = new Color(
+                currentBuffer.r > light.r ? currentBuffer.r : light.r,
+                currentBuffer.g > light.g ? currentBuffer.g : light.g,
+                currentBuffer.b > light.b ? currentBuffer.b : light.b,
+                currentBuffer.a
+            );
 
             if (light.r < 0.02f && light.g < 0.02f && light.b < 0.02f) continue;
 
-            (int dx, int dy)[] dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
-
-            foreach (var (dx, dy) in dirs)
+            for (int i = 0; i < 4; i++)
             {
-                int nx = x + dx;
-                int ny = y + dy;
+                int nx = x + _dirs[i].dx;
+                int ny = y + _dirs[i].dy;
 
                 if (nx < 0 || nx >= _width || ny < 0 || ny >= _height) continue;
 
                 int nIdx = ny * _width + nx;
-                int wx = nx + wm.OffsetX;
-                int wy = ny + wm.OffsetY;
+                int wx = nx + offsetX;
+                int wy = ny + offsetY;
 
                 float mult = currentFalloff;
-                if (wm.GetBlock(wx, wy) != BlockType.Air)
+                BlockType block = wm.GetBlock(wx, wy);
+                if (block != BlockType.Air && block != BlockType.Water)
                 {
-                    mult = Mathf.Lerp(0.52f, 0.68f, currentFalloff >= dayFalloff ? 1f : 0f);
+                    mult = currentFalloff >= dayFalloff ? 1f : 0f;
+                    mult = mult * 0.16f + 0.52f;
                 }
                 else if (wm.GetWall(wx, wy) != WallType.None)
                 {
@@ -165,16 +229,14 @@ public class LightingSystem : MonoBehaviour
                 Color nextLight = new Color(light.r * mult, light.g * mult, light.b * mult, 1f);
                 float nextGrayscale = nextLight.grayscale;
 
-                if (!visited.TryGetValue(nIdx, out float maxGray) || nextGrayscale > maxGray)
+                if (!_visited.TryGetValue(nIdx, out float maxGray) || nextGrayscale > maxGray)
                 {
-                    visited[nIdx] = nextGrayscale;
-                    queue.Enqueue((nx, ny, nextLight));
+                    _visited[nIdx] = nextGrayscale;
+                    _queue.Enqueue((nx, ny, nextLight));
                 }
             }
         }
     }
-
-    private Color Max(Color a, Color b) => new Color(Mathf.Max(a.r, b.r), Mathf.Max(a.g, b.g), Mathf.Max(a.b, b.b), a.a);
 
     public RenderTexture GetLightMap() => _lightMap;
 

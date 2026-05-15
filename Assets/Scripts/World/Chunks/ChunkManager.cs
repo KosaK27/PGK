@@ -70,7 +70,7 @@ public class ChunkManager : MonoBehaviour
         chunk.Initialize(chunkPos, blockRegistry, wallRegistry, chunkParent);
         chunk.RenderAll(world.Data, world.OffsetX, world.OffsetY);
         _loadedChunks[chunkPos] = chunk;
-        FindFirstObjectByType<LightingMaterialController>()?.RefreshRenderers();
+        LightingMaterialController.Instance.RefreshAllRenderers();
     }
 
     private void UnloadChunk(Vector2Int chunkPos)
