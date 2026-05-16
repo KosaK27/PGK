@@ -14,6 +14,14 @@ public class PlayerInteraction : MonoBehaviour
     void Update()
     {
         if (InventorySystem.Instance == null || WorldManager.Instance == null) return;
+
+        if (MapSystem.IsMapOpen)
+        {
+            BreakSystem.Instance.CancelBreak();
+            MultitileObjectSystem.Instance.CancelBreak();
+            return;
+        }
+
         HandleBreak();
         HandleInteract();
         HandlePlaceOrWallBreak();
