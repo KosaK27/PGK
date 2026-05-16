@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 6304452396083164312}
   - component: {fileID: 4053087563488706650}
   - component: {fileID: -1805597402698571462}
+  - component: {fileID: 4187933994018861279}
   m_Layer: 0
   m_Name: Boss1
   m_TagString: Boss
@@ -361,3 +362,16 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4187933994018861279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8153806310597004330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acf04d8cf29e4944babf5033b16d0c0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapTrackable
+  _markerType: 1

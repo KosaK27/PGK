@@ -20,17 +20,22 @@ public class DayNightSystem : MonoBehaviour
     public bool IsDay => timeOfDay >= 0.22f && timeOfDay < 0.78f;
     public bool IsNight => !IsDay;
     public float AmbientBrightness { get; private set; }
+
     public event System.Action<bool> OnDayNightChanged;
 
     private bool _wasDayLastFrame;
     private Camera _mainCamera;
-
+    private float _lastUpdateBrightness = -1f;
 
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         _wasDayLastFrame = IsDay;
+    }
+
+    void Start()
+    {
         _mainCamera = Camera.main;
     }
 
@@ -43,16 +48,19 @@ public class DayNightSystem : MonoBehaviour
         }
 
         AmbientBrightness = CalculateBrightness();
+
         ApplySkyColor();
 
         bool isNowDay = IsDay;
         if (isNowDay != _wasDayLastFrame)
-        {
             OnDayNightChanged?.Invoke(isNowDay);
-            _wasDayLastFrame = isNowDay;
-        }
+        _wasDayLastFrame = isNowDay;
 
-        LightingSystem.Instance?.UpdateAmbientOnly();
+        if (Mathf.Abs(AmbientBrightness - _lastUpdateBrightness) > 0.01f)
+        {
+            _lastUpdateBrightness = AmbientBrightness;
+            LightingSystem.Instance?.UpdateAmbientOnly();
+        }
     }
 
     private void ApplySkyColor()
@@ -65,22 +73,22 @@ public class DayNightSystem : MonoBehaviour
     public Color GetSkyColor()
     {
         if (timeOfDay < 0.22f)
-            return Color.Lerp(nightColor, dawnColor, Mathf.SmoothStep(0, 1, timeOfDay / 0.22f));
+            return Color.Lerp(nightColor, dawnColor, Mathf.SmoothStep(0f, 1f, timeOfDay / 0.22f));
         if (timeOfDay < 0.30f)
-            return Color.Lerp(dawnColor, dayColor, Mathf.SmoothStep(0, 1, (timeOfDay - 0.22f) / 0.08f));
+            return Color.Lerp(dawnColor, dayColor, Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.22f) / 0.08f));
         if (timeOfDay < 0.70f)
             return dayColor;
         if (timeOfDay < 0.78f)
-            return Color.Lerp(dayColor, dawnColor, Mathf.SmoothStep(0, 1, (timeOfDay - 0.70f) / 0.08f));
-        return Color.Lerp(dawnColor, nightColor, Mathf.SmoothStep(0, 1, (timeOfDay - 0.78f) / 0.22f));
+            return Color.Lerp(dayColor, dawnColor, Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.70f) / 0.08f));
+        return Color.Lerp(dawnColor, nightColor, Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.78f) / 0.22f));
     }
 
     private float CalculateBrightness()
     {
         if (timeOfDay < 0.22f || timeOfDay >= 0.78f) return 0.05f;
-        if (timeOfDay < 0.30f) return Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.22f) / 0.08f);
+        if (timeOfDay < 0.30f) return Mathf.SmoothStep(0.05f, 1f, (timeOfDay - 0.22f) / 0.08f);
         if (timeOfDay < 0.70f) return 1f;
-        return Mathf.SmoothStep(1f, 0f, (timeOfDay - 0.70f) / 0.08f);
+        return Mathf.SmoothStep(1f, 0.05f, (timeOfDay - 0.70f) / 0.08f);
     }
 
     public float GetTimeOfDay() => timeOfDay;

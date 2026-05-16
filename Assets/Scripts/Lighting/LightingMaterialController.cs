@@ -3,43 +3,52 @@ using UnityEngine.Tilemaps;
 
 public class LightingMaterialController : MonoBehaviour
 {
-    [Header("Materia³y z shaderem TilemapLighting")]
-    [SerializeField] private Material lightingMaterial;
+    public static LightingMaterialController Instance { get; private set; }
 
-    private TilemapRenderer[] _renderers;
+    [Header("Material bazowy z shaderem TilemapLighting")]
+    [SerializeField] private Material baseLightingMaterial;
+
     private MaterialPropertyBlock _mpb;
+
+    void Awake()
+    {
+        Instance = this;
+        _mpb = new MaterialPropertyBlock();
+    }
 
     void Start()
     {
-        _mpb = new MaterialPropertyBlock();
-        RefreshRenderers();
+        RefreshAllRenderers();
     }
 
-    public void RefreshRenderers()
+    public void RegisterRenderer(Renderer r)
     {
-        _renderers = FindObjectsByType<TilemapRenderer>(FindObjectsSortMode.None);
-        foreach (var r in _renderers)
-            r.sharedMaterial = lightingMaterial;
-    }
+        if (r == null) return;
 
-    void LateUpdate()
-    {
-        var lightMap = LightingSystem.Instance?.GetLightMap();
-        if (lightMap == null || _renderers == null) return;
-
-        var wm = WorldManager.Instance;
-        if (wm == null) return;
-
-        foreach (var r in _renderers)
+        if (r.sharedMaterial != baseLightingMaterial)
         {
-            if (r == null) continue;
-            r.GetPropertyBlock(_mpb);
-            _mpb.SetTexture("_LightMap", lightMap);
-            _mpb.SetFloat("_WorldMinX", wm.OffsetX);
-            _mpb.SetFloat("_WorldMinY", wm.OffsetY);
-            _mpb.SetFloat("_WorldWidth", wm.Data.Width);
-            _mpb.SetFloat("_WorldHeight", wm.Data.Height);
-            r.SetPropertyBlock(_mpb);
+            r.sharedMaterial = baseLightingMaterial;
+        }
+
+        bool isBg = r.sortingLayerName.ToLower().Contains("back") ||
+                    r.gameObject.layer == LayerMask.NameToLayer("Background") ||
+                    r.gameObject.CompareTag("Background") ||
+                    r.gameObject.name.ToLower().Contains("back");
+
+        r.GetPropertyBlock(_mpb);
+        _mpb.SetFloat("_IsBackground", isBg ? 1f : 0f);
+        r.SetPropertyBlock(_mpb);
+    }
+
+    public void RefreshAllRenderers()
+    {
+        var renderers = FindObjectsByType<Renderer>(FindObjectsSortMode.None);
+        foreach (var r in renderers)
+        {
+            if (r is TilemapRenderer || r is SpriteRenderer)
+            {
+                RegisterRenderer(r);
+            }
         }
     }
 }

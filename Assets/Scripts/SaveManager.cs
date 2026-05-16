@@ -21,6 +21,8 @@ public class SaveManager : MonoBehaviour
     public CharacterSaveData SelectedCharacter => Characters.Find(c => c.id == Profile.selectedCharacterId);
     public WorldSaveData SelectedWorld => Worlds.Find(w => w.id == Profile.selectedWorldId);
 
+    private HashSet<Vector2Int> _discoveredChunksSet = new();
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
@@ -32,7 +34,6 @@ public class SaveManager : MonoBehaviour
         Characters = LoadAll<CharacterSaveData>(CharactersDir);
         Worlds = LoadAll<WorldSaveData>(WorldsDir);
         Settings = LoadJson<SettingsData>(SettingsPath) ?? new SettingsData();
-        Debug.Log($"[SaveManager] Loaded {Characters.Count} characters, {Worlds.Count} worlds. Path: {RootDir}");
     }
 
     public CharacterSaveData CreateCharacter(string name)
@@ -99,6 +100,13 @@ public class SaveManager : MonoBehaviour
             world.SetBlock(diff.x, diff.y, (BlockType)diff.blockType);
         foreach (var diff in save.wallDiffs)
             world.SetWall(diff.x, diff.y, (WallType)diff.wallType);
+
+        _discoveredChunksSet.Clear();
+        if (save.discoveredChunks != null)
+        {
+            foreach (var c in save.discoveredChunks)
+                _discoveredChunksSet.Add(c);
+        }
     }
 
     public void CaptureCharacterState(CharacterSaveData save, GameObject player, string worldId)
@@ -135,17 +143,38 @@ public class SaveManager : MonoBehaviour
         player.transform.position = worldPos != null ? new Vector3(worldPos.positionX, worldPos.positionY, 0f) : fallbackSpawnPos;
     }
 
+    public bool IsChunkDiscovered(int x, int y)
+    {
+        return _discoveredChunksSet.Contains(new Vector2Int(x, y));
+    }
+
+    public void DiscoverChunk(int x, int y)
+    {
+        var pos = new Vector2Int(x, y);
+        if (_discoveredChunksSet.Add(pos))
+        {
+            if (SelectedWorld != null)
+            {
+                if (SelectedWorld.discoveredChunks == null)
+                {
+                    SelectedWorld.discoveredChunks = new List<Vector2Int>();
+                }
+                SelectedWorld.discoveredChunks.Add(pos);
+            }
+        }
+    }
+
     private static void WriteJson<T>(T obj, string path)
     {
         try { File.WriteAllText(path, JsonUtility.ToJson(obj, true)); }
-        catch (Exception e) { Debug.LogError($"[SaveManager] Write failed {path}: {e.Message}"); }
+        catch (Exception) { }
     }
 
     private static T LoadJson<T>(string path) where T : class
     {
         if (!File.Exists(path)) return null;
         try { return JsonUtility.FromJson<T>(File.ReadAllText(path)); }
-        catch (Exception e) { Debug.LogError($"[SaveManager] Read failed {path}: {e.Message}"); return null; }
+        catch (Exception) { return null; }
     }
 
     private static List<T> LoadAll<T>(string dir) where T : class

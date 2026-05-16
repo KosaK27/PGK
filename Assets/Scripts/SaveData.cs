@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class CharacterSaveData
@@ -43,6 +44,7 @@ public class WorldSaveData
     public List<BlockDiff> blockDiffs = new();
     public List<WallDiff> wallDiffs = new();
     public List<MultitileObjectSave> multitileObjects = new();
+    public List<Vector2Int> discoveredChunks = new();
 }
 
 [Serializable]

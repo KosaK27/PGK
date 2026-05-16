@@ -388,6 +388,7 @@ GameObject:
   - component: {fileID: -5613597596296873650}
   - component: {fileID: 8457748068919150142}
   - component: {fileID: 2110507127020342011}
+  - component: {fileID: -4161875913129442402}
   m_Layer: 6
   m_Name: Player 1
   m_TagString: Player
@@ -783,18 +784,14 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 4a6d2721620dcf947934a6294de870f0, type: 3}
   - {fileID: 8300000, guid: cad8f344d151aa849bf40bc41e379e0e, type: 3}
   footstepInterval: 0.35
-  footstepVolume: 0.5
   jumpSound: {fileID: 8300000, guid: 70e6becd9ac823448a4614805bf0e82c, type: 3}
   doubleJumpSound: {fileID: 8300000, guid: 70e6becd9ac823448a4614805bf0e82c, type: 3}
   dashSound: {fileID: 8300000, guid: 801e3d3fca4dd264db43275aef2ef309, type: 3}
-  movementVolume: 0.5
   swordSwingSound: {fileID: 8300000, guid: 7dbeb87bbc32cab48be2d836bbb3f526, type: 3}
   toolSwingSound: {fileID: 8300000, guid: 7dbeb87bbc32cab48be2d836bbb3f526, type: 3}
   bowShootSound: {fileID: 8300000, guid: a0fa12bf960fe8147bb2f7c2a9bde943, type: 3}
   playerHitSound: {fileID: 8300000, guid: e73b5b16b45891e459b154486a904ace, type: 3}
-  combatVolume: 0.25
   enemyHitSound: {fileID: 8300000, guid: 2886b1fdf0e3f4948acf4a4d2f5f15a2, type: 3}
-  enemyHitVolume: 0.25
 --- !u!82 &2110507127020342011
 AudioSource:
   m_ObjectHideFlags: 0
@@ -892,6 +889,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-4161875913129442402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acf04d8cf29e4944babf5033b16d0c0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapTrackable
+  _markerType: 3
 --- !u!1 &5291934614461029377
 GameObject:
   m_ObjectHideFlags: 0

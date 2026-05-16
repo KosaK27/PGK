@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 7178929792493729165}
   - component: {fileID: -8273433114951826492}
   - component: {fileID: 1504565143840810233}
+  - component: {fileID: 5396879197476452787}
   m_Layer: 7
   m_Name: BatEnemy
   m_TagString: Untagged
@@ -291,3 +292,16 @@ MonoBehaviour:
   wingsMiddle: {fileID: -3685644493221375052, guid: 82aac53d7ad615941bad246dd50928d0, type: 3}
   wingsDown: {fileID: 394267731516017603, guid: d9f17def003034848b1f9e3f717feb3a, type: 3}
   framesPerSecond: 10
+--- !u!114 &5396879197476452787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1437335698542309438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acf04d8cf29e4944babf5033b16d0c0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapTrackable
+  _markerType: 0

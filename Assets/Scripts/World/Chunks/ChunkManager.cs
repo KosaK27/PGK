@@ -52,6 +52,12 @@ public class ChunkManager : MonoBehaviour
                 var cp = new Vector2Int(cx, cy);
                 if (!IsValidChunk(cp, world)) continue;
                 toLoad.Add(cp);
+
+                if (SaveManager.Instance != null)
+                {
+                    SaveManager.Instance.DiscoverChunk(cp.x, cp.y);
+                }
+
                 if (!_loadedChunks.ContainsKey(cp))
                     LoadChunk(cp, world);
             }
@@ -70,7 +76,7 @@ public class ChunkManager : MonoBehaviour
         chunk.Initialize(chunkPos, blockRegistry, wallRegistry, chunkParent);
         chunk.RenderAll(world.Data, world.OffsetX, world.OffsetY);
         _loadedChunks[chunkPos] = chunk;
-        FindFirstObjectByType<LightingMaterialController>()?.RefreshRenderers();
+        LightingMaterialController.Instance.RefreshAllRenderers();
     }
 
     private void UnloadChunk(Vector2Int chunkPos)
