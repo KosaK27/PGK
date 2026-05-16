@@ -921,14 +921,14 @@ RectTransform:
   m_GameObject: {fileID: 253074469}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 13, y: 1, z: 1}
+  m_LocalScale: {x: 13, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1997447505}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -47.9}
   m_SizeDelta: {x: 93, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &253074471
@@ -951,7 +951,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 864ff9cdbf0b4564bbeb460da71863d1, type: 3}
+  m_Texture: {fileID: 2800000, guid: 76cf8e07350f93d41a5e501b452eb485, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -3801,7 +3801,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxBackground
   cam: {fileID: 519420032}
-  surfaceSprite: {fileID: 4344905968321586392, guid: 31beee2e2e2b19141a556c6cb431176b, type: 3}
+  surfaceSprite: {fileID: 7257825215433390563, guid: 2c654371e68f69a41ae68211f104bc7e, type: 3}
   undergroundSprite: {fileID: 2637568282973435956, guid: 20bc421fc1ec4f54da3e2a727b6c2565, type: 3}
   surfaceThresholdY: -30
   tileWidth: 60
@@ -3810,7 +3810,7 @@ MonoBehaviour:
   surfaceParallaxY: 0.05
   undergroundParallaxX: 0.8
   undergroundParallaxY: 0.8
-  backgroundOffsetY: 0
+  backgroundOffsetY: -3
 --- !u!222 &813728469
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4810,7 +4810,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6528301, g: 0.6528301, b: 0.6528301, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -8139,7 +8139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7283019, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 0.05620098, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -10124,7 +10124,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: -440}
-  m_SizeDelta: {x: 1100, y: 200}
+  m_SizeDelta: {x: 1110, y: 200}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1997447507
 CanvasRenderer:
