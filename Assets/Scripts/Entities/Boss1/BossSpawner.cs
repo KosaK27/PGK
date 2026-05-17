@@ -3,12 +3,19 @@ using UnityEngine.InputSystem;
 
 public class BossSpawner : MonoBehaviour
 {
+    public static BossSpawner Instance { get; private set; }
+
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private float spawnOffsetX = 8f;
     [SerializeField] private float spawnOffsetY = 4f;
 
     private GameObject _activeBoss;
 
+    void Awake()
+    {
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+    }
 
     void Update()
     {
@@ -16,15 +23,21 @@ public class BossSpawner : MonoBehaviour
             SpawnBoss();
     }
 
-    private void SpawnBoss()
+    public void SpawnBoss()
+    {
+        SpawnBossFromItem(bossPrefab);
+    }
+
+    public void SpawnBossFromItem(GameObject prefab)
     {
         if (_activeBoss != null) return;
+        if (prefab == null) return;
 
         var playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj == null) return;
 
         Vector3 spawnPos = playerObj.transform.position + new Vector3(spawnOffsetX, spawnOffsetY, 0f);
-        _activeBoss = Instantiate(bossPrefab, spawnPos, Quaternion.identity);
+        _activeBoss = Instantiate(prefab, spawnPos, Quaternion.identity);
 
         MusicManager.Instance?.PlayBoss();
 
@@ -47,7 +60,7 @@ public class BossSpawner : MonoBehaviour
         {
             Destroy(_activeBoss);
             _activeBoss = null;
-            MusicManager.Instance?.PlayNormal(); // <- i tu na wypadek śmierci gracza
+            MusicManager.Instance?.PlayNormal();
         }
     }
 }

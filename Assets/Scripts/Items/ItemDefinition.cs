@@ -2,6 +2,7 @@ using UnityEngine;
 
 public enum ToolType { None, Pickaxe, Axe, Shovel }
 public enum WeaponType { None, Sword, Bow }
+public enum ConsumableType { None, HealPotion, HeartContainer, SummonBoss }
 
 [CreateAssetMenu(fileName = "ItemDefinition", menuName = "Items/ItemDefinition")]
 public class ItemDefinition : ScriptableObject
@@ -22,7 +23,7 @@ public class ItemDefinition : ScriptableObject
     [Header("Multitile Object")]
     public bool isMultitileObject;
     public MultitileObjectDefinition multitileObjectDefinition;
-    
+
     [Header("Tool")]
     public bool isTool;
     public ToolType toolType;
@@ -38,6 +39,14 @@ public class ItemDefinition : ScriptableObject
     [Header("Bow")]
     public float projectileSpeed = 14f;
     public float shootCooldown = 0.8f;
+
+    [Header("Consumable")]
+    public bool isConsumable;
+    public ConsumableType consumableType;
+    public bool consumeOnUse;
+    public int healAmount = 5;
+    public int heartContainerAmount = 1;
+    public GameObject bossPrefabToSummon;
 
     [Header("Hold Positions")]
     public Vector2 holdPositionUp;

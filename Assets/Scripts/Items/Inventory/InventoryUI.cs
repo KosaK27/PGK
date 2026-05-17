@@ -71,14 +71,36 @@ public class InventoryUI : MonoBehaviour
         HandleToggle();
         HandleHotbarKeys();
         UpdateHoldIconPosition();
+        HandleConsumeFromHotbar();
 
         if (_isHolding && Mouse.current.leftButton.wasPressedThisFrame && !IsPointerOverUI())
         {
-            DropToWorld(_holdFromIndex, _holdFromContainer, _holdStack);
-            CancelHold();
+            if (_holdStack != null && !_holdStack.IsEmpty && _holdStack.item.isConsumable)
+            {
+                ConsumableSystem.Instance?.TryUseSelected();
+                SetSlotIconVisible(_holdFromIndex, _holdFromContainer, true);
+                CancelHold();
+            }
+            else
+            {
+                DropToWorld(_holdFromIndex, _holdFromContainer, _holdStack);
+                CancelHold();
+            }
         }
     }
 
+    private void HandleConsumeFromHotbar()
+    {
+        if (_isHolding) return;
+        if (!Mouse.current.leftButton.wasPressedThisFrame) return;
+        if (IsPointerOverUI()) return;
+
+        var selected = InventorySystem.Instance.SelectedItem;
+        if (selected == null || selected.IsEmpty) return;
+        if (!selected.item.isConsumable) return;
+
+        ConsumableSystem.Instance?.TryUseSelected();
+    }
     public void ForceOpen()
     {
         _isOpen = true;
