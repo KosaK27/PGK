@@ -33,6 +33,19 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    public void Heal(int amount)
+    {
+        currentHP = Mathf.Min(currentHP + amount, maxHP);
+        OnHealthChanged?.Invoke(currentHP, maxHP);
+    }
+
+    public void AddMaxHP(int amount)
+    {
+        maxHP += amount;
+        currentHP += amount;
+        OnHealthChanged?.Invoke(currentHP, maxHP);
+    }
+
     public void TakeDamage(int damage, Vector2? sourcePosition = null, float knockbackForce = 10f)
     {
         if (_iframeTimer > 0f) return;

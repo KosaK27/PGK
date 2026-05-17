@@ -22,6 +22,24 @@ public class ItemRegistry : ScriptableObject
         return def;
     }
 
+    public AccessoryDefinition GetAccessoryById(string accessoryId)
+    {
+        if (string.IsNullOrEmpty(accessoryId)) return null;
+        foreach (var item in items)
+            if (item != null && item.isAccessory && item.accessoryDefinition != null && item.accessoryDefinition.accessoryId == accessoryId)
+                return item.accessoryDefinition;
+        return null;
+    }
+
+    public ItemDefinition GetItemByAccessoryId(string accessoryId)
+    {
+        if (string.IsNullOrEmpty(accessoryId)) return null;
+        foreach (var item in items)
+            if (item != null && item.isAccessory && item.accessoryDefinition != null && item.accessoryDefinition.accessoryId == accessoryId)
+                return item;
+        return null;
+    }
+
     public ItemDefinition GetByBlockType(BlockType blockType)
     {
         foreach (var item in items)

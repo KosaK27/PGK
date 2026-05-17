@@ -53,9 +53,6 @@ public class DoorObject : MultitileObject
         _sr.sprite = DoorDefinition.openSprite;
         _sr.flipX = opensLeft;
 
-        // right-opening: sprite extends right from origin, center at (openSize.x * 0.5)
-        // left-opening:  sprite extends left from origin, flipX mirrors it,
-        //                center needs to sit at (closedSize.x - openSize.x * 0.5) relative to origin
         float spriteX = opensLeft
             ? DoorDefinition.closedSize.x - DoorDefinition.openSize.x * 0.5f
             : DoorDefinition.openSize.x * 0.5f;

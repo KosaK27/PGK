@@ -50,20 +50,16 @@ public class SettingsManager : MonoBehaviour
 
     private void ApplyResolution(int index, bool fullscreen)
     {
+        var resolutions = Screen.resolutions;
+        if (resolutions.Length == 0) return;
+        index = Mathf.Clamp(index, 0, resolutions.Length - 1);
+        var r = resolutions[index];
         if (fullscreen)
         {
-            var resolutions = Screen.resolutions;
-            if (resolutions.Length == 0) return;
-            index = Mathf.Clamp(index, 0, resolutions.Length - 1);
-            var r = resolutions[index];
             Screen.SetResolution(r.width, r.height, FullScreenMode.FullScreenWindow);
         }
         else
         {
-            var resolutions = Screen.resolutions;
-            if (resolutions.Length == 0) return;
-            index = Mathf.Clamp(index, 0, resolutions.Length - 1);
-            var r = resolutions[index];
             Screen.SetResolution(r.width, r.height, FullScreenMode.Windowed);
         }
     }

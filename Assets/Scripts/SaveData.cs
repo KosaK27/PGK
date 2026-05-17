@@ -13,6 +13,7 @@ public class CharacterSaveData
     public int currentHP;
     public int maxHP;
     public List<WorldPositionSave> worldPositions = new();
+    public List<string> equippedAccessoryIds = new();
 }
 
 [Serializable]

@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
   m_Name: LeatherBoots_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 33
+  itemId: 106
   displayName: Leather Boots
   sprite: {fileID: -2241300882062069919, guid: 95eda5e7d5c8e42459f69a5858825e8c, type: 3}
-  maxStack: 99
+  maxStack: 1
   isBlock: 0
   blockType: 0
   isWall: 0
   wallType: 0
   isMultitileObject: 0
-  multitileObjectDefinition: {fileID: 11400000, guid: a05b6bbd6f67b92478921b85d09a12db, type: 2}
+  multitileObjectDefinition: {fileID: 11400000, guid: ea871628d2ad94d48afebb0740c7e3d6, type: 2}
   isTool: 0
   toolType: 0
   breakingSpeed: 1
@@ -32,6 +32,14 @@ MonoBehaviour:
   hitboxDistance: 1.2
   projectileSpeed: 14
   shootCooldown: 0.8
+  isConsumable: 0
+  consumableType: 0
+  consumeOnUse: 0
+  healAmount: 5
+  heartContainerAmount: 1
+  bossPrefabToSummon: {fileID: 0}
+  isAccessory: 1
+  accessoryDefinition: {fileID: 11400000, guid: 3fced21728cea074292a8305d743f5e3, type: 2}
   holdPositionUp: {x: 0, y: 0}
   holdPositionForward: {x: 0, y: 0}
   holdPositionDown: {x: 0, y: 0}

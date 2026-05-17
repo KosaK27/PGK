@@ -8,14 +8,14 @@ using TMPro;
 public class InventorySlotUI : MonoBehaviour,
     IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private Image           slotBackground;
-    [SerializeField] private Image           itemIcon;
+    [SerializeField] private Image slotBackground;
+    [SerializeField] private Image itemIcon;
     [SerializeField] private TextMeshProUGUI countLabel;
-    [SerializeField] private Image           highlightOverlay;
+    [SerializeField] private Image highlightOverlay;
 
     [SerializeField] private Color hoverTint = new Color(1f, 1f, 1f, 0.15f);
 
-    private int         _slotIndex;
+    private int _slotIndex;
     private Action<int> _onClicked;
 
     public void Init(int index, Action<int> onClicked)
@@ -33,7 +33,7 @@ public class InventorySlotUI : MonoBehaviour,
     public void Refresh(ItemStack stack)
     {
         bool hasItem = stack != null && !stack.IsEmpty;
-        itemIcon.enabled   = hasItem;
+        itemIcon.enabled = hasItem;
         countLabel.enabled = hasItem && stack.amount > 1;
 
         if (hasItem)

@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a74a511ed650984d8e0afe0181b4f31, type: 3}
-  m_Name: LightningBoots_Item
+  m_Name: LightningRod_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  itemId: 36
-  displayName: Lightning Boots
-  sprite: {fileID: 120030935451547106, guid: 7f652749b806a4447b0431ff50d92ad1, type: 3}
+  itemId: 102
+  displayName: Lightning Rod
+  sprite: {fileID: 2102038073974554466, guid: 92c63f22db792404bb904628929084a3, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 0
   isWall: 0
   wallType: 0
   isMultitileObject: 0
-  multitileObjectDefinition: {fileID: 11400000, guid: a05b6bbd6f67b92478921b85d09a12db, type: 2}
+  multitileObjectDefinition: {fileID: 11400000, guid: ea871628d2ad94d48afebb0740c7e3d6, type: 2}
   isTool: 0
   toolType: 0
   breakingSpeed: 1
@@ -32,6 +32,12 @@ MonoBehaviour:
   hitboxDistance: 1.2
   projectileSpeed: 14
   shootCooldown: 0.8
+  isConsumable: 1
+  consumableType: 3
+  consumeOnUse: 0
+  healAmount: 10
+  heartContainerAmount: 4
+  bossPrefabToSummon: {fileID: 8153806310597004330, guid: 283daf0759f9d4b459e63ac0ebe5a22c, type: 3}
   holdPositionUp: {x: 0, y: 0}
   holdPositionForward: {x: 0, y: 0}
   holdPositionDown: {x: 0, y: 0}

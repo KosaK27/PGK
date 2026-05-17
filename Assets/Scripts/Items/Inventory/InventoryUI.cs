@@ -71,12 +71,35 @@ public class InventoryUI : MonoBehaviour
         HandleToggle();
         HandleHotbarKeys();
         UpdateHoldIconPosition();
+        HandleConsumeFromHotbar();
 
         if (_isHolding && Mouse.current.leftButton.wasPressedThisFrame && !IsPointerOverUI())
         {
-            DropToWorld(_holdFromIndex, _holdFromContainer, _holdStack);
-            CancelHold();
+            if (_holdStack != null && !_holdStack.IsEmpty && _holdStack.item.isConsumable)
+            {
+                ConsumableSystem.Instance?.TryUseSelected();
+                SetSlotIconVisible(_holdFromIndex, _holdFromContainer, true);
+                CancelHold();
+            }
+            else
+            {
+                DropToWorld(_holdFromIndex, _holdFromContainer, _holdStack);
+                CancelHold();
+            }
         }
+    }
+
+    private void HandleConsumeFromHotbar()
+    {
+        if (_isHolding) return;
+        if (!Mouse.current.leftButton.wasPressedThisFrame) return;
+        if (IsPointerOverUI()) return;
+
+        var selected = InventorySystem.Instance.SelectedItem;
+        if (selected == null || selected.IsEmpty) return;
+        if (!selected.item.isConsumable) return;
+
+        ConsumableSystem.Instance?.TryUseSelected();
     }
 
     public void ForceOpen()
@@ -84,6 +107,22 @@ public class InventoryUI : MonoBehaviour
         _isOpen = true;
         mainInventoryPanel.SetActive(true);
         inventoryCraftButton?.gameObject.SetActive(true);
+    }
+
+    public void CloseMainPanel()
+    {
+        if (AccessoryPanelUI.Instance != null && AccessoryPanelUI.Instance.IsOpen) return;
+        if (ContainerUIManager.Instance.IsOpen) return;
+        if (CraftingUIManager.Instance.IsOpen) return;
+        _isOpen = false;
+        mainInventoryPanel.SetActive(false);
+        inventoryCraftButton?.gameObject.SetActive(false);
+
+        if (_isHolding)
+        {
+            SetSlotIconVisible(_holdFromIndex, _holdFromContainer, true);
+            CancelHold();
+        }
     }
 
     private void PositionInventoryBelowHotbar()
@@ -140,8 +179,7 @@ public class InventoryUI : MonoBehaviour
 
     private void OnSlotClicked(int slotIndex)
     {
-        var playerContainer = GetPlayerContainer();
-        HandleSlotClick(slotIndex, playerContainer);
+        HandleSlotClick(slotIndex, GetPlayerContainer());
     }
 
     public void OnContainerSlotClicked(int slotIndex, IContainer container)
@@ -179,36 +217,48 @@ public class InventoryUI : MonoBehaviour
 
     private void MoveSlotBetweenContainers(IContainer from, int fromIdx, IContainer to, int toIdx)
     {
-        var fromStack = from.GetSlot(fromIdx);
+        if (to is AccessoryContainer && from.GetSlot(fromIdx) != null)
+        {
+            var fromStack = from.GetSlot(fromIdx);
+            if (fromStack != null && !fromStack.IsEmpty && (!fromStack.item.isAccessory || fromStack.item.accessoryDefinition == null))
+                return;
+        }
+
+        var fromStackFinal = from.GetSlot(fromIdx);
         var toStack = to.GetSlot(toIdx);
 
-        if (fromStack == null || fromStack.IsEmpty)
+        if (fromStackFinal == null || fromStackFinal.IsEmpty)
         {
             from.SetSlot(fromIdx, toStack);
             to.SetSlot(toIdx, null);
             return;
         }
 
-        if (toStack != null && !toStack.IsEmpty && toStack.item == fromStack.item)
+        if (toStack != null && !toStack.IsEmpty && toStack.item == fromStackFinal.item)
         {
             int space = toStack.item.maxStack - toStack.amount;
             if (space > 0)
             {
-                int move = Mathf.Min(space, fromStack.amount);
+                int move = Mathf.Min(space, fromStackFinal.amount);
                 toStack.amount += move;
-                fromStack.amount -= move;
-                from.SetSlot(fromIdx, fromStack.amount <= 0 ? null : fromStack);
+                fromStackFinal.amount -= move;
+                from.SetSlot(fromIdx, fromStackFinal.amount <= 0 ? null : fromStackFinal);
                 to.SetSlot(toIdx, toStack);
                 return;
             }
         }
 
-        to.SetSlot(toIdx, fromStack);
+        to.SetSlot(toIdx, fromStackFinal);
         from.SetSlot(fromIdx, toStack);
     }
 
     private void SetSlotIconVisible(int index, IContainer container, bool visible)
     {
+        if (container is AccessoryContainer)
+        {
+            AccessoryPanelUI.Instance?.SetSlotIconVisible(index, visible);
+            return;
+        }
         if (container == GetPlayerContainer())
             GetPlayerSlotUI(index)?.SetIconVisible(visible);
         else
@@ -244,6 +294,12 @@ public class InventoryUI : MonoBehaviour
         if (CraftingUIManager.Instance.IsOpen)
         {
             CraftingUIManager.Instance.CloseStation();
+            return;
+        }
+
+        if (AccessoryPanelUI.Instance != null && AccessoryPanelUI.Instance.IsOpen)
+        {
+            AccessoryPanelUI.Instance.Close();
             return;
         }
 
