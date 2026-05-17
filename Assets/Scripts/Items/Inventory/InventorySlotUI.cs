@@ -46,7 +46,18 @@ public class InventorySlotUI : MonoBehaviour,
     public void SetIconVisible(bool visible) => itemIcon.enabled = visible;
 
     public void SetHighlight(bool selected, Color normal, Color selectedColor)
-        => slotBackground.color = selected ? selectedColor : normal;
+    {
+        
+        slotBackground.color = selected ? selectedColor : normal;
+
+        
+        if (highlightOverlay != null)
+        {
+            highlightOverlay.gameObject.SetActive(selected);
+            
+            highlightOverlay.color = Color.white;
+        }
+    }
 
     public void OnPointerClick(PointerEventData eventData)
     {
