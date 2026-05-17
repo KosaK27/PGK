@@ -103,10 +103,8 @@ public class SaveManager : MonoBehaviour
 
         _discoveredChunksSet.Clear();
         if (save.discoveredChunks != null)
-        {
             foreach (var c in save.discoveredChunks)
                 _discoveredChunksSet.Add(c);
-        }
     }
 
     public void CaptureCharacterState(CharacterSaveData save, GameObject player, string worldId)
@@ -122,6 +120,15 @@ public class SaveManager : MonoBehaviour
         }
         var stats = player.GetComponent<PlayerStats>();
         if (stats != null) { save.currentHP = stats.currentHP; save.maxHP = stats.maxHP; }
+
+        var acc = AccessorySystem.Instance;
+        if (acc != null)
+        {
+            save.equippedAccessoryIds.Clear();
+            for (int i = 0; i < acc.SlotCount; i++)
+                save.equippedAccessoryIds.Add(acc.GetSlot(i)?.accessoryId ?? "");
+        }
+
         save.worldPositions.RemoveAll(p => p.worldId == worldId);
         save.worldPositions.Add(new WorldPositionSave { worldId = worldId, positionX = player.transform.position.x, positionY = player.transform.position.y });
     }
@@ -137,16 +144,25 @@ public class SaveManager : MonoBehaviour
             InventorySystem.Instance.SetSlot(entry.slotIndex, new ItemStack(def, entry.amount));
         }
         InventorySystem.Instance.SelectHotbarSlot(save.hotbarSelectedIndex);
+
         var stats = player.GetComponent<PlayerStats>();
         if (stats != null) { stats.currentHP = save.currentHP > 0 ? save.currentHP : save.maxHP; stats.maxHP = save.maxHP > 0 ? save.maxHP : 20; }
+
+        var acc = AccessorySystem.Instance;
+        if (acc != null && save.equippedAccessoryIds != null)
+        {
+            for (int i = 0; i < acc.SlotCount; i++)
+            {
+                string accId = i < save.equippedAccessoryIds.Count ? save.equippedAccessoryIds[i] : "";
+                acc.Equip(i, registry.GetAccessoryById(accId));
+            }
+        }
+
         var worldPos = save.worldPositions.Find(p => p.worldId == worldId);
         player.transform.position = worldPos != null ? new Vector3(worldPos.positionX, worldPos.positionY, 0f) : fallbackSpawnPos;
     }
 
-    public bool IsChunkDiscovered(int x, int y)
-    {
-        return _discoveredChunksSet.Contains(new Vector2Int(x, y));
-    }
+    public bool IsChunkDiscovered(int x, int y) => _discoveredChunksSet.Contains(new Vector2Int(x, y));
 
     public void DiscoverChunk(int x, int y)
     {
@@ -155,10 +171,7 @@ public class SaveManager : MonoBehaviour
         {
             if (SelectedWorld != null)
             {
-                if (SelectedWorld.discoveredChunks == null)
-                {
-                    SelectedWorld.discoveredChunks = new List<Vector2Int>();
-                }
+                SelectedWorld.discoveredChunks ??= new List<Vector2Int>();
                 SelectedWorld.discoveredChunks.Add(pos);
             }
         }

@@ -48,6 +48,10 @@ public class ItemDefinition : ScriptableObject
     public int heartContainerAmount = 1;
     public GameObject bossPrefabToSummon;
 
+    [Header("Accessory")]
+    public bool isAccessory;
+    public AccessoryDefinition accessoryDefinition;
+
     [Header("Hold Positions")]
     public Vector2 holdPositionUp;
     public Vector2 holdPositionForward;

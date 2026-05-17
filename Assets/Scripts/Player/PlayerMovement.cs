@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
-    [SerializeField] private int maxJumps = 2;
+    [SerializeField] private int maxJumpsBase = 1;
 
     [Header("Dash Settings")]
     [SerializeField] private float dashSpeed = 18f;
@@ -20,9 +20,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float waterMoveSpeedMultiplier = 0.6f;
     [SerializeField] private float waterLeapForce = 10f;
 
+    [Header("Step Up Settings")]
+    [SerializeField] private float stepUpSpeed = 8f;
+
     public bool isGrounded;
     public bool IsDashing { get; private set; }
     private bool _isInWater;
+    private bool _isSteppingUp;
+    private float _stepUpTargetY;
 
     public PlayerLocomotionState LocomotionState { get; private set; }
     public PlayerAirState AirState { get; private set; }
@@ -53,6 +58,11 @@ public class PlayerMovement : MonoBehaviour
     private const float GROUNDED_COOLDOWN = 0.1f;
     private const float KNOCKBACK_DURATION = 0.15f;
 
+    private bool HasDash => AccessorySystem.Instance != null && AccessorySystem.Instance.HasEffect(AccessoryEffect.LightningBoots);
+    private bool HasDoubleJump => AccessorySystem.Instance != null && AccessorySystem.Instance.HasEffect(AccessoryEffect.BatWings);
+    private bool HasStepUp => AccessorySystem.Instance != null && (AccessorySystem.Instance.HasEffect(AccessoryEffect.LeatherBoots) || AccessorySystem.Instance.HasEffect(AccessoryEffect.LightningBoots));
+    private int MaxJumps => HasDoubleJump ? 2 : maxJumpsBase;
+
     public void ApplyKnockback()
     {
         _knockbackTimer = KNOCKBACK_DURATION;
@@ -61,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _jumpsLeft = maxJumps;
+        _jumpsLeft = MaxJumps;
         _defaultGravityScale = _rb.gravityScale;
     }
 
@@ -73,6 +83,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (_groundedTimer > 0) { _groundedTimer -= Time.deltaTime; isGrounded = true; }
         _dashCooldownTimer -= Time.deltaTime;
+
+        if (_isSteppingUp)
+        {
+            StepUpMove();
+            return;
+        }
 
         if (IsDashing)
         {
@@ -92,7 +108,8 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 Jump();
-                TryDash();
+                if (HasDash) TryDash();
+                if (HasStepUp) TryStepUp();
             }
         }
 
@@ -100,6 +117,46 @@ public class PlayerMovement : MonoBehaviour
 
         bool isMoving = LocomotionState == PlayerLocomotionState.Walk;
         PlayerAudioManager.Instance?.TryPlayFootstep(isMoving, isGrounded);
+    }
+
+    private void TryStepUp()
+    {
+        if (!isGrounded) return;
+
+        float moveInput = 0f;
+        if (Keyboard.current.aKey.isPressed) moveInput = -1f;
+        if (Keyboard.current.dKey.isPressed) moveInput = 1f;
+        if (moveInput == 0f) return;
+
+        float colliderBottom = -0.9f;
+        float stepHeight = 1f;
+
+        Vector2 direction = new Vector2(moveInput, 0f);
+        int layerMask = ~LayerMask.GetMask("Player");
+
+        Vector2 originLow = (Vector2)transform.position + new Vector2(0f, colliderBottom + 0.1f);
+        var hitLow = Physics2D.Raycast(originLow, direction, 1f, layerMask);
+
+        Vector2 originHigh = (Vector2)transform.position + new Vector2(0f, colliderBottom + stepHeight + 0.1f);
+        var hitHigh = Physics2D.Raycast(originHigh, direction, 1f, layerMask);
+
+        if (!hitLow.collider) return;
+        if (hitHigh.collider) return;
+
+        _isSteppingUp = true;
+        _stepUpTargetY = transform.position.y + stepHeight;
+        _rb.linearVelocity = Vector2.zero;
+    }
+
+    private void StepUpMove()
+    {
+        float newY = Mathf.MoveTowards(transform.position.y, _stepUpTargetY, stepUpSpeed * Time.deltaTime);
+        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        if (Mathf.Abs(transform.position.y - _stepUpTargetY) < 0.01f)
+        {
+            transform.position = new Vector3(transform.position.x, _stepUpTargetY, transform.position.z);
+            _isSteppingUp = false;
+        }
     }
 
     private void CheckWater()
@@ -115,7 +172,7 @@ public class PlayerMovement : MonoBehaviour
         if (_isInWater)
         {
             _rb.gravityScale = waterGravityScale;
-            _jumpsLeft = maxJumps;
+            _jumpsLeft = MaxJumps;
         }
         else
         {
@@ -125,6 +182,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
+        if (_isSteppingUp) return;
+
         float move = 0;
         if (Keyboard.current.aKey.isPressed) move = -1;
         if (Keyboard.current.dKey.isPressed) move = 1;
@@ -166,7 +225,7 @@ public class PlayerMovement : MonoBehaviour
         {
             _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
 
-            if (_jumpsLeft == maxJumps)
+            if (_jumpsLeft == MaxJumps)
                 PlayerAudioManager.Instance?.PlayJump();
             else
                 PlayerAudioManager.Instance?.PlayDoubleJump();
@@ -219,7 +278,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (c.normal.y > 0.5f)
             {
-                if (!isGrounded) _jumpsLeft = maxJumps;
+                if (!isGrounded) _jumpsLeft = MaxJumps;
                 isGrounded = true;
                 _groundedTimer = GROUNDED_COOLDOWN;
                 return;
