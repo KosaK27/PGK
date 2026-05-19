@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 public class ChunkManager : MonoBehaviour
 {
     public static ChunkManager Instance { get; private set; }
+
     [SerializeField] private BlockRegistry blockRegistry;
     [SerializeField] private Transform chunkParent;
     [SerializeField] private int viewDistanceX = 4;
@@ -46,27 +47,51 @@ public class ChunkManager : MonoBehaviour
         var world = WorldManager.Instance;
         var playerChunk = WorldToChunkPos(_playerTransform.position, world.OffsetX, world.OffsetY);
         var toLoad = new HashSet<Vector2Int>();
-        for (int cy = playerChunk.y - viewDistanceY; cy <= playerChunk.y + viewDistanceY; cy++)
-            for (int cx = playerChunk.x - viewDistanceX; cx <= playerChunk.x + viewDistanceX; cx++)
-            {
-                var cp = new Vector2Int(cx, cy);
-                if (!IsValidChunk(cp, world)) continue;
-                toLoad.Add(cp);
 
-                if (SaveManager.Instance != null)
-                {
-                    SaveManager.Instance.DiscoverChunk(cp.x, cp.y);
-                }
+        int minCX = playerChunk.x - viewDistanceX;
+        int maxCX = playerChunk.x + viewDistanceX;
+        int minCY = playerChunk.y - viewDistanceY;
+        int maxCY = playerChunk.y + viewDistanceY;
 
-                if (!_loadedChunks.ContainsKey(cp))
-                    LoadChunk(cp, world);
-            }
+        for (int cy = minCY; cy <= maxCY; cy++)
+        for (int cx = minCX; cx <= maxCX; cx++)
+        {
+            var cp = new Vector2Int(cx, cy);
+            if (!IsValidChunk(cp, world)) continue;
+            toLoad.Add(cp);
+
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.DiscoverChunk(cp.x, cp.y);
+
+            if (!_loadedChunks.ContainsKey(cp))
+                LoadChunk(cp, world);
+        }
+
         var toUnload = new List<Vector2Int>();
         foreach (var cp in _loadedChunks.Keys)
             if (!toLoad.Contains(cp))
                 toUnload.Add(cp);
         foreach (var cp in toUnload)
             UnloadChunk(cp);
+
+        UpdateLightingWindow(world, minCX, maxCX, minCY, maxCY);
+    }
+
+    private void UpdateLightingWindow(WorldManager world, int minCX, int maxCX, int minCY, int maxCY)
+    {
+        if (LightingSystem.Instance == null) return;
+
+        int clampedMinCX = Mathf.Max(0, minCX);
+        int clampedMinCY = Mathf.Max(0, minCY);
+        int clampedMaxCX = Mathf.Min(world.Data.Width / Chunk.SIZE - 1, maxCX);
+        int clampedMaxCY = Mathf.Min(world.Data.Height / Chunk.SIZE - 1, maxCY);
+
+        int originWorldX = clampedMinCX * Chunk.SIZE + world.OffsetX;
+        int originWorldY = clampedMinCY * Chunk.SIZE + world.OffsetY;
+        int widthTiles = (clampedMaxCX - clampedMinCX + 1) * Chunk.SIZE;
+        int heightTiles = (clampedMaxCY - clampedMinCY + 1) * Chunk.SIZE;
+
+        LightingSystem.Instance.SetWindow(originWorldX, originWorldY, widthTiles, heightTiles);
     }
 
     private void LoadChunk(Vector2Int chunkPos, WorldManager world)
@@ -76,7 +101,6 @@ public class ChunkManager : MonoBehaviour
         chunk.Initialize(chunkPos, blockRegistry, wallRegistry, chunkParent);
         chunk.RenderAll(world.Data, world.OffsetX, world.OffsetY);
         _loadedChunks[chunkPos] = chunk;
-        LightingMaterialController.Instance.RefreshAllRenderers();
     }
 
     private void UnloadChunk(Vector2Int chunkPos)
@@ -125,8 +149,7 @@ public class ChunkManager : MonoBehaviour
         var world = WorldManager.Instance;
         int lx = Mathf.FloorToInt(worldPos.x) - world.OffsetX;
         int ly = Mathf.FloorToInt(worldPos.y) - world.OffsetY;
-        var chunkPos = GetChunkPos(lx, ly);
-        return _loadedChunks.ContainsKey(chunkPos);
+        return _loadedChunks.ContainsKey(GetChunkPos(lx, ly));
     }
 
     public void RefreshWall(int lx, int ly, int offsetX, int offsetY, TileBase tile)
@@ -154,10 +177,9 @@ public class ChunkManager : MonoBehaviour
             if (world == null) return;
             float x = kvp.Key.x * Chunk.SIZE + world.OffsetX;
             float y = kvp.Key.y * Chunk.SIZE + world.OffsetY;
-            float size = Chunk.SIZE;
             Gizmos.DrawWireCube(
-                new Vector3(x + size / 2f, y + size / 2f, 0),
-                new Vector3(size, size, 0)
+                new Vector3(x + Chunk.SIZE / 2f, y + Chunk.SIZE / 2f, 0),
+                new Vector3(Chunk.SIZE, Chunk.SIZE, 0)
             );
         }
     }

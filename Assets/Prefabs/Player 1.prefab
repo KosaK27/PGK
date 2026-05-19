@@ -389,6 +389,8 @@ GameObject:
   - component: {fileID: 8457748068919150142}
   - component: {fileID: 2110507127020342011}
   - component: {fileID: -4161875913129442402}
+  - component: {fileID: 8916208154608391720}
+  - component: {fileID: 8786627986954176815}
   m_Layer: 6
   m_Name: Player 1
   m_TagString: Player
@@ -519,7 +521,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 8
   jumpForce: 20
-  maxJumps: 2
+  maxJumpsBase: 1
   dashSpeed: 18
   dashDuration: 0.3
   dashCooldown: 0.8
@@ -902,6 +904,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapTrackable
   _markerType: 3
+--- !u!114 &8916208154608391720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71b09ab7ca28dbd4b80af4b5527b8862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLight
+  strength: 0.6
+  lightColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &8786627986954176815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8baf7306438ab7d4da678008edea2fa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LitSprite
 --- !u!1 &5291934614461029377
 GameObject:
   m_ObjectHideFlags: 0

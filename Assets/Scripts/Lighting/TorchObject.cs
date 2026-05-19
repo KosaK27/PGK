@@ -15,6 +15,15 @@ public class TorchObject : MultitileObject
         _lightSource.Strength = def.lightStrength;
     }
 
-    void OnEnable() { }
-    void OnDisable() { }
+    void OnDestroy()
+    {
+        if (LightingSystem.Instance != null && _lightSource != null)
+        {
+            LightingSystem.Instance.UnregisterSource(_lightSource);
+            LightingSystem.Instance.RebuildLightMapAt(
+                Mathf.RoundToInt(transform.position.x),
+                Mathf.RoundToInt(transform.position.y)
+            );
+        }
+    }
 }

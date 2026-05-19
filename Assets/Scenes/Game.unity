@@ -995,12 +995,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a7a9715ff09f6d4cbefae2c2f025985, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DayNightSystem
-  dayLengthSeconds: 10000
+  dayLengthSeconds: 1800
   timeOfDay: 0.413
   autoAdvanceTime: 1
-  dayColor: {r: 0.53, g: 0.81, b: 0.98, a: 1}
-  nightColor: {r: 0.02, g: 0.02, b: 0.08, a: 1}
-  dawnColor: {r: 0.9, g: 0.55, b: 0.25, a: 1}
+  dayColor: {r: 1, g: 1, b: 1, a: 1}
+  nightColor: {r: 0.12164471, g: 0.12164471, b: 0.2528302, a: 1}
+  dawnColor: {r: 0.82641506, g: 0.5668805, b: 0.347718, a: 1}
 --- !u!4 &253483242
 Transform:
   m_ObjectHideFlags: 0
@@ -6348,11 +6348,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96caf677dc8b9c47b15545227180669, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightingSystem
-  dayFalloff: 0.97
-  dayWallFalloff: 0.95
+  dayFalloff: 0.9
+  dayWallFalloff: 0.9
   nightFalloff: 0.9
   nightWallFalloff: 0.9
-  minUndergroundBrightness: 0.03
+  minUndergroundBrightness: 0
+  dayBlockOcclusion: 0.6
+  lightFalloffExponent: 2
+  lightCutoff: 0.04
+  localRebuildRadius: 24
 --- !u!4 &1381351092
 Transform:
   m_ObjectHideFlags: 0
@@ -6898,8 +6902,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChunkManager
   blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
   chunkParent: {fileID: 1091144312}
-  viewDistanceX: 4
-  viewDistanceY: 3
+  viewDistanceX: 2
+  viewDistanceY: 2
   wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}
 --- !u!114 &1548276942
 MonoBehaviour:

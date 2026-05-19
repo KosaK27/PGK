@@ -1,19 +1,15 @@
 using UnityEngine;
+
 public class LightSource : MonoBehaviour
 {
     public Color LightColor = Color.white;
-    [Range(0f, 1f)] public float Strength = 1f;
+    [Min(0f)] public float Strength = 1f;
+    public bool isDynamic = false;
     public Vector2 WorldPosition => transform.position;
     private bool _registered = false;
-    void OnEnable()
-    {
-        TryRegister();
-    }
-    void Start()
-    {
-        if (!_registered)
-            TryRegister();
-    }
+
+    void OnEnable() => TryRegister();
+
     void OnDisable()
     {
         if (LightingSystem.Instance != null && _registered)
@@ -23,13 +19,12 @@ public class LightSource : MonoBehaviour
             _registered = false;
         }
     }
+
     private void TryRegister()
     {
-        if (LightingSystem.Instance != null)
-        {
-            LightingSystem.Instance.RegisterSource(this);
-            LightingSystem.Instance.RebuildLightMap();
-            _registered = true;
-        }
+        if (_registered || LightingSystem.Instance == null) return;
+        LightingSystem.Instance.RegisterSource(this);
+        if (!isDynamic) LightingSystem.Instance.RebuildLightMap();
+        _registered = true;
     }
 }
