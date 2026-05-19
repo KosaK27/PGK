@@ -20,9 +20,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float waterMoveSpeedMultiplier = 0.6f;
     [SerializeField] private float waterLeapForce = 10f;
 
-    [Header("Step Up Settings")]
-    [SerializeField] private float stepUpSpeed = 8f;
-
     public bool isGrounded;
     public bool IsDashing { get; private set; }
     private bool _isInWater;
@@ -128,34 +125,32 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.dKey.isPressed) moveInput = 1f;
         if (moveInput == 0f) return;
 
-        float colliderBottom = -0.9f;
-        float stepHeight = 1f;
-
-        Vector2 direction = new Vector2(moveInput, 0f);
         int layerMask = ~LayerMask.GetMask("Player");
 
-        Vector2 originLow = (Vector2)transform.position + new Vector2(0f, colliderBottom + 0.1f);
-        var hitLow = Physics2D.Raycast(originLow, direction, 1f, layerMask);
+        Vector2 direction = new Vector2(moveInput, 0f);
+        Vector2 wallCheckOrigin = (Vector2)transform.position + new Vector2(0f, -1.35f);
+        var hitWall = Physics2D.Raycast(wallCheckOrigin, direction, 1.0f, layerMask);
+        if (!hitWall.collider) return;
 
-        Vector2 originHigh = (Vector2)transform.position + new Vector2(0f, colliderBottom + stepHeight + 0.1f);
-        var hitHigh = Physics2D.Raycast(originHigh, direction, 1f, layerMask);
-
-        if (!hitLow.collider) return;
-        if (hitHigh.collider) return;
+        Vector2 landingCenter = (Vector2)transform.position + new Vector2(moveInput * 0.5f, 1f);
+        var overlap = Physics2D.OverlapBox(landingCenter, new Vector2(2.5f, 2.8f), 0f, layerMask);
+        if (overlap) return;
 
         _isSteppingUp = true;
-        _stepUpTargetY = transform.position.y + stepHeight;
-        _rb.linearVelocity = Vector2.zero;
+        _stepUpTargetY = transform.position.y + 1.1f;
     }
 
     private void StepUpMove()
     {
-        float newY = Mathf.MoveTowards(transform.position.y, _stepUpTargetY, stepUpSpeed * Time.deltaTime);
+        float newY = Mathf.MoveTowards(transform.position.y, _stepUpTargetY, 20f * Time.deltaTime);
         transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, 0f);
+
         if (Mathf.Abs(transform.position.y - _stepUpTargetY) < 0.01f)
         {
             transform.position = new Vector3(transform.position.x, _stepUpTargetY, transform.position.z);
             _isSteppingUp = false;
+            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, 0f);
         }
     }
 
