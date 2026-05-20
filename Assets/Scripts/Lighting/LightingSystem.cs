@@ -47,6 +47,8 @@ public class LightingSystem : MonoBehaviour
     [Header("Point Light Shape")]
     [SerializeField] private float lightFalloffExponent = 2.2f;
     [SerializeField] private float lightCutoff = 0.04f;
+    [SerializeField, Range(0.5f, 1f)] private float turnPenalty = 0.80f;
+    [SerializeField, Range(0.5f, 1f)] private float downwardFalloffMult = 0.75f;
 
     [Header("Point Light Solid Falloff")]
     [SerializeField] private float solidFalloffDay = 0.68f;
@@ -77,16 +79,24 @@ public class LightingSystem : MonoBehaviour
     private Task _rebuildTask = null;
     private bool _uploadPending = false;
 
-    private readonly (int dx, int dy)[] _dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
-
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    public void RegisterSource(LightSource src) => _sources.Add(src);
-    public void UnregisterSource(LightSource src) => _sources.Remove(src);
+    public void RegisterSource(LightSource src)
+    {
+        _sources.Add(src);
+        _pendingFullRebuild = true;
+    }
+
+    public void UnregisterSource(LightSource src)
+    {
+        _sources.Remove(src);
+        _pendingFullRebuild = true;
+    }
+
     public void RebuildLightMap() => _pendingFullRebuild = true;
     public void UpdateAmbientOnly() => _pendingFullRebuild = true;
 
@@ -94,6 +104,13 @@ public class LightingSystem : MonoBehaviour
     {
         for (int dx = -localRebuildRadius; dx <= localRebuildRadius; dx++)
             _pendingDirtyColumns.Add(worldX + dx);
+    }
+
+    public void MarkSourceDirty(LightSource src)
+    {
+        int wx = Mathf.RoundToInt(src.WorldPosition.x);
+        int wy = Mathf.RoundToInt(src.WorldPosition.y);
+        RebuildLightMapAt(wx, wy);
     }
 
     public void SetWindow(int originWorldX, int originWorldY, int widthTiles, int heightTiles)
@@ -203,6 +220,8 @@ public class LightingSystem : MonoBehaviour
         float falloffExp = lightFalloffExponent;
         float cutoff = lightCutoff;
         float skyCutoff = skyLightCutoff;
+        float turnPen = turnPenalty;
+        float downMult = downwardFalloffMult;
         var buffer = _lightBuffer;
 
         _uploadPending = true;
@@ -213,7 +232,7 @@ public class LightingSystem : MonoBehaviour
                 for (int i = 0; i < buffer.Length; i++)
                     buffer[i] = Color.clear;
                 for (int bx = 0; bx < bufW; bx++)
-                    UpdateColumn(bx, bufW, bufH, originX, originY, snapshot, buffer, dayIntensity, airBlockLerp, wallFalloff, skyCutoff);
+                    UpdateColumn(bx, bufW, bufH, snapshot, buffer, dayIntensity, airBlockLerp, wallFalloff, skyCutoff);
             }
             else
             {
@@ -228,14 +247,14 @@ public class LightingSystem : MonoBehaviour
                 {
                     int bx = wx - originX;
                     if (bx < 0 || bx >= bufW) continue;
-                    UpdateColumn(bx, bufW, bufH, originX, originY, snapshot, buffer, dayIntensity, airBlockLerp, wallFalloff, skyCutoff);
+                    UpdateColumn(bx, bufW, bufH, snapshot, buffer, dayIntensity, airBlockLerp, wallFalloff, skyCutoff);
                 }
             }
 
             ApplyHorizontalSkyBleed(bufW, bufH, snapshot, buffer, airBlockLerp, wallFalloff, skyCutoff);
 
             foreach (var src in sources)
-                Propagate(src, bufW, bufH, originX, originY, snapshot, buffer, falloff, wallFalloff, solidFalloff, falloffExp, cutoff);
+                Propagate(src, bufW, bufH, originX, originY, snapshot, buffer, falloff, wallFalloff, solidFalloff, falloffExp, cutoff, turnPen, downMult);
         });
     }
 
@@ -257,7 +276,7 @@ public class LightingSystem : MonoBehaviour
     }
 
     private static void UpdateColumn(
-        int bx, int bufW, int bufH, int originX, int originY,
+        int bx, int bufW, int bufH,
         BlockSnapshot[] snap, NativeArray<Color> buffer,
         float dayIntensity, float airBlockLerp, float wallFalloff, float skyCutoff)
     {
@@ -319,24 +338,24 @@ public class LightingSystem : MonoBehaviour
         int bufW, int bufH, int originX, int originY,
         BlockSnapshot[] snap, NativeArray<Color> buffer,
         float falloff, float wallFalloff, float solidFalloff,
-        float falloffExp, float cutoff)
+        float falloffExp, float cutoff, float turnPenalty, float downwardFalloffMult)
     {
         int startX = Mathf.RoundToInt(src.Position.x) - originX;
         int startY = Mathf.RoundToInt(src.Position.y) - originY;
         if (startX < 0 || startX >= bufW || startY < 0 || startY >= bufH) return;
 
         var visited = new float[bufW * bufH];
-        var queue = new Queue<(int x, int y, Color light, float rawStr)>();
+        var queue = new Queue<(int x, int y, Color light, float rawStr, int dirX, int dirY)>();
 
         int startIdx = startY * bufW + startX;
-        queue.Enqueue((startX, startY, new Color(src.Color.r, src.Color.g, src.Color.b, 1f), src.Strength));
+        queue.Enqueue((startX, startY, new Color(src.Color.r, src.Color.g, src.Color.b, 1f), src.Strength, 0, 0));
         visited[startIdx] = src.Strength;
 
         (int dx, int dy)[] dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
 
         while (queue.Count > 0)
         {
-            var (x, y, light, rawStr) = queue.Dequeue();
+            var (x, y, light, rawStr, prevDX, prevDY) = queue.Dequeue();
             if (rawStr <= cutoff) continue;
 
             float brightness = Mathf.Pow(rawStr, falloffExp);
@@ -354,19 +373,28 @@ public class LightingSystem : MonoBehaviour
 
             for (int i = 0; i < 4; i++)
             {
-                int nx = x + dirs[i].dx;
-                int ny = y + dirs[i].dy;
+                int ndx = dirs[i].dx;
+                int ndy = dirs[i].dy;
+                int nx = x + ndx;
+                int ny = y + ndy;
                 if (nx < 0 || nx >= bufW || ny < 0 || ny >= bufH) continue;
 
                 int nIdx = ny * bufW + nx;
                 var cell = snap[nIdx];
                 float mult = cell.IsSolid ? solidFalloff : cell.HasWall ? wallFalloff : falloff;
+
+                bool isTurn = prevDX != 0 && ndx != prevDX || prevDY != 0 && ndy != prevDY;
+                if (isTurn) mult *= turnPenalty;
+
+                if (ndy == -1 && !cell.IsSolid)
+                    mult *= downwardFalloffMult;
+
                 float nextRaw = rawStr * mult;
 
                 if (nextRaw > visited[nIdx])
                 {
                     visited[nIdx] = nextRaw;
-                    queue.Enqueue((nx, ny, light, nextRaw));
+                    queue.Enqueue((nx, ny, light, nextRaw, ndx, ndy));
                 }
             }
         }

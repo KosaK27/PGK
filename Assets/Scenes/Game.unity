@@ -3808,6 +3808,7 @@ MonoBehaviour:
   undergroundParallaxX: 0.8
   undergroundParallaxY: 0.8
   backgroundOffsetY: -3
+  surfaceDarkenStrength: 0.6
 --- !u!222 &813728469
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6349,13 +6350,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightingSystem
   dayFalloff: 0.9
-  dayWallFalloff: 0.9
+  dayWallFalloff: 0.95
   nightFalloff: 0.9
   nightWallFalloff: 0.9
   minUndergroundBrightness: 0
   dayBlockOcclusion: 0.6
+  skyLightCutoff: 0.02
   lightFalloffExponent: 2
   lightCutoff: 0.04
+  turnPenalty: 0.8
+  downwardFalloffMult: 0.75
+  solidFalloffDay: 0.68
+  solidFalloffNight: 0.52
   localRebuildRadius: 24
 --- !u!4 &1381351092
 Transform:
@@ -6902,8 +6908,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChunkManager
   blockRegistry: {fileID: 11400000, guid: 444c2c434570c2e49bc9d2f3976359b4, type: 2}
   chunkParent: {fileID: 1091144312}
-  viewDistanceX: 2
-  viewDistanceY: 2
+  viewDistanceX: 3
+  viewDistanceY: 3
   wallRegistry: {fileID: 11400000, guid: dc642e8eeb767894897dd8bd8f6ed4a0, type: 2}
 --- !u!114 &1548276942
 MonoBehaviour:
