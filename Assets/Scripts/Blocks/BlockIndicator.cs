@@ -6,6 +6,7 @@ public class BlockIndicator : MonoBehaviour
     [SerializeField] private Color _placeColor = new(1f, 1f, 1f, 0.4f);
     [SerializeField] private Color _breakIdleColor = new(1f, 0.3f, 0.1f, 0.5f);
     [SerializeField] private Color _breakActiveColor = new(1f, 0.3f, 0.1f, 0.8f);
+    [SerializeField] private Color _smartBreakColor = new(0.3f, 0.8f, 1f, 0.6f);
     [SerializeField] private Camera _cam;
     [SerializeField] private float _reach = 5f;
 
@@ -13,10 +14,12 @@ public class BlockIndicator : MonoBehaviour
     private SpriteRenderer _breakSr;
     private GameObject _placeGo;
     private GameObject _breakGo;
+    private PlayerInteraction _playerInteraction;
 
     void Awake()
     {
         if (_cam == null) _cam = Camera.main;
+        _playerInteraction = GetComponent<PlayerInteraction>();
         _placeGo = MakeIndicator("PlaceHologram", 1);
         _breakGo = MakeIndicator("BreakHighlight", 199);
         _placeSr = _placeGo.GetComponent<SpriteRenderer>();
@@ -36,14 +39,28 @@ public class BlockIndicator : MonoBehaviour
             && item.item.isMultitileObject && item.item.multitileObjectDefinition != null;
         bool hasTool = item != null && !item.IsEmpty && item.item != null && item.item.isTool;
 
-        var cell = CellUnderMouse();
-        bool inReach = InReach(cell);
-        var cellV2 = new Vector2Int(cell.x, cell.y);
+        Vector3Int breakCell;
+        bool useSmartBreak = false;
+        Color breakColor = _breakIdleColor;
 
-        var currentBlock = WorldManager.Instance.GetBlock(cell.x, cell.y);
+        if (hasTool && _playerInteraction != null && _playerInteraction.IsSmartCursorEnabled() && _playerInteraction.HasSmartTarget())
+        {
+            breakCell = _playerInteraction.GetSmartTarget();
+            useSmartBreak = true;
+            breakColor = _smartBreakColor;
+        }
+        else
+        {
+            breakCell = CellUnderMouse();
+        }
+
+        bool inReach = InReach(breakCell);
+        var cellV2 = new Vector2Int(breakCell.x, breakCell.y);
+
+        var currentBlock = WorldManager.Instance.GetBlock(breakCell.x, breakCell.y);
         bool canPlaceHere = currentBlock == BlockType.Air || currentBlock == BlockType.Water;
         bool cellHasBlock = currentBlock != BlockType.Air && currentBlock != BlockType.Water;
-        bool cellHasWall = WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None;
+        bool cellHasWall = WorldManager.Instance.GetWall(breakCell.x, breakCell.y) != WallType.None;
         bool cellHasObject = MultitileObjectSystem.Instance != null && MultitileObjectSystem.Instance.IsOccupied(cellV2);
         bool cellIsSupporting = MultitileObjectSystem.Instance != null && MultitileObjectSystem.Instance.IsSupporting(cellV2);
         bool rightHeld = Mouse.current.rightButton.isPressed;
@@ -57,10 +74,10 @@ public class BlockIndicator : MonoBehaviour
                 bool facingRight = transform.localScale.x > 0;
                 int extra = doorDef.openSize.x - doorDef.closedSize.x;
 
-                int indicatorOriginX = facingRight ? cell.x - extra : cell.x;
+                int indicatorOriginX = facingRight ? breakCell.x - extra : breakCell.x;
 
-                bool canPlace = MultitileAreaIsClear(new Vector3Int(cell.x, cell.y, 0), doorDef.closedSize)
-                    && HasSolidSupportBelow(new Vector2Int(cell.x, cell.y), doorDef.closedSize);
+                bool canPlace = MultitileAreaIsClear(new Vector3Int(breakCell.x, breakCell.y, 0), doorDef.closedSize)
+                    && HasSolidSupportBelow(new Vector2Int(breakCell.x, breakCell.y), doorDef.closedSize);
 
                 _placeSr.enabled = canPlace;
                 if (canPlace)
@@ -71,12 +88,12 @@ public class BlockIndicator : MonoBehaviour
                     _placeGo.transform.localScale = Vector3.one;
                     _placeGo.transform.position = new Vector3(
                         indicatorOriginX + doorDef.openSize.x * 0.5f,
-                        cell.y + doorDef.openSize.y * 0.5f);
+                        breakCell.y + doorDef.openSize.y * 0.5f);
                 }
             }
             else
             {
-                bool canPlace = MultitileAreaIsClear(cell, def.size) && HasSolidSupportBelow(new Vector2Int(cell.x, cell.y), def.size);
+                bool canPlace = MultitileAreaIsClear(breakCell, def.size) && HasSolidSupportBelow(new Vector2Int(breakCell.x, breakCell.y), def.size);
                 _placeSr.enabled = canPlace;
                 if (canPlace)
                 {
@@ -84,27 +101,37 @@ public class BlockIndicator : MonoBehaviour
                     _placeSr.flipX = false;
                     _placeSr.color = _placeColor;
                     _placeGo.transform.localScale = new Vector3(1f, 1f, 1f);
-                    _placeGo.transform.position = new Vector3(cell.x + def.size.x * 0.5f, cell.y + def.size.y * 0.5f);
+                    _placeGo.transform.position = new Vector3(breakCell.x + def.size.x * 0.5f, breakCell.y + def.size.y * 0.5f);
                 }
             }
         }
-        else if (inReach && hasBlock && canPlaceHere && !cellHasObject && HasSolidNeighbor(cell))
+        else if (inReach && hasBlock && canPlaceHere && !cellHasObject && !useSmartBreak)
         {
-            _placeSr.enabled = true;
-            _placeSr.sprite = item.item.sprite;
-            _placeSr.flipX = false;
-            _placeSr.color = _placeColor;
-            _placeGo.transform.localScale = Vector3.one;
-            _placeGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+            bool hasSolidNeighbor = HasSolidNeighbor(breakCell);
+            bool hasWallHere = WorldManager.Instance.GetWall(breakCell.x, breakCell.y) != WallType.None;
+            
+            if (hasSolidNeighbor || hasWall)
+            {
+                _placeSr.enabled = true;
+                _placeSr.sprite = item.item.sprite;
+                _placeSr.flipX = false;
+                _placeSr.color = _placeColor;
+                _placeGo.transform.localScale = Vector3.one;
+                _placeGo.transform.position = new Vector3(breakCell.x + 0.5f, breakCell.y + 0.5f);
+            }
+            else
+            {
+                _placeSr.enabled = false;
+            }
         }
-        else if (inReach && hasWall && !cellHasWall && rightHeld)
+        else if (inReach && hasWall && !cellHasWall && CanPlaceWallAt(breakCell) && !useSmartBreak)
         {
             _placeSr.enabled = true;
             _placeSr.sprite = item.item.sprite;
             _placeSr.flipX = false;
             _placeSr.color = _placeColor;
             _placeGo.transform.localScale = Vector3.one;
-            _placeGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+            _placeGo.transform.position = new Vector3(breakCell.x + 0.5f, breakCell.y + 0.5f);
         }
         else
         {
@@ -147,18 +174,18 @@ public class BlockIndicator : MonoBehaviour
         {
             breaking = true;
             pressing = Mouse.current.leftButton.isPressed;
-            progress = BreakSystem.Instance.GetBreakProgress(cell, BreakTarget.Block);
+            progress = BreakSystem.Instance.GetBreakProgress(breakCell, BreakTarget.Block);
             float s = 1f + progress * 0.12f;
-            _breakGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+            _breakGo.transform.position = new Vector3(breakCell.x + 0.5f, breakCell.y + 0.5f);
             _breakGo.transform.localScale = new Vector3(s, s, 1f);
         }
         else if (hasTool && inReach && cellHasWall)
         {
             breaking = true;
-            pressing = Mouse.current.rightButton.isPressed;
-            progress = BreakSystem.Instance.GetBreakProgress(cell, BreakTarget.Wall);
+            pressing = Mouse.current.leftButton.isPressed && (useSmartBreak || !_playerInteraction.IsSmartCursorEnabled());
+            progress = BreakSystem.Instance.GetBreakProgress(breakCell, BreakTarget.Wall);
             float s = 1f + progress * 0.12f;
-            _breakGo.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f);
+            _breakGo.transform.position = new Vector3(breakCell.x + 0.5f, breakCell.y + 0.5f);
             _breakGo.transform.localScale = new Vector3(s, s, 1f);
         }
 
@@ -166,9 +193,10 @@ public class BlockIndicator : MonoBehaviour
         {
             _breakSr.enabled = true;
             float pulse = pressing ? 0.5f + 0.15f * Mathf.Sin(Time.time * 14f) : 0f;
+            Color color = useSmartBreak ? _smartBreakColor : breakColor;
             _breakSr.color = pressing
-                ? new Color(_breakActiveColor.r, _breakActiveColor.g, _breakActiveColor.b, _breakActiveColor.a + pulse)
-                : _breakIdleColor;
+                ? new Color(color.r, color.g, color.b, color.a + pulse)
+                : color;
         }
         else _breakSr.enabled = false;
     }
@@ -187,17 +215,6 @@ public class BlockIndicator : MonoBehaviour
     }
 
     private bool HasSolidSupportBelow(Vector2Int origin, Vector2Int size)
-    {
-        for (int x = 0; x < size.x; x++)
-        {
-            var below = new Vector2Int(origin.x + x, origin.y - 1);
-            var b = WorldManager.Instance.GetBlock(below.x, below.y);
-            if (b == BlockType.Air || b == BlockType.Water) return false;
-        }
-        return true;
-    }
-
-    private bool HasAllSupportBelow(Vector3Int origin, Vector2Int size)
     {
         for (int x = 0; x < size.x; x++)
         {
@@ -239,6 +256,26 @@ public class BlockIndicator : MonoBehaviour
         }
         return false;
     }
+
+    private bool CanPlaceWallAt(Vector3Int cell)
+    {
+        if (WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None) return false;
+        
+        Vector3Int[] neighbors = {
+            cell + Vector3Int.up, cell + Vector3Int.down,
+            cell + Vector3Int.left, cell + Vector3Int.right
+        };
+        
+        foreach (var neighbor in neighbors)
+        {
+            var block = WorldManager.Instance.GetBlock(neighbor.x, neighbor.y);
+            if (block != BlockType.Air && block != BlockType.Water) return true;
+            if (WorldManager.Instance.GetWall(neighbor.x, neighbor.y) != WallType.None) return true;
+        }
+        
+        return false;
+    }
+
 
     void OnDestroy() { if (_placeGo) Destroy(_placeGo); if (_breakGo) Destroy(_breakGo); }
 }

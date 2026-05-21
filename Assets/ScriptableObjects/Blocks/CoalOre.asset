@@ -15,6 +15,7 @@ MonoBehaviour:
   blockType: 8
   displayName: CoalOre
   tile: {fileID: 11400000, guid: c999a34cfe893fe438d57ec656631d8d, type: 2}
+  connectedTile: {fileID: 0}
   isSolid: 1
   destructible: 1
   hardness: 2.5

@@ -73,7 +73,7 @@ public class InventoryUI : MonoBehaviour
         UpdateHoldIconPosition();
         HandleConsumeFromHotbar();
 
-        if (_isHolding && Mouse.current.leftButton.wasPressedThisFrame && !IsPointerOverUI())
+        if (_isHolding && Mouse.current.rightButton.wasPressedThisFrame && !IsPointerOverUI())
         {
             if (_holdStack != null && !_holdStack.IsEmpty && _holdStack.item.isConsumable)
             {

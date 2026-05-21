@@ -15,10 +15,11 @@ MonoBehaviour:
   blockType: 12
   displayName: Water
   tile: {fileID: 11400000, guid: e2fb523bd47f65342bb69d44c32d718c, type: 2}
+  connectedTile: {fileID: 0}
   isSolid: 1
   destructible: 0
   hardness: 0
-  requiredTool: 0
+  requiredTool: 1
   dropType: 12
   dropAmount: 1
   particleColor: {r: 0, g: 0.6311674, b: 1, a: 1}

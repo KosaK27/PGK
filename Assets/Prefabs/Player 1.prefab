@@ -737,6 +737,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStartInventory
   startItems:
   - {fileID: 11400000, guid: c7333205c942f71409dd30b67723441a, type: 2}
+  - {fileID: 11400000, guid: 071303af1d9f2524397a306909ed807d, type: 2}
   - {fileID: 11400000, guid: c6e46751f3e037447b80201805d2f86c, type: 2}
   - {fileID: 11400000, guid: 220270b926b29914b8af9db59c88f789, type: 2}
   - {fileID: 11400000, guid: 24aca1424333d3149ab5c59b9e0efae3, type: 2}

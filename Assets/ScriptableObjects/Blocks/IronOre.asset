@@ -15,6 +15,7 @@ MonoBehaviour:
   blockType: 7
   displayName: IronOre
   tile: {fileID: 11400000, guid: 2dabd4c2823358b4eab67ec924b91b3b, type: 2}
+  connectedTile: {fileID: 0}
   isSolid: 1
   destructible: 1
   hardness: 3

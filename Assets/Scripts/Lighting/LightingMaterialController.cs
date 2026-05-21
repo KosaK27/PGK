@@ -38,7 +38,6 @@ public class LightingMaterialController : MonoBehaviour
             if (forceBackground) isBg = true;
             else
             {
-                // Optimized fast-checks without generating heap string garbage every calculation
                 isBg = r.gameObject.layer == _backgroundLayer || 
                        r.gameObject.CompareTag("Background") || 
                        r.sortingLayerName.IndexOf("back", System.StringComparison.OrdinalIgnoreCase) >= 0 ||

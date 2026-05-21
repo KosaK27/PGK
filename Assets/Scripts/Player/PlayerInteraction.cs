@@ -1,10 +1,17 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float blockReach = 5f;
+
+    private bool _smartCursorEnabled = false;
+    private Vector3Int _smartTargetCell;
+    private bool _hasSmartTarget = false;
+    private List<Vector3Int> _priorityTargets = new List<Vector3Int>();
+    private int _currentTargetIndex = 0;
 
     void Start()
     {
@@ -22,19 +29,207 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-        HandleBreak();
+        if (Keyboard.current.leftCtrlKey.wasPressedThisFrame)
+            _smartCursorEnabled = !_smartCursorEnabled;
+
+        HandleBreaking();
+        HandlePlacement();
         HandleInteract();
-        HandlePlaceOrWallBreak();
         HandleDropKey();
     }
 
-    private void HandleBreak()
+    private List<Vector3Int> GetPriorityTargetsForPickaxe()
+    {
+        List<Vector3Int> targets = new List<Vector3Int>();
+        Vector2 playerPos = transform.position;
+        Vector3 mouseWorld = GetMouseWorldPos();
+        Vector2 mouseDir = ((Vector2)mouseWorld - playerPos).normalized;
+
+        float absX = Mathf.Abs(mouseDir.x);
+        float absY = Mathf.Abs(mouseDir.y);
+
+        if (absX > absY)
+        {
+            if (mouseDir.x > 0)
+            {
+                for (int offset = 1; offset <= 3; offset++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        Vector3Int target = new Vector3Int(Mathf.FloorToInt(playerPos.x + offset + 0.5f), Mathf.FloorToInt(playerPos.y + y + 0.5f), 0);
+                        if (IsValidBreakTarget(target, BreakTarget.Block) && !targets.Contains(target))
+                            targets.Add(target);
+                    }
+                }
+            }
+            else
+            {
+                for (int offset = 1; offset <= 3; offset++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        Vector3Int target = new Vector3Int(Mathf.FloorToInt(playerPos.x - offset + 0.5f), Mathf.FloorToInt(playerPos.y + y + 0.5f), 0);
+                        if (IsValidBreakTarget(target, BreakTarget.Block) && !targets.Contains(target))
+                            targets.Add(target);
+                    }
+                }
+            }
+        }
+        else if (mouseDir.y > 0)
+        {
+            for (int offset = 1; offset <= 2; offset++)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    Vector3Int target = new Vector3Int(Mathf.FloorToInt(playerPos.x + x + 0.5f), Mathf.FloorToInt(playerPos.y + offset + 1.5f), 0);
+                    if (IsValidBreakTarget(target, BreakTarget.Block) && !targets.Contains(target))
+                        targets.Add(target);
+                }
+            }
+        }
+        else
+        {
+            for (int offset = 1; offset <= 2; offset++)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    Vector3Int target = new Vector3Int(Mathf.FloorToInt(playerPos.x + x + 0.5f), Mathf.FloorToInt(playerPos.y - offset + 0.5f), 0);
+                    if (IsValidBreakTarget(target, BreakTarget.Block) && !targets.Contains(target))
+                        targets.Add(target);
+                }
+            }
+        }
+
+        return targets;
+    }
+
+    private Vector3Int GetSmartTargetForAxe()
+    {
+        Vector2 playerPos = transform.position;
+        float closestDist = float.MaxValue;
+        Vector3Int closest = new Vector3Int(int.MinValue, 0, 0);
+
+        for (int x = -3; x <= 3; x++)
+        {
+            for (int y = -2; y <= 3; y++)
+            {
+                Vector3Int cell = new Vector3Int(Mathf.FloorToInt(playerPos.x + x + 0.5f), Mathf.FloorToInt(playerPos.y + y + 0.5f), 0);
+                if (IsValidBreakTarget(cell, BreakTarget.Wall))
+                {
+                    float dist = Vector2.Distance(playerPos, new Vector2(cell.x + 0.5f, cell.y + 0.5f));
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        closest = cell;
+                    }
+                }
+            }
+        }
+
+        return closest;
+    }
+
+    private bool IsValidBreakTarget(Vector3Int cell, BreakTarget target)
+    {
+        if (!IsInReach(cell)) return false;
+
+        if (target == BreakTarget.Block)
+        {
+            var block = WorldManager.Instance.GetBlock(cell.x, cell.y);
+            if (block == BlockType.Air || block == BlockType.Water) return false;
+            if (MultitileObjectSystem.Instance.IsOccupied(new Vector2Int(cell.x, cell.y))) return false;
+            if (MultitileObjectSystem.Instance.IsSupporting(new Vector2Int(cell.x, cell.y))) return false;
+            return true;
+        }
+        else
+        {
+            var wall = WorldManager.Instance.GetWall(cell.x, cell.y);
+            if (wall == WallType.None) return false;
+            return true;
+        }
+    }
+
+    private void HandleBreaking()
     {
         var selected = InventorySystem.Instance.SelectedItem;
-        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
-        bool hasWeapon = selected != null && !selected.IsEmpty && selected.item.isWeapon;
+        bool hasPickaxe = selected != null && !selected.IsEmpty && selected.item.isTool && selected.item.toolType == ToolType.Pickaxe;
+        bool hasAxe = selected != null && !selected.IsEmpty && selected.item.isTool && selected.item.toolType == ToolType.Axe;
+        bool hasShovel = selected != null && !selected.IsEmpty && selected.item.isTool && selected.item.toolType == ToolType.Shovel;
 
-        if (!hasTool || hasWeapon)
+        if (!hasPickaxe && !hasAxe && !hasShovel)
+        {
+            BreakSystem.Instance.CancelBreak();
+            MultitileObjectSystem.Instance.CancelBreak();
+            _hasSmartTarget = false;
+            _priorityTargets.Clear();
+            return;
+        }
+
+        Vector3Int targetCell;
+        bool useSmartTarget = false;
+
+        if (_smartCursorEnabled && hasPickaxe)
+        {
+            if (_priorityTargets.Count == 0 || (_priorityTargets.Count > 0 && _currentTargetIndex >= _priorityTargets.Count))
+            {
+                _priorityTargets = GetPriorityTargetsForPickaxe();
+                _currentTargetIndex = 0;
+            }
+
+            if (_priorityTargets.Count > 0 && _currentTargetIndex < _priorityTargets.Count)
+            {
+                targetCell = _priorityTargets[_currentTargetIndex];
+                if (IsValidBreakTarget(targetCell, BreakTarget.Block))
+                {
+                    useSmartTarget = true;
+                    _hasSmartTarget = true;
+                    _smartTargetCell = targetCell;
+                }
+                else
+                {
+                    _currentTargetIndex++;
+                    if (_currentTargetIndex < _priorityTargets.Count)
+                    {
+                        targetCell = _priorityTargets[_currentTargetIndex];
+                        useSmartTarget = true;
+                        _hasSmartTarget = true;
+                        _smartTargetCell = targetCell;
+                    }
+                    else
+                    {
+                        _hasSmartTarget = false;
+                        targetCell = GetCellUnderMouse();
+                    }
+                }
+            }
+            else
+            {
+                _hasSmartTarget = false;
+                targetCell = GetCellUnderMouse();
+            }
+        }
+        else if (_smartCursorEnabled && hasAxe)
+        {
+            targetCell = GetSmartTargetForAxe();
+            if (targetCell.x != int.MinValue)
+            {
+                useSmartTarget = true;
+                _hasSmartTarget = true;
+                _smartTargetCell = targetCell;
+            }
+            else
+            {
+                _hasSmartTarget = false;
+                targetCell = GetCellUnderMouse();
+            }
+        }
+        else
+        {
+            _hasSmartTarget = false;
+            targetCell = GetCellUnderMouse();
+        }
+
+        if (!IsInReach(targetCell))
         {
             BreakSystem.Instance.CancelBreak();
             MultitileObjectSystem.Instance.CancelBreak();
@@ -43,24 +238,30 @@ public class PlayerInteraction : MonoBehaviour
 
         if (Mouse.current.leftButton.isPressed)
         {
-            var cell = GetCellUnderMouse();
-            if (!IsInReach(cell))
-            {
-                BreakSystem.Instance.CancelBreak();
-                MultitileObjectSystem.Instance.CancelBreak();
-                return;
-            }
-
-            var cellV2 = new Vector2Int(cell.x, cell.y);
+            var cellV2 = new Vector2Int(targetCell.x, targetCell.y);
             if (MultitileObjectSystem.Instance.IsOccupied(cellV2))
             {
                 BreakSystem.Instance.CancelBreak();
                 MultitileObjectSystem.Instance.TryBreak(cellV2, Time.deltaTime);
             }
-            else
+            else if (hasPickaxe)
             {
                 MultitileObjectSystem.Instance.CancelBreak();
-                BreakSystem.Instance.TryBreak(cell, BreakTarget.Block, Time.deltaTime);
+                bool broke = BreakSystem.Instance.TryBreak(targetCell, BreakTarget.Block, Time.deltaTime);
+                if (broke && useSmartTarget && _priorityTargets.Count > 0)
+                {
+                    _currentTargetIndex++;
+                }
+            }
+            else if (hasAxe)
+            {
+                MultitileObjectSystem.Instance.CancelBreak();
+                BreakSystem.Instance.TryBreak(targetCell, BreakTarget.Wall, Time.deltaTime);
+            }
+            else
+            {
+                BreakSystem.Instance.CancelBreak();
+                MultitileObjectSystem.Instance.CancelBreak();
             }
         }
 
@@ -68,33 +269,20 @@ public class PlayerInteraction : MonoBehaviour
         {
             BreakSystem.Instance.CancelBreak();
             MultitileObjectSystem.Instance.CancelBreak();
+            _priorityTargets.Clear();
+            _currentTargetIndex = 0;
         }
     }
 
-    private void HandlePlaceOrWallBreak()
+    private void HandlePlacement()
     {
         var selected = InventorySystem.Instance.SelectedItem;
         bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
         bool hasWeapon = selected != null && !selected.IsEmpty && selected.item.isWeapon;
 
-        if (hasWeapon)
-        {
-            if (Mouse.current.rightButton.wasReleasedThisFrame)
-                BreakSystem.Instance.CancelBreak();
-            return;
-        }
+        if (hasTool || hasWeapon) return;
 
-        if (Mouse.current.rightButton.isPressed && hasTool)
-        {
-            var cell = GetCellUnderMouse();
-            if (IsInReach(cell)) BreakSystem.Instance.TryBreak(cell, BreakTarget.Wall, Time.deltaTime);
-            else BreakSystem.Instance.CancelBreak();
-        }
-        else if (Mouse.current.rightButton.wasReleasedThisFrame && hasTool)
-        {
-            BreakSystem.Instance.CancelBreak();
-        }
-        else if (Mouse.current.rightButton.wasPressedThisFrame && !hasTool)
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             var cell = GetCellUnderMouse();
             if (!IsInReach(cell) || selected == null || selected.IsEmpty) return;
@@ -133,14 +321,28 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    private bool CanPlaceWallAt(Vector3Int cell)
+    {
+        if (WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None) return false;
+        
+        Vector3Int[] neighbors = {
+            cell + Vector3Int.up, cell + Vector3Int.down,
+            cell + Vector3Int.left, cell + Vector3Int.right
+        };
+        
+        foreach (var neighbor in neighbors)
+        {
+            var block = WorldManager.Instance.GetBlock(neighbor.x, neighbor.y);
+            if (block != BlockType.Air && block != BlockType.Water) return true;
+            if (WorldManager.Instance.GetWall(neighbor.x, neighbor.y) != WallType.None) return true;
+        }
+        
+        return false;
+    }
+
     private void HandleInteract()
     {
         if (!Mouse.current.rightButton.wasPressedThisFrame) return;
-
-        var selected = InventorySystem.Instance.SelectedItem;
-        bool hasTool = selected != null && !selected.IsEmpty && selected.item.isTool;
-        bool hasWeapon = selected != null && !selected.IsEmpty && selected.item.isWeapon;
-        if (hasTool || hasWeapon) return;
 
         var cell = GetCellUnderMouse();
         if (!IsInReach(cell)) return;
@@ -178,8 +380,17 @@ public class PlayerInteraction : MonoBehaviour
 
     private Vector3Int GetCellUnderMouse()
     {
-        var mousePos = Mouse.current.position.ReadValue();
-        var worldPos = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
+        var worldPos = GetMouseWorldPos();
         return WorldManager.Instance.WorldToCell(worldPos);
     }
+
+    private Vector3 GetMouseWorldPos()
+    {
+        var mousePos = Mouse.current.position.ReadValue();
+        return mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
+    }
+
+    public bool IsSmartCursorEnabled() => _smartCursorEnabled;
+    public bool HasSmartTarget() => _hasSmartTarget && _smartTargetCell.x != int.MinValue;
+    public Vector3Int GetSmartTarget() => _smartTargetCell;
 }

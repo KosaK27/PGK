@@ -13,7 +13,7 @@ public class PlaceSystem : MonoBehaviour
     public bool TryPlace(Vector3Int cell, BlockType blockType)
     {
         if (!ChunkManager.Instance.IsChunkLoaded(new Vector2(cell.x, cell.y))) return false;
-        if (!HasSolidNeighbor(cell)) return false;
+        if (!HasSolidNeighbor(cell, true)) return false;
 
         var currentBlock = WorldManager.Instance.GetBlock(cell.x, cell.y);
         if (currentBlock != BlockType.Air && currentBlock != BlockType.Water) return false;
@@ -28,22 +28,39 @@ public class PlaceSystem : MonoBehaviour
     {
         if (!ChunkManager.Instance.IsChunkLoaded(new Vector2(cell.x, cell.y))) return false;
         if (WorldManager.Instance.GetWall(cell.x, cell.y) != WallType.None) return false;
+        if (!HasSolidNeighborForWall(cell)) return false;
 
         WorldManager.Instance.PlaceWall(cell.x, cell.y, wallType);
         BlockAudioManager.Instance?.PlayPlace();
         return true;
     }
 
-    private bool HasSolidNeighbor(Vector3Int cell)
+    private bool HasSolidNeighbor(Vector3Int cell, bool checkWalls = false)
     {
         Vector3Int[] neighbors = {
-        cell + Vector3Int.up, cell + Vector3Int.down,
-        cell + Vector3Int.left, cell + Vector3Int.right
-    };
+            cell + Vector3Int.up, cell + Vector3Int.down,
+            cell + Vector3Int.left, cell + Vector3Int.right
+        };
         foreach (var neighbor in neighbors)
         {
             var b = WorldManager.Instance.GetBlock(neighbor.x, neighbor.y);
             if (b != BlockType.Air && b != BlockType.Water) return true;
+            if (checkWalls && WorldManager.Instance.GetWall(neighbor.x, neighbor.y) != WallType.None) return true;
+        }
+        return false;
+    }
+
+    private bool HasSolidNeighborForWall(Vector3Int cell)
+    {
+        Vector3Int[] neighbors = {
+            cell + Vector3Int.up, cell + Vector3Int.down,
+            cell + Vector3Int.left, cell + Vector3Int.right
+        };
+        foreach (var neighbor in neighbors)
+        {
+            var block = WorldManager.Instance.GetBlock(neighbor.x, neighbor.y);
+            if (block != BlockType.Air && block != BlockType.Water) return true;
+            if (WorldManager.Instance.GetWall(neighbor.x, neighbor.y) != WallType.None) return true;
         }
         return false;
     }
