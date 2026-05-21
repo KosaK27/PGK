@@ -86,10 +86,16 @@ public class DayNightSystem : MonoBehaviour
 
     private float CalculateBrightness()
     {
-        if (timeOfDay < 0.22f || timeOfDay >= 0.78f) return 0.15f;
-        if (timeOfDay < 0.30f) return Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.22f) / 0.08f);
-        if (timeOfDay < 0.70f) return 1f;
-        return Mathf.SmoothStep(1f, 0f, (timeOfDay - 0.70f) / 0.08f);
+        if (timeOfDay < 0.22f || timeOfDay >= 0.78f) 
+            return 0.15f;
+            
+        if (timeOfDay < 0.30f) 
+            return Mathf.Lerp(0.15f, 1f, Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.22f) / 0.08f));
+            
+        if (timeOfDay < 0.70f) 
+            return 1f;
+            
+        return Mathf.Lerp(1f, 0.15f, Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.70f) / 0.08f));
     }
 
     public float GetTimeOfDay() => timeOfDay;

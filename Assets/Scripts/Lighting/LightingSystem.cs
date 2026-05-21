@@ -31,13 +31,7 @@ public class LightingSystem : MonoBehaviour
 {
     public static LightingSystem Instance { get; private set; }
 
-    [Header("Day Falloff")]
-    [SerializeField] private float dayFalloff = 0.97f;
-    [SerializeField] private float dayWallFalloff = 0.95f;
-
-    [Header("Night Falloff")]
-    [SerializeField] private float nightFalloff = 0.90f;
-    [SerializeField] private float nightWallFalloff = 0.90f;
+    [SerializeField] private float lightFalloff = 0.90f;
 
     [Header("Underground")]
     [SerializeField, Range(0f, 1f)] private float minUndergroundBrightness = 0f;
@@ -174,8 +168,8 @@ public class LightingSystem : MonoBehaviour
         if (wm == null || wm.Data == null || !_lightBuffer.IsCreated || _bufWidth == 0) return;
 
         float dayIntensity = DayNightSystem.Instance != null ? DayNightSystem.Instance.AmbientBrightness : 1f;
-        float falloff = Mathf.Lerp(nightFalloff, dayFalloff, dayIntensity);
-        float wallFalloff = Mathf.Lerp(nightWallFalloff, dayWallFalloff, dayIntensity);
+        float falloff = Mathf.Lerp(lightFalloff, lightFalloff, dayIntensity);
+        float wallFalloff = Mathf.Lerp(lightFalloff, lightFalloff, dayIntensity);
         float solidFalloff = Mathf.Lerp(solidFalloffNight, solidFalloffDay, dayIntensity);
 
         UpdateSnapshotBuffer(wm);
