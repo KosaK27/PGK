@@ -6349,17 +6349,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96caf677dc8b9c47b15545227180669, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightingSystem
-  dayFalloff: 0.9
-  dayWallFalloff: 0.95
-  nightFalloff: 0.9
-  nightWallFalloff: 0.9
+  lightFalloff: 0.92
   minUndergroundBrightness: 0
-  dayBlockOcclusion: 0.6
   skyLightCutoff: 0.02
   lightFalloffExponent: 2
   lightCutoff: 0.04
-  turnPenalty: 0.8
-  downwardFalloffMult: 0.75
+  downwardFalloffMult: 1
   solidFalloffDay: 0.68
   solidFalloffNight: 0.52
   localRebuildRadius: 24
