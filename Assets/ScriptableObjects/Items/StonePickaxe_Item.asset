@@ -30,6 +30,16 @@ MonoBehaviour:
   damage: 10
   hitboxSize: {x: 2.5, y: 0.6}
   hitboxDistance: 1.2
+  projectileSpeed: 14
+  shootCooldown: 0.8
+  isConsumable: 0
+  consumableType: 0
+  consumeOnUse: 0
+  healAmount: 5
+  heartContainerAmount: 1
+  bossPrefabToSummon: {fileID: 0}
+  isAccessory: 0
+  accessoryDefinition: {fileID: 0}
   holdPositionUp: {x: -0.5, y: 0.8}
   holdPositionForward: {x: -0.5, y: 0}
   holdPositionDown: {x: -0.5, y: -0.7}

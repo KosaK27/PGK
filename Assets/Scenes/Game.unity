@@ -5533,8 +5533,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 10dc1cd63d2e2cd47afdb468b88fb9e1, type: 2}
   maxEntitiesCap: 20
   baseSpawnInterval: 5
-  spawnMinDist: 12
-  spawnMaxDist: 40
+  spawnMinDist: 32
+  spawnMaxDist: 48
   groundLayer:
     serializedVersion: 2
     m_Bits: 4294967295

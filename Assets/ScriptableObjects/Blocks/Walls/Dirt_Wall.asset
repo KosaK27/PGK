@@ -16,8 +16,8 @@ MonoBehaviour:
   displayName: Dirt Wall
   tile: {fileID: 11400000, guid: d1b37970827f1134e855e6fd5633b002, type: 2}
   destructible: 1
-  hardness: 1
-  requiredTool: 3
+  hardness: 2
+  requiredTool: 2
   dropType: 1
   dropAmount: 1
   particleColor: {r: 0.5245282, g: 0.3147987, b: 0.2286151, a: 1}

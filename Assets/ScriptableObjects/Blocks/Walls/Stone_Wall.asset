@@ -16,8 +16,8 @@ MonoBehaviour:
   displayName: Stone Wall
   tile: {fileID: 11400000, guid: d82812115d9364e44b7dce0e89bb906c, type: 2}
   destructible: 1
-  hardness: 2
-  requiredTool: 1
+  hardness: 3
+  requiredTool: 2
   dropType: 2
   dropAmount: 1
   particleColor: {r: 0.335849, g: 0.31873968, b: 0.31873968, a: 1}

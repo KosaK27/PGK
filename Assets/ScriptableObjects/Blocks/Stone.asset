@@ -18,7 +18,7 @@ MonoBehaviour:
   connectedTile: {fileID: 11400000, guid: 36f6c3343660d5e4b90782f234b63f08, type: 2}
   isSolid: 1
   destructible: 1
-  hardness: 2
+  hardness: 3
   requiredTool: 1
   dropType: 2
   dropAmount: 1
