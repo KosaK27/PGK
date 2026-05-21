@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4464511932246548860}
   - component: {fileID: 2520766890139587203}
   - component: {fileID: 6253556609445341782}
+  - component: {fileID: -7752017779986563271}
   m_Layer: 8
   m_Name: DroppedItem
   m_TagString: Untagged
@@ -216,3 +217,15 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 2
+--- !u!114 &-7752017779986563271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4416827021343474648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8baf7306438ab7d4da678008edea2fa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LitSprite

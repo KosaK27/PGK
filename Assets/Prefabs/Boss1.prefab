@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 4053087563488706650}
   - component: {fileID: -1805597402698571462}
   - component: {fileID: 4187933994018861279}
+  - component: {fileID: 838083256265777877}
   m_Layer: 0
   m_Name: Boss1
   m_TagString: Boss
@@ -375,3 +376,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapTrackable
   _markerType: 1
+--- !u!114 &838083256265777877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8153806310597004330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8baf7306438ab7d4da678008edea2fa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LitSprite

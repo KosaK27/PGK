@@ -4,17 +4,14 @@ public class DayNightSystem : MonoBehaviour
 {
     public static DayNightSystem Instance { get; private set; }
 
-    [Header("Czas dnia")]
+    [Header("Time")]
     public float dayLengthSeconds = 120f;
-
-    [Header("Reczne sterowanie")]
-    [Range(0f, 1f)]
-    public float timeOfDay = 0.25f;
+    [Range(0f, 1f)] public float timeOfDay = 0.25f;
     public bool autoAdvanceTime = true;
 
-    [Header("Kolory nieba")]
+    [Header("Sky Colors")]
     public Color dayColor = new Color(0.53f, 0.81f, 0.98f);
-    public Color nightColor = new Color(0.02f, 0.02f, 0.08f);
+    public Color nightColor = new Color(0f, 0f, 0f, 1f);
     public Color dawnColor = new Color(0.90f, 0.55f, 0.25f);
 
     public bool IsDay => timeOfDay >= 0.22f && timeOfDay < 0.78f;
@@ -25,18 +22,21 @@ public class DayNightSystem : MonoBehaviour
 
     private bool _wasDayLastFrame;
     private Camera _mainCamera;
-    private float _lastUpdateBrightness = -1f;
+    private float _lastRebuildBrightness = -1f;
+    private const float RebuildThreshold = 0.005f;
 
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
+        AmbientBrightness = CalculateBrightness();
         _wasDayLastFrame = IsDay;
     }
 
     void Start()
     {
         _mainCamera = Camera.main;
+        OnDayNightChanged?.Invoke(IsDay);
     }
 
     void Update()
@@ -48,17 +48,18 @@ public class DayNightSystem : MonoBehaviour
         }
 
         AmbientBrightness = CalculateBrightness();
-
         ApplySkyColor();
 
         bool isNowDay = IsDay;
         if (isNowDay != _wasDayLastFrame)
-            OnDayNightChanged?.Invoke(isNowDay);
-        _wasDayLastFrame = isNowDay;
-
-        if (Mathf.Abs(AmbientBrightness - _lastUpdateBrightness) > 0.01f)
         {
-            _lastUpdateBrightness = AmbientBrightness;
+            OnDayNightChanged?.Invoke(isNowDay);
+            _wasDayLastFrame = isNowDay;
+        }
+
+        if (Mathf.Abs(AmbientBrightness - _lastRebuildBrightness) > RebuildThreshold)
+        {
+            _lastRebuildBrightness = AmbientBrightness;
             LightingSystem.Instance?.UpdateAmbientOnly();
         }
     }
@@ -85,10 +86,16 @@ public class DayNightSystem : MonoBehaviour
 
     private float CalculateBrightness()
     {
-        if (timeOfDay < 0.22f || timeOfDay >= 0.78f) return 0.05f;
-        if (timeOfDay < 0.30f) return Mathf.SmoothStep(0.05f, 1f, (timeOfDay - 0.22f) / 0.08f);
-        if (timeOfDay < 0.70f) return 1f;
-        return Mathf.SmoothStep(1f, 0.05f, (timeOfDay - 0.70f) / 0.08f);
+        if (timeOfDay < 0.22f || timeOfDay >= 0.78f) 
+            return 0.15f;
+            
+        if (timeOfDay < 0.30f) 
+            return Mathf.Lerp(0.15f, 1f, Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.22f) / 0.08f));
+            
+        if (timeOfDay < 0.70f) 
+            return 1f;
+            
+        return Mathf.Lerp(1f, 0.15f, Mathf.SmoothStep(0f, 1f, (timeOfDay - 0.70f) / 0.08f));
     }
 
     public float GetTimeOfDay() => timeOfDay;

@@ -1,39 +1,50 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class LightingMaterialController : MonoBehaviour
 {
     public static LightingMaterialController Instance { get; private set; }
 
-    [Header("Material bazowy z shaderem TilemapLighting")]
     [SerializeField] private Material baseLightingMaterial;
 
     private MaterialPropertyBlock _mpb;
+    private readonly List<Renderer> _registeredRenderers = new();
+    private int _backgroundLayer;
 
     void Awake()
     {
+        if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         _mpb = new MaterialPropertyBlock();
+        _backgroundLayer = LayerMask.NameToLayer("Background");
     }
 
-    void Start()
-    {
-        RefreshAllRenderers();
-    }
-
-    public void RegisterRenderer(Renderer r)
+    public void RegisterRenderer(Renderer r, bool forceBackground = false, bool forceForeground = false)
     {
         if (r == null) return;
+        if (!_registeredRenderers.Contains(r)) _registeredRenderers.Add(r);
+        ApplyToRenderer(r, forceBackground, forceForeground);
+    }
 
-        if (r.sharedMaterial != baseLightingMaterial)
+    public void UnregisterRenderer(Renderer r) => _registeredRenderers.Remove(r);
+
+    private void ApplyToRenderer(Renderer r, bool forceBackground = false, bool forceForeground = false)
+    {
+        if (r.sharedMaterial != baseLightingMaterial) r.sharedMaterial = baseLightingMaterial;
+
+        bool isBg = false;
+        if (!forceForeground)
         {
-            r.sharedMaterial = baseLightingMaterial;
+            if (forceBackground) isBg = true;
+            else
+            {
+                // Optimized fast-checks without generating heap string garbage every calculation
+                isBg = r.gameObject.layer == _backgroundLayer || 
+                       r.gameObject.CompareTag("Background") || 
+                       r.sortingLayerName.IndexOf("back", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                       r.gameObject.name.IndexOf("back", System.StringComparison.OrdinalIgnoreCase) >= 0;
+            }
         }
-
-        bool isBg = r.sortingLayerName.ToLower().Contains("back") ||
-                    r.gameObject.layer == LayerMask.NameToLayer("Background") ||
-                    r.gameObject.CompareTag("Background") ||
-                    r.gameObject.name.ToLower().Contains("back");
 
         r.GetPropertyBlock(_mpb);
         _mpb.SetFloat("_IsBackground", isBg ? 1f : 0f);
@@ -42,13 +53,11 @@ public class LightingMaterialController : MonoBehaviour
 
     public void RefreshAllRenderers()
     {
-        var renderers = FindObjectsByType<Renderer>(FindObjectsSortMode.None);
-        foreach (var r in renderers)
+        for (int i = _registeredRenderers.Count - 1; i >= 0; i--)
         {
-            if (r is TilemapRenderer || r is SpriteRenderer)
-            {
-                RegisterRenderer(r);
-            }
+            var r = _registeredRenderers[i];
+            if (r == null) _registeredRenderers.RemoveAt(i);
+            else ApplyToRenderer(r);
         }
     }
 }

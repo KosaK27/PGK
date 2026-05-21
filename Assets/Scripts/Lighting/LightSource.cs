@@ -1,35 +1,47 @@
 using UnityEngine;
+
 public class LightSource : MonoBehaviour
 {
     public Color LightColor = Color.white;
-    [Range(0f, 1f)] public float Strength = 1f;
+    [Min(0f)] public float Strength = 1f;
+    
     public Vector2 WorldPosition => transform.position;
-    private bool _registered = false;
-    void OnEnable()
-    {
-        TryRegister();
-    }
-    void Start()
-    {
-        if (!_registered)
-            TryRegister();
-    }
+    
+    private bool _registered;
+    private Vector2Int _lastTilePos;
+
+    void OnEnable() => TryRegister();
+
     void OnDisable()
     {
-        if (LightingSystem.Instance != null && _registered)
+        if (_registered && LightingSystem.Instance != null)
         {
             LightingSystem.Instance.UnregisterSource(this);
-            LightingSystem.Instance.RebuildLightMap();
             _registered = false;
         }
     }
+
+    void LateUpdate()
+    {
+        if (!_registered) return;
+
+        Vector3 pos = transform.position;
+        Vector2Int currentTilePos = new Vector2Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
+
+        if (currentTilePos != _lastTilePos)
+        {
+            LightingSystem.Instance?.MarkSourceDirty(this);
+            _lastTilePos = currentTilePos;
+        }
+    }
+
     private void TryRegister()
     {
-        if (LightingSystem.Instance != null)
-        {
-            LightingSystem.Instance.RegisterSource(this);
-            LightingSystem.Instance.RebuildLightMap();
-            _registered = true;
-        }
+        if (_registered || LightingSystem.Instance == null) return;
+        
+        LightingSystem.Instance.RegisterSource(this);
+        Vector3 pos = transform.position;
+        _lastTilePos = new Vector2Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y));
+        _registered = true;
     }
 }

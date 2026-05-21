@@ -5,6 +5,7 @@ public class Chunk : MonoBehaviour
 {
     public const int SIZE = 16;
     public Vector2Int ChunkPos { get; private set; }
+
     private Tilemap _tilemap;
     private Tilemap _wallTilemap;
     private Tilemap _nonSolidTilemap;
@@ -13,7 +14,10 @@ public class Chunk : MonoBehaviour
     private Rigidbody2D _rb;
     private BlockRegistry _blockRegistry;
     private WallRegistry _wallRegistry;
-    private bool _dirty = false;
+
+    private TilemapRenderer _solidRenderer;
+    private TilemapRenderer _wallRenderer;
+    private TilemapRenderer _nonSolidRenderer;
 
     public void Initialize(Vector2Int chunkPos, BlockRegistry blockRegistry, WallRegistry wallRegistry, Transform parent)
     {
@@ -22,25 +26,49 @@ public class Chunk : MonoBehaviour
         _blockRegistry = blockRegistry;
         _wallRegistry = wallRegistry;
         transform.SetParent(parent);
+
         var wallGo = new GameObject("WallTilemap");
         wallGo.transform.SetParent(transform);
         _wallTilemap = wallGo.AddComponent<Tilemap>();
-        var wallRenderer = wallGo.AddComponent<TilemapRenderer>();
-        wallRenderer.sortingOrder = -50;
+        _wallRenderer = wallGo.AddComponent<TilemapRenderer>();
+        _wallRenderer.sortingOrder = -50;
+
         var nonSolidGo = new GameObject("NonSolidTilemap");
         nonSolidGo.transform.SetParent(transform);
         _nonSolidTilemap = nonSolidGo.AddComponent<Tilemap>();
-        var nonSolidRenderer = nonSolidGo.AddComponent<TilemapRenderer>();
-        nonSolidRenderer.sortingOrder = -1;
+        _nonSolidRenderer = nonSolidGo.AddComponent<TilemapRenderer>();
+        _nonSolidRenderer.sortingOrder = -1;
+
         _tilemap = gameObject.AddComponent<Tilemap>();
-        var renderer = gameObject.AddComponent<TilemapRenderer>();
-        renderer.sortingOrder = 100;
+        _solidRenderer = gameObject.AddComponent<TilemapRenderer>();
+        _solidRenderer.sortingOrder = 100;
+
         _tilemapCollider = gameObject.AddComponent<TilemapCollider2D>();
         _tilemapCollider.compositeOperation = Collider2D.CompositeOperation.Merge;
         _rb = gameObject.AddComponent<Rigidbody2D>();
         _rb.bodyType = RigidbodyType2D.Static;
         _compositeCollider = gameObject.AddComponent<CompositeCollider2D>();
         _compositeCollider.generationType = CompositeCollider2D.GenerationType.Synchronous;
+
+        RegisterRenderers();
+    }
+
+    private void RegisterRenderers()
+    {
+        var ctrl = LightingMaterialController.Instance;
+        if (ctrl == null) return;
+        ctrl.RegisterRenderer(_solidRenderer);
+        ctrl.RegisterRenderer(_wallRenderer);
+        ctrl.RegisterRenderer(_nonSolidRenderer);
+    }
+
+    private void UnregisterRenderers()
+    {
+        var ctrl = LightingMaterialController.Instance;
+        if (ctrl == null) return;
+        ctrl.UnregisterRenderer(_solidRenderer);
+        ctrl.UnregisterRenderer(_wallRenderer);
+        ctrl.UnregisterRenderer(_nonSolidRenderer);
     }
 
     private TileBase ResolveTile(int wx, int wy, BlockData data)
@@ -58,6 +86,7 @@ public class Chunk : MonoBehaviour
         var solidTiles = new TileBase[SIZE * SIZE];
         var nonSolidTiles = new TileBase[SIZE * SIZE];
         var wallTiles = new TileBase[SIZE * SIZE];
+
         for (int ly = 0; ly < SIZE; ly++)
         for (int lx = 0; lx < SIZE; lx++)
         {
@@ -65,19 +94,21 @@ public class Chunk : MonoBehaviour
             int wy = startY + ly + offsetY;
             int i = ly * SIZE + lx;
             positions[i] = new Vector3Int(wx, wy, 0);
+
             var block = world.GetBlock(startX + lx, startY + ly);
             var data = _blockRegistry.Get(block);
             if (data != null && !data.isSolid)
                 nonSolidTiles[i] = ResolveTile(wx, wy, data);
             else if (data != null)
                 solidTiles[i] = ResolveTile(wx, wy, data);
+
             var wall = world.GetWall(startX + lx, startY + ly);
             wallTiles[i] = _wallRegistry.Get(wall)?.tile;
         }
+
         _tilemap.SetTiles(positions, solidTiles);
         _nonSolidTilemap.SetTiles(positions, nonSolidTiles);
         _wallTilemap.SetTiles(positions, wallTiles);
-        _dirty = false;
     }
 
     public void RefreshTile(int wx, int wy, int offsetX, int offsetY, BlockData data)
@@ -101,14 +132,11 @@ public class Chunk : MonoBehaviour
         _wallTilemap.SetTile(new Vector3Int(wx + offsetX, wy + offsetY, 0), tile);
     }
 
-    public void FlushIfDirty()
-    {
-        if (!_dirty) return;
-        _dirty = false;
-    }
+    public void FlushIfDirty() { }
 
     public void Clear()
     {
+        UnregisterRenderers();
         _tilemap.ClearAllTiles();
         _nonSolidTilemap.ClearAllTiles();
         _wallTilemap.ClearAllTiles();

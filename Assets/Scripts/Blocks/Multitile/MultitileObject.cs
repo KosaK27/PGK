@@ -22,6 +22,8 @@ public class MultitileObject : MonoBehaviour
         _sr.sprite = def.sprite;
         _sr.sortingOrder = def.sortingOrder;
 
+        LightingMaterialController.Instance?.RegisterRenderer(_sr);
+
         if (def.hasCollision)
         {
             var rb = gameObject.AddComponent<Rigidbody2D>();
@@ -30,6 +32,11 @@ public class MultitileObject : MonoBehaviour
             col.size = new Vector2(def.size.x, def.size.y);
             col.offset = new Vector2(def.size.x * 0.5f, def.size.y * 0.5f);
         }
+    }
+
+    void OnDestroy()
+    {
+        LightingMaterialController.Instance?.UnregisterRenderer(_sr);
     }
 
     public virtual void Interact() { }
