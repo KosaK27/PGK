@@ -7,10 +7,10 @@ public class ChunkManager : MonoBehaviour
     public static ChunkManager Instance { get; private set; }
 
     [SerializeField] private BlockRegistry blockRegistry;
+    [SerializeField] private WallRegistry wallRegistry;
     [SerializeField] private Transform chunkParent;
     [SerializeField] private int viewDistanceX = 4;
     [SerializeField] private int viewDistanceY = 3;
-    [SerializeField] private WallRegistry wallRegistry;
 
     private Dictionary<Vector2Int, Chunk> _loadedChunks = new();
     private Transform _playerTransform;
@@ -40,6 +40,20 @@ public class ChunkManager : MonoBehaviour
         var chunkPos = GetChunkPos(lx, ly);
         if (_loadedChunks.TryGetValue(chunkPos, out var chunk))
             chunk.RefreshTile(lx, ly, offsetX, offsetY, data);
+    }
+
+    public void RefreshLiquid(int lx, int ly, int offsetX, int offsetY, byte level)
+    {
+        var chunkPos = GetChunkPos(lx, ly);
+        if (_loadedChunks.TryGetValue(chunkPos, out var chunk))
+            chunk.RefreshLiquidTile(lx, ly, offsetX, offsetY, level);
+    }
+
+    public void RefreshWall(int lx, int ly, int offsetX, int offsetY, TileBase tile)
+    {
+        var chunkPos = GetChunkPos(lx, ly);
+        if (_loadedChunks.TryGetValue(chunkPos, out var chunk))
+            chunk.RefreshWallTile(lx, ly, offsetX, offsetY, tile);
     }
 
     private void UpdateChunks()
@@ -150,13 +164,6 @@ public class ChunkManager : MonoBehaviour
         int lx = Mathf.FloorToInt(worldPos.x) - world.OffsetX;
         int ly = Mathf.FloorToInt(worldPos.y) - world.OffsetY;
         return _loadedChunks.ContainsKey(GetChunkPos(lx, ly));
-    }
-
-    public void RefreshWall(int lx, int ly, int offsetX, int offsetY, TileBase tile)
-    {
-        var chunkPos = GetChunkPos(lx, ly);
-        if (_loadedChunks.TryGetValue(chunkPos, out var chunk))
-            chunk.RefreshWallTile(lx, ly, offsetX, offsetY, tile);
     }
 
     public void RebuildAll(int offsetX, int offsetY)

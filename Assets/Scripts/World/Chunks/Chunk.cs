@@ -9,6 +9,7 @@ public class Chunk : MonoBehaviour
     private Tilemap _tilemap;
     private Tilemap _wallTilemap;
     private Tilemap _nonSolidTilemap;
+    private Tilemap _liquidTilemap;
     private TilemapCollider2D _tilemapCollider;
     private CompositeCollider2D _compositeCollider;
     private Rigidbody2D _rb;
@@ -18,6 +19,7 @@ public class Chunk : MonoBehaviour
     private TilemapRenderer _solidRenderer;
     private TilemapRenderer _wallRenderer;
     private TilemapRenderer _nonSolidRenderer;
+    private TilemapRenderer _liquidRenderer;
 
     public void Initialize(Vector2Int chunkPos, BlockRegistry blockRegistry, WallRegistry wallRegistry, Transform parent)
     {
@@ -38,6 +40,12 @@ public class Chunk : MonoBehaviour
         _nonSolidTilemap = nonSolidGo.AddComponent<Tilemap>();
         _nonSolidRenderer = nonSolidGo.AddComponent<TilemapRenderer>();
         _nonSolidRenderer.sortingOrder = -1;
+
+        var liquidGo = new GameObject("LiquidTilemap");
+        liquidGo.transform.SetParent(transform);
+        _liquidTilemap = liquidGo.AddComponent<Tilemap>();
+        _liquidRenderer = liquidGo.AddComponent<TilemapRenderer>();
+        _liquidRenderer.sortingOrder = 50;
 
         _tilemap = gameObject.AddComponent<Tilemap>();
         _solidRenderer = gameObject.AddComponent<TilemapRenderer>();
@@ -60,6 +68,7 @@ public class Chunk : MonoBehaviour
         ctrl.RegisterRenderer(_solidRenderer);
         ctrl.RegisterRenderer(_wallRenderer);
         ctrl.RegisterRenderer(_nonSolidRenderer);
+        ctrl.RegisterRenderer(_liquidRenderer);
     }
 
     private void UnregisterRenderers()
@@ -69,6 +78,7 @@ public class Chunk : MonoBehaviour
         ctrl.UnregisterRenderer(_solidRenderer);
         ctrl.UnregisterRenderer(_wallRenderer);
         ctrl.UnregisterRenderer(_nonSolidRenderer);
+        ctrl.UnregisterRenderer(_liquidRenderer);
     }
 
     private TileBase ResolveTile(int wx, int wy, BlockData data)
@@ -76,6 +86,14 @@ public class Chunk : MonoBehaviour
         if (data.connectedTile != null)
             return WorldManager.Instance.GetConnectedTileBase(wx, wy, data.connectedTile);
         return data.tile;
+    }
+
+    private TileBase ResolveLiquidTile(WorldData world, int lx, int ly)
+    {
+        byte level = world.GetLiquid(lx, ly);
+        if (level == 0) return null;
+        bool belowEmpty = !world.InBounds(lx, ly - 1) || world.GetBlock(lx, ly - 1) == BlockType.Air && world.GetLiquid(lx, ly - 1) == 0;
+        return LiquidTileSet.Instance?.Resolve(level, belowEmpty);
     }
 
     public void RenderAll(WorldData world, int offsetX, int offsetY)
@@ -86,6 +104,7 @@ public class Chunk : MonoBehaviour
         var solidTiles = new TileBase[SIZE * SIZE];
         var nonSolidTiles = new TileBase[SIZE * SIZE];
         var wallTiles = new TileBase[SIZE * SIZE];
+        var liquidTiles = new TileBase[SIZE * SIZE];
 
         for (int ly = 0; ly < SIZE; ly++)
         for (int lx = 0; lx < SIZE; lx++)
@@ -96,24 +115,31 @@ public class Chunk : MonoBehaviour
             positions[i] = new Vector3Int(wx, wy, 0);
 
             var block = world.GetBlock(startX + lx, startY + ly);
-            var data = _blockRegistry.Get(block);
-            if (data != null && !data.isSolid)
-                nonSolidTiles[i] = ResolveTile(wx, wy, data);
-            else if (data != null)
-                solidTiles[i] = ResolveTile(wx, wy, data);
+            if (block != BlockType.Water)
+            {
+                var data = _blockRegistry.Get(block);
+                if (data != null && !data.isSolid)
+                    nonSolidTiles[i] = ResolveTile(wx, wy, data);
+                else if (data != null)
+                    solidTiles[i] = ResolveTile(wx, wy, data);
+            }
 
             var wall = world.GetWall(startX + lx, startY + ly);
             wallTiles[i] = _wallRegistry.Get(wall)?.tile;
+
+            liquidTiles[i] = ResolveLiquidTile(world, startX + lx, startY + ly);
         }
 
         _tilemap.SetTiles(positions, solidTiles);
         _nonSolidTilemap.SetTiles(positions, nonSolidTiles);
         _wallTilemap.SetTiles(positions, wallTiles);
+        _liquidTilemap.SetTiles(positions, liquidTiles);
     }
 
     public void RefreshTile(int wx, int wy, int offsetX, int offsetY, BlockData data)
     {
         var pos = new Vector3Int(wx + offsetX, wy + offsetY, 0);
+        if (data != null && data.blockType == BlockType.Water) return;
         TileBase tile = data != null ? ResolveTile(wx + offsetX, wy + offsetY, data) : null;
         if (data != null && !data.isSolid)
         {
@@ -125,6 +151,15 @@ public class Chunk : MonoBehaviour
             _tilemap.SetTile(pos, tile);
             _nonSolidTilemap.SetTile(pos, null);
         }
+    }
+
+    public void RefreshLiquidTile(int wx, int wy, int offsetX, int offsetY, byte level)
+    {
+        int lx = wx;
+        int ly = wy;
+        var world = WorldManager.Instance.Data;
+        bool belowEmpty = !world.InBounds(lx, ly - 1) || world.GetBlock(lx, ly - 1) == BlockType.Air && world.GetLiquid(lx, ly - 1) == 0;
+        _liquidTilemap.SetTile(new Vector3Int(wx + offsetX, wy + offsetY, 0), LiquidTileSet.Instance?.Resolve(level, belowEmpty));
     }
 
     public void RefreshWallTile(int wx, int wy, int offsetX, int offsetY, TileBase tile)
@@ -140,5 +175,6 @@ public class Chunk : MonoBehaviour
         _tilemap.ClearAllTiles();
         _nonSolidTilemap.ClearAllTiles();
         _wallTilemap.ClearAllTiles();
+        _liquidTilemap.ClearAllTiles();
     }
 }

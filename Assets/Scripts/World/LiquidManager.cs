@@ -5,22 +5,21 @@ public class LiquidManager : MonoBehaviour
 {
     public static LiquidManager Instance { get; private set; }
 
-    [Header("Settings")]
     [SerializeField] private float tickRate = 0.05f;
+    [SerializeField] private byte evaporateBelow = 3;
 
-    private HashSet<Vector2Int> _activeWater = new HashSet<Vector2Int>();
+    private HashSet<Vector2Int> _activeCells = new();
+    private HashSet<Vector2Int> _nextActive = new();
+    private HashSet<Vector2Int> _pending = new();
     private float _timer;
-    public bool isSimulating { get; private set; }
+
+    public bool IsSimulating { get; private set; }
 
     void Awake() => Instance = this;
 
-    public void AddActiveWater(int x, int y) => _activeWater.Add(new Vector2Int(x, y));
+    public void AddActiveCell(int x, int y) => _pending.Add(new Vector2Int(x, y));
 
-    public void NotifyBlockChanged(int x, int y)
-    {
-        if (isSimulating) return;
-        WakeNeighbors(x, y);
-    }
+    public void NotifyBlockChanged(int x, int y) => WakeNeighbors(x, y);
 
     void Update()
     {
@@ -29,67 +28,110 @@ public class LiquidManager : MonoBehaviour
         if (_timer >= tickRate)
         {
             _timer = 0;
-            if (_activeWater.Count > 0) Simulate();
+            foreach (var p in _pending)
+                _activeCells.Add(p);
+            _pending.Clear();
+            if (_activeCells.Count > 0)
+                Simulate();
         }
     }
 
     private void Simulate()
     {
-        isSimulating = true;
-        List<Vector2Int> currentTick = new List<Vector2Int>(_activeWater);
-        _activeWater.Clear();
+        IsSimulating = true;
+        _nextActive.Clear();
 
-        currentTick.Sort((a, b) => a.y.CompareTo(b.y));
+        var current = new List<Vector2Int>(_activeCells);
+        _activeCells.Clear();
+        current.Sort((a, b) => a.y.CompareTo(b.y));
 
-        foreach (var pos in currentTick)
-        {
-            UpdateBlock(pos.x, pos.y);
-        }
-        isSimulating = false;
+        foreach (var pos in current)
+            SimulateCell(pos.x, pos.y);
+
+        (_activeCells, _nextActive) = (_nextActive, _activeCells);
+        IsSimulating = false;
     }
 
-    private void UpdateBlock(int x, int y)
+    private void SimulateCell(int x, int y)
     {
-        if (WorldManager.Instance.GetBlock(x, y) != BlockType.Water) return;
+        byte level = WorldManager.Instance.GetLiquid(x, y);
+        if (level == 0) return;
 
-        if (TryMove(x, y, x, y - 1)) return;
+        if (level < evaporateBelow)
+        {
+            Write(x, y, 0);
+            return;
+        }
 
-        int side = (Random.value > 0.5f) ? 1 : -1;
+        TryFlowDown(x, y, ref level);
 
-        if (TryMove(x, y, x + side, y)) return;
-        if (TryMove(x, y, x - side, y)) return;
+        if (level > 1)
+        {
+            EqualizeWith(x, y, x - 1, y, ref level);
+            EqualizeWith(x, y, x + 1, y, ref level);
+        }
+
+        if (level > 0)
+            _nextActive.Add(new Vector2Int(x, y));
     }
 
-    private bool TryMove(int ox, int oy, int nx, int ny)
+    private void TryFlowDown(int x, int y, ref byte level)
     {
-        if (WorldManager.Instance.GetBlock(nx, ny) == BlockType.Air)
+        if (!IsPassable(x, y - 1)) return;
+
+        byte below = WorldManager.Instance.GetLiquid(x, y - 1);
+        int space = 255 - below;
+        if (space <= 0) return;
+
+        int give = Mathf.Min(level, space);
+        byte newLevel = (byte)(level - give);
+        byte newBelow = (byte)(below + give);
+
+        Write(x, y, newLevel);
+        Write(x, y - 1, newBelow);
+        level = newLevel;
+
+        _nextActive.Add(new Vector2Int(x, y - 1));
+        WakeNeighbors(x, y - 1);
+    }
+
+    private void EqualizeWith(int ax, int ay, int bx, int by, ref byte aLevel)
+    {
+        if (!IsPassable(bx, by)) return;
+
+        byte bLevel = WorldManager.Instance.GetLiquid(bx, by);
+        if (aLevel <= bLevel) return;
+
+        int total = aLevel + bLevel;
+        byte newA = (byte)((total + 1) / 2);
+        byte newB = (byte)(total / 2);
+        if (newA == aLevel) return;
+
+        Write(ax, ay, newA);
+        Write(bx, by, newB);
+        aLevel = newA;
+
+        if (newB > 0)
         {
-            WorldManager.Instance.PlaceBlock(ox, oy, BlockType.Air);
-            WorldManager.Instance.PlaceBlock(nx, ny, BlockType.Water);
-
-            _activeWater.Add(new Vector2Int(nx, ny));
-
-
-            WakeNeighbors(ox, oy);
-            WakeNeighbors(nx, ny);
-
-            return true;
+            _nextActive.Add(new Vector2Int(bx, by));
+            WakeNeighbors(bx, by);
         }
-        return false;
+    }
+
+    private void Write(int x, int y, byte amount) =>
+        WorldManager.Instance.SetLiquid(x, y, amount);
+
+    private bool IsPassable(int x, int y)
+    {
+        var block = WorldManager.Instance.GetBlock(x, y);
+        return block == BlockType.Air || block == BlockType.Water;
     }
 
     private void WakeNeighbors(int x, int y)
     {
         for (int iy = -1; iy <= 1; iy++)
-        {
             for (int ix = -1; ix <= 1; ix++)
-            {
-                BlockType b = WorldManager.Instance.GetBlock(x + ix, y + iy);
-                if (b == BlockType.Water)
-                {
-                    _activeWater.Add(new Vector2Int(x + ix, y + iy));
-                }
-            }
-        }
+                if (WorldManager.Instance.GetLiquid(x + ix, y + iy) > 0)
+                    _nextActive.Add(new Vector2Int(x + ix, y + iy));
     }
 }

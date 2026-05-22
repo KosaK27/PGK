@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance { get; private set; }
+
     [SerializeField] private WorldGenerator worldGenerator;
     [SerializeField] private int worldWidth = 200;
     [SerializeField] private int worldHeight = 100;
@@ -12,8 +13,10 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private WallRegistry wallRegistry;
 
     private readonly Dictionary<(ConnectedTile, int), Tile> _tileCache = new();
+
     public WorldData Data { get; private set; }
     public WorldData OriginalData { get; private set; }
+
     public int OffsetX => Data != null ? -Data.Width / 2 : 0;
     public int OffsetY => Data != null ? -Data.Height / 2 : 0;
 
@@ -46,24 +49,39 @@ public class WorldManager : MonoBehaviour
 
     void Start()
     {
-        if (LiquidManager.Instance != null && Data != null) InitializeLiquids();
+        if (LiquidManager.Instance != null && Data != null)
+            InitializeLiquids();
     }
 
     private void InitializeLiquids()
     {
         for (int x = 0; x < Data.Width; x++)
             for (int y = 0; y < Data.Height; y++)
-                if (Data.GetBlock(x, y) == BlockType.Water)
-                    LiquidManager.Instance.AddActiveWater(x + OffsetX, y + OffsetY);
+                if (Data.GetLiquid(x, y) > 0)
+                    LiquidManager.Instance.AddActiveCell(x + OffsetX, y + OffsetY);
     }
 
     public BlockType GetBlock(int x, int y) => Data.GetBlock(x - OffsetX, y - OffsetY);
     public WallType GetWall(int x, int y) => Data.GetWall(x - OffsetX, y - OffsetY);
+    public byte GetLiquid(int x, int y) => Data.GetLiquid(x - OffsetX, y - OffsetY);
 
-    public BlockData GetBlockData(int worldX, int worldY)
+    public void SetLiquid(int x, int y, byte amount)
     {
-        return blockRegistry.Get(GetBlock(worldX, worldY));
+        int lx = x - OffsetX;
+        int ly = y - OffsetY;
+        if (!Data.SetLiquid(lx, ly, amount)) return;
+        ChunkManager.Instance.RefreshLiquid(lx, ly, OffsetX, OffsetY, amount);
+        LightingSystem.Instance?.RebuildLightMapAt(x, y);
     }
+
+    public bool IsLiquidPassable(int x, int y)
+    {
+        var block = GetBlock(x, y);
+        return block == BlockType.Air;
+    }
+
+    public BlockData GetBlockData(int worldX, int worldY) =>
+        blockRegistry.Get(GetBlock(worldX, worldY));
 
     public TileBase GetConnectedTileBase(int wx, int wy, ConnectedTile connectedTile)
     {
@@ -72,6 +90,7 @@ public class WorldManager : MonoBehaviour
         bool left = IsSolidBlock(wx - 1, wy);
         bool right = IsSolidBlock(wx + 1, wy);
         int index = (up ? 1 : 0) | (down ? 2 : 0) | (left ? 4 : 0) | (right ? 8 : 0);
+
         var key = (connectedTile, index);
         if (!_tileCache.TryGetValue(key, out var tile))
         {
@@ -84,8 +103,7 @@ public class WorldManager : MonoBehaviour
 
     private bool IsSolidBlock(int wx, int wy)
     {
-        var block = GetBlock(wx, wy);
-        return block != BlockType.Air && block != BlockType.Water;
+        return GetBlock(wx, wy) != BlockType.Air;
     }
 
     public void PlaceBlock(int x, int y, BlockType type)
@@ -95,8 +113,7 @@ public class WorldManager : MonoBehaviour
         if (!Data.SetBlock(lx, ly, type)) return;
         RefreshBlockAndNeighbors(x, y);
         GravityBlockSystem.Instance?.NotifyNeighbors(x, y);
-        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating)
-            LiquidManager.Instance.NotifyBlockChanged(x, y);
+        LiquidManager.Instance?.NotifyBlockChanged(x, y);
         LightingSystem.Instance?.RebuildLightMapAt(x, y);
     }
 
@@ -108,8 +125,7 @@ public class WorldManager : MonoBehaviour
         Data.SetBlock(lx, ly, BlockType.Air);
         RefreshBlockAndNeighbors(x, y);
         GravityBlockSystem.Instance?.NotifyNeighbors(x, y);
-        if (LiquidManager.Instance != null && !LiquidManager.Instance.isSimulating)
-            LiquidManager.Instance.NotifyBlockChanged(x, y);
+        LiquidManager.Instance?.NotifyBlockChanged(x, y);
         LightingSystem.Instance?.RebuildLightMapAt(x, y);
     }
 
@@ -148,10 +164,8 @@ public class WorldManager : MonoBehaviour
         ChunkManager.Instance.RefreshBlock(lx, ly, OffsetX, OffsetY, data);
     }
 
-    public Vector3Int WorldToCell(Vector3 worldPos)
-    {
-        return new Vector3Int(Mathf.FloorToInt(worldPos.x), Mathf.FloorToInt(worldPos.y), 0);
-    }
+    public Vector3Int WorldToCell(Vector3 worldPos) =>
+        new Vector3Int(Mathf.FloorToInt(worldPos.x), Mathf.FloorToInt(worldPos.y), 0);
 
     public Vector3 CellToWorld(int x, int y) => new Vector3(x, y, 0);
 

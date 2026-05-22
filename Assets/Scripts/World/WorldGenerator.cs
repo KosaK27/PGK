@@ -222,7 +222,7 @@ public class WorldGenerator : ScriptableObject
                 {
                     if (!world.InBounds(x, y)) continue;
                     if (y > waterLevelY) { world.SetBlock(x, y, BlockType.Air); world.SetWall(x, y, WallType.None); }
-                    else if (y <= waterLevelY && y > bottomY) { world.SetBlock(x, y, BlockType.Water); world.SetWall(x, y, dirtWall); }
+                    else if (y <= waterLevelY && y > bottomY) { world.SetLiquid(x, y, 255); world.SetWall(x, y, dirtWall); }
                     else if (y == bottomY) { world.SetBlock(x, y, BlockType.Sand); world.SetWall(x, y, dirtWall); }
                     else if (y < bottomY && y >= bottomY - 2) { world.SetBlock(x, y, BlockType.Dirt); }
                     else if (y < bottomY - 2)
