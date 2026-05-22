@@ -73,7 +73,7 @@ public class LoadingManager : MonoBehaviour
         _stopwatch.Stop();
 
         WorldDataTransfer.Data = data;
-        WorldDataTransfer.OriginalData = data.Clone();
+        WorldDataTransfer.OriginalData = null;
 
         yield return new WaitForSeconds(0.5f);
 
@@ -89,36 +89,29 @@ public class LoadingManager : MonoBehaviour
         var worldSave = sm.SelectedWorld;
 
         _loadingProgressBar.value = 0f;
-        if (_loadingStepLabel != null) _loadingStepLabel.text = "Generating world...";
+        if (_loadingStepLabel != null) _loadingStepLabel.text = "Loading world...";
 
         yield return null;
-
-        _worldGenerator.randomSeed = false;
-        _worldGenerator.seed = worldSave.seed;
 
         var data = new WorldData(worldSave.width, worldSave.height);
+        sm.RestoreWorldState(worldSave, data);
 
-        yield return StartCoroutine(_worldGenerator.GenerateCoroutine(data, (progress, step) =>
-        {
-            _loadingProgressBar.value = progress * 0.8f;
-            if (_loadingStepLabel != null) _loadingStepLabel.text = step;
-        }));
-
-        WorldDataTransfer.OriginalData = data.Clone();
-
-        if (_loadingStepLabel != null) _loadingStepLabel.text = "Loading world...";
-        _loadingProgressBar.value = 0.8f;
+        _loadingProgressBar.value = 0.6f;
+        if (_loadingStepLabel != null) _loadingStepLabel.text = "Preparing...";
 
         yield return null;
+
+        WorldDataTransfer.Data = data;
+        WorldDataTransfer.OriginalData = null;
 
         var asyncLoad = SceneManager.LoadSceneAsync(_gameSceneName);
         asyncLoad.allowSceneActivation = false;
 
         float elapsed = 0f;
-        while (asyncLoad.progress < 0.9f || elapsed < 2f)
+        while (asyncLoad.progress < 0.9f || elapsed < 1f)
         {
             elapsed += Time.deltaTime;
-            _loadingProgressBar.value = 0.8f + Mathf.Min(asyncLoad.progress / 0.9f, elapsed / 2f) * 0.2f;
+            _loadingProgressBar.value = 0.6f + Mathf.Min(asyncLoad.progress / 0.9f, elapsed / 1f) * 0.4f;
             yield return null;
         }
 
@@ -126,7 +119,6 @@ public class LoadingManager : MonoBehaviour
         if (_loadingStepLabel != null) _loadingStepLabel.text = "Done.";
         yield return new WaitForSeconds(0.3f);
 
-        WorldDataTransfer.Data = data;
         asyncLoad.allowSceneActivation = true;
     }
 

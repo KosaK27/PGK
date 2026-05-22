@@ -15,7 +15,6 @@ public class WorldManager : MonoBehaviour
     private readonly Dictionary<(ConnectedTile, int), Tile> _tileCache = new();
 
     public WorldData Data { get; private set; }
-    public WorldData OriginalData { get; private set; }
 
     public int OffsetX => Data != null ? -Data.Width / 2 : 0;
     public int OffsetY => Data != null ? -Data.Height / 2 : 0;
@@ -35,15 +34,12 @@ public class WorldManager : MonoBehaviour
         if (WorldDataTransfer.Data != null)
         {
             Data = WorldDataTransfer.Data;
-            OriginalData = WorldDataTransfer.OriginalData;
             WorldDataTransfer.Data = null;
-            WorldDataTransfer.OriginalData = null;
         }
         else
         {
             Data = new WorldData(worldWidth, worldHeight);
             worldGenerator.Generate(Data);
-            OriginalData = Data.Clone();
         }
     }
 
