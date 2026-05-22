@@ -49,9 +49,8 @@ public class GameBootstrap : MonoBehaviour
         var charSave = sm.SelectedCharacter;
         bool isNewSession = charSave == null || charSave.inventorySlots.Count == 0;
 
-        if (worldSave != null && worldSave.blockDiffs != null && worldSave.blockDiffs.Count > 0)
+        if (sm.HasWorldState(worldSave))
         {
-            sm.RestoreWorldState(worldSave, _worldManager.Data);
             ChunkManager.Instance.RebuildAll(_worldManager.OffsetX, _worldManager.OffsetY);
             yield return null;
             RestoreMultitileObjects(worldSave);
@@ -121,7 +120,7 @@ public class GameBootstrap : MonoBehaviour
 
         if (worldSave != null && _worldManager != null)
         {
-            sm.CaptureWorldState(worldSave, _worldManager.Data, _worldManager.OriginalData);
+            sm.CaptureWorldState(worldSave, _worldManager.Data);
             CaptureMultitileObjects(worldSave);
             sm.SaveWorld(worldSave);
         }

@@ -77,35 +77,26 @@ public class SaveManager : MonoBehaviour
     public void SaveProfile() => WriteJson(Profile, ProfilePath);
     public void SaveSettings() => WriteJson(Settings, SettingsPath);
 
-    public void CaptureWorldState(WorldSaveData save, WorldData world, WorldData originalWorld)
+    public void CaptureWorldState(WorldSaveData save, WorldData world)
     {
-        save.blockDiffs.Clear();
-        save.wallDiffs.Clear();
-        for (int x = 0; x < world.Width; x++)
-            for (int y = 0; y < world.Height; y++)
-            {
-                var block = world.GetBlock(x, y);
-                if (block != originalWorld.GetBlock(x, y))
-                    save.blockDiffs.Add(new BlockDiff { x = x, y = y, blockType = (int)block });
-                var wall = world.GetWall(x, y);
-                if (wall != originalWorld.GetWall(x, y))
-                    save.wallDiffs.Add(new WallDiff { x = x, y = y, wallType = (int)wall });
-            }
+        save.blockRLE = WorldRLE.EncodeBlocks(world);
+        save.wallRLE = WorldRLE.EncodeWalls(world);
+        save.liquidRLE = WorldRLE.EncodeLiquids(world);
         save.lastPlayedAt = DateTime.UtcNow.Ticks;
     }
 
     public void RestoreWorldState(WorldSaveData save, WorldData world)
     {
-        foreach (var diff in save.blockDiffs)
-            world.SetBlock(diff.x, diff.y, (BlockType)diff.blockType);
-        foreach (var diff in save.wallDiffs)
-            world.SetWall(diff.x, diff.y, (WallType)diff.wallType);
+        WorldRLE.DecodeInto(world, save.blockRLE, save.wallRLE, save.liquidRLE);
 
         _discoveredChunksSet.Clear();
         if (save.discoveredChunks != null)
             foreach (var c in save.discoveredChunks)
                 _discoveredChunksSet.Add(c);
     }
+
+    public bool HasWorldState(WorldSaveData save) =>
+        save != null && save.blockRLE != null && save.blockRLE.Count > 0;
 
     public void CaptureCharacterState(CharacterSaveData save, GameObject player, string worldId)
     {

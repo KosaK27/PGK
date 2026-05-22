@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc0df64068e15404a8eec43fac691d83, type: 3}
   m_Name: LiquidTileSet
   m_EditorClassIdentifier: Assembly-CSharp::LiquidTileSet
-  tiles: []
+  tiles:
+  - {fileID: 11400000, guid: 938b3fb791a7ab2459674fa294989837, type: 2}
+  - {fileID: 11400000, guid: 4e7a78ad932cb324fb83172a6da4ec69, type: 2}
+  - {fileID: 11400000, guid: 247543cca128f37468133ff7ef3aeb25, type: 2}
+  - {fileID: 11400000, guid: d4fb13b40996ea2468ee76167a496816, type: 2}
+  - {fileID: 11400000, guid: 0a45e84ef2e4704408986b510e0e4882, type: 2}
+  - {fileID: 11400000, guid: d0f4244ab41cbae478898e6d5021fc81, type: 2}
+  - {fileID: 11400000, guid: 80761bcfcd0b1524ba16b732562c6c1e, type: 2}
+  - {fileID: 11400000, guid: bb0a6549f0b5e174792fca47532f2423, type: 2}
