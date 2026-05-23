@@ -29,11 +29,12 @@ public class PlayerArmAnimator : MonoBehaviour
     public void SetArmSprite()
     {
         if (frontArmRenderer == null) return;
+        var chest = ArmorSystem.Instance?.GetSlot<ChestArmorDefinition>(ArmorSlot.Chest);
         frontArmRenderer.sprite = CurrentZone switch
         {
-            ArmZone.Up => armUp,
-            ArmZone.Down => armDown,
-            _ => armForward
+            ArmZone.Up => chest?.armFToolUp ?? armUp,
+            ArmZone.Down => chest?.armFToolDown ?? armDown,
+            _ => chest?.armFToolForward ?? armForward
         };
     }
 

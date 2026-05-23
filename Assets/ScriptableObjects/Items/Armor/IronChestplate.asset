@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d59712ace53a5ab42b4fa64bc2d6ca04, type: 3}
+  m_Name: IronChestplate
+  m_EditorClassIdentifier: Assembly-CSharp::ChestArmorDefinition
+  armorId: 1
+  displayName: Iron Chestplate
+  sprite: {fileID: 1813579351650993768, guid: 1f254b909c6bd2d488536ebf161724eb, type: 3}
+  defense: 3
+  torsoSprite: {fileID: 1813579351650993768, guid: 1f254b909c6bd2d488536ebf161724eb, type: 3}
+  armBIdle: {fileID: -4422806087785124797, guid: a17e742e5754e394292faaf22d1d9bd0, type: 3}
+  armBWalk:
+  - {fileID: -6959241752027403095, guid: 1d1418f7a5365464393fc899e991233b, type: 3}
+  - {fileID: -3287257447983932311, guid: 4c44c800155c3154abe4e3cd9a25ab40, type: 3}
+  - {fileID: 2729021244228794247, guid: 681d05c06e3128a4fa4c7c224c90ded3, type: 3}
+  - {fileID: 3000320661341032419, guid: e99a73bf4d538d94189174cd41de3c31, type: 3}
+  armBJump: {fileID: -4025969551801430597, guid: c999955f00d550146bde7f1be465b8a1, type: 3}
+  armFIdle: {fileID: -2329960992057405427, guid: 72d3f8189f2d81748b77dea2048f830e, type: 3}
+  armFWalk:
+  - {fileID: 4653658734695330153, guid: cbdf1a8898c4db140b2e5a9019e93e3b, type: 3}
+  - {fileID: -3906093807969111557, guid: 01e0827737db91543ae7ac79771b8342, type: 3}
+  - {fileID: -7838598235025618560, guid: 64b0dc0af7d59e64da6e1be92b689ad9, type: 3}
+  - {fileID: -2535687898834038024, guid: 19913fa3e4477844c85753f018d0404a, type: 3}
+  armFJump: {fileID: 7625168786167916410, guid: 192d3b63504dd194e96cfb19fb181b89, type: 3}
+  armFToolUp: {fileID: -3150666472794284540, guid: dc882535e40c1a949bb410db02e3b8ee, type: 3}
+  armFToolForward: {fileID: -2732509821464511548, guid: db378c57ae40aff49bb488b38965cd78, type: 3}
+  armFToolDown: {fileID: -1621361826106596505, guid: 415541929626dfc4eb169ff408a2c014, type: 3}

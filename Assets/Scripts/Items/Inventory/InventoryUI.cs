@@ -217,39 +217,70 @@ public class InventoryUI : MonoBehaviour
 
     private void MoveSlotBetweenContainers(IContainer from, int fromIdx, IContainer to, int toIdx)
     {
-        if (to is AccessoryContainer && from.GetSlot(fromIdx) != null)
+        var fromStack = from.GetSlot(fromIdx);
+
+        if (to is AccessoryContainer)
         {
-            var fromStack = from.GetSlot(fromIdx);
-            if (fromStack != null && !fromStack.IsEmpty && (!fromStack.item.isAccessory || fromStack.item.accessoryDefinition == null))
+            if (fromStack == null || fromStack.IsEmpty || !fromStack.item.isAccessory || fromStack.item.accessoryDefinition == null)
                 return;
         }
 
+        if (to is ArmorContainer)
+        {
+            if (fromStack == null || fromStack.IsEmpty || !fromStack.item.isArmor || fromStack.item.armorDefinition == null)
+                return;
+            if (fromStack.item.armorDefinition.Slot != (ArmorSlot)toIdx)
+                return;
+        }
+
+        if (from is AccessoryContainer && to is not AccessoryContainer)
+        {
+            if (to.GetSlot(toIdx) != null && !to.GetSlot(toIdx).IsEmpty)
+            {
+                var toStack = to.GetSlot(toIdx);
+                if (!toStack.item.isAccessory || toStack.item.accessoryDefinition == null)
+                    return;
+            }
+        }
+
+        if (from is ArmorContainer && to is not ArmorContainer)
+        {
+            var toStack = to.GetSlot(toIdx);
+            if (toStack != null && !toStack.IsEmpty)
+            {
+                if (!toStack.item.isArmor || toStack.item.armorDefinition == null)
+                    return;
+                if (toStack.item.armorDefinition.Slot != (ArmorSlot)fromIdx)
+                    return;
+            }
+        }
+
         var fromStackFinal = from.GetSlot(fromIdx);
-        var toStack = to.GetSlot(toIdx);
+        var toStackFinal = to.GetSlot(toIdx);
 
         if (fromStackFinal == null || fromStackFinal.IsEmpty)
         {
-            from.SetSlot(fromIdx, toStack);
+            from.SetSlot(fromIdx, toStackFinal);
             to.SetSlot(toIdx, null);
             return;
         }
 
-        if (toStack != null && !toStack.IsEmpty && toStack.item == fromStackFinal.item)
+        if (toStackFinal != null && !toStackFinal.IsEmpty && toStackFinal.item == fromStackFinal.item)
         {
-            int space = toStack.item.maxStack - toStack.amount;
+            int space = toStackFinal.item.maxStack - toStackFinal.amount;
             if (space > 0)
             {
                 int move = Mathf.Min(space, fromStackFinal.amount);
-                toStack.amount += move;
+                toStackFinal.amount += move;
                 fromStackFinal.amount -= move;
                 from.SetSlot(fromIdx, fromStackFinal.amount <= 0 ? null : fromStackFinal);
-                to.SetSlot(toIdx, toStack);
+                to.SetSlot(toIdx, toStackFinal);
                 return;
             }
         }
 
         to.SetSlot(toIdx, fromStackFinal);
-        from.SetSlot(fromIdx, toStack);
+        from.SetSlot(fromIdx, toStackFinal);
     }
 
     private void SetSlotIconVisible(int index, IContainer container, bool visible)
@@ -257,6 +288,11 @@ public class InventoryUI : MonoBehaviour
         if (container is AccessoryContainer)
         {
             AccessoryPanelUI.Instance?.SetSlotIconVisible(index, visible);
+            return;
+        }
+        if (container is ArmorContainer)
+        {
+            ArmorPanelUI.Instance?.SetSlotIconVisible(index, visible);
             return;
         }
         if (container == GetPlayerContainer())

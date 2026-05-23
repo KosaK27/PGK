@@ -10,11 +10,13 @@ public class HitEffect : MonoBehaviour
     private SpriteRenderer[] _renderers;
     private Color _originalColor;
     private Coroutine _blinkCoroutine;
+    private PlayerAnimation _playerAnimation;
 
     void Awake()
     {
         _renderers = GetComponentsInChildren<SpriteRenderer>();
         if (_renderers.Length > 0) _originalColor = _renderers[0].color;
+        _playerAnimation = GetComponent<PlayerAnimation>();
     }
 
     public void TriggerHit(Vector2 sourcePosition)
@@ -36,6 +38,7 @@ public class HitEffect : MonoBehaviour
             _blinkCoroutine = null;
         }
         foreach (var sr in _renderers) sr.enabled = true;
+        _playerAnimation?.RefreshArmorCache();
     }
 
     private IEnumerator DoFlash()
@@ -52,6 +55,7 @@ public class HitEffect : MonoBehaviour
             foreach (var sr in _renderers) sr.enabled = false;
             yield return new WaitForSeconds(iframeBlinkInterval);
             foreach (var sr in _renderers) sr.enabled = true;
+            _playerAnimation?.RefreshArmorCache();
             yield return new WaitForSeconds(iframeBlinkInterval);
         }
     }

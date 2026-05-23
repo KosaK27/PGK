@@ -14,6 +14,7 @@ public class CharacterSaveData
     public int maxHP;
     public List<WorldPositionSave> worldPositions = new();
     public List<string> equippedAccessoryIds = new();
+    public List<string> equippedArmorIds = new();
 }
 
 [Serializable]

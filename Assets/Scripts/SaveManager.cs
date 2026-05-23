@@ -120,6 +120,15 @@ public class SaveManager : MonoBehaviour
                 save.equippedAccessoryIds.Add(acc.GetSlot(i)?.accessoryId ?? "");
         }
 
+        var armor = ArmorSystem.Instance;
+        if (armor != null)
+        {
+            save.equippedArmorIds.Clear();
+            save.equippedArmorIds.Add(armor.GetSlot(ArmorSlot.Head)?.armorId ?? "");
+            save.equippedArmorIds.Add(armor.GetSlot(ArmorSlot.Chest)?.armorId ?? "");
+            save.equippedArmorIds.Add(armor.GetSlot(ArmorSlot.Legs)?.armorId ?? "");
+        }
+
         save.worldPositions.RemoveAll(p => p.worldId == worldId);
         save.worldPositions.Add(new WorldPositionSave { worldId = worldId, positionX = player.transform.position.x, positionY = player.transform.position.y });
     }
@@ -146,6 +155,17 @@ public class SaveManager : MonoBehaviour
             {
                 string accId = i < save.equippedAccessoryIds.Count ? save.equippedAccessoryIds[i] : "";
                 acc.Equip(i, registry.GetAccessoryById(accId));
+            }
+        }
+        
+        var armor = ArmorSystem.Instance;
+        if (armor != null && save.equippedArmorIds != null)
+        {
+            ArmorSlot[] armorSlots = { ArmorSlot.Head, ArmorSlot.Chest, ArmorSlot.Legs };
+            for (int i = 0; i < armorSlots.Length; i++)
+            {
+                string id = i < save.equippedArmorIds.Count ? save.equippedArmorIds[i] : "";
+                armor.Equip(armorSlots[i], registry.GetArmorById(id));
             }
         }
 

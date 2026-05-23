@@ -572,6 +572,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a72d7150004c1a45a99cc4afd111359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
+  headDefault: {fileID: 6943535168657398750, guid: df70f87762cc65d47aa7c3aeaaf8d421, type: 3}
+  torsoDefault: {fileID: 1221316241063588470, guid: c82018e4315d6bb4ab68fbd17383080d, type: 3}
   legsIdle: {fileID: 8452868397695827223, guid: cc68cc8ceeaa23240b8baabdcc27f103, type: 3}
   legsWalk:
   - {fileID: -7291374624341017600, guid: 5d90b4bf318d8bb4dbc3319512c2e62b, type: 3}
@@ -593,6 +595,9 @@ MonoBehaviour:
   - {fileID: 65730502576618334, guid: 4d4995763b4ee2047a433ca939fa41a7, type: 3}
   - {fileID: 483082140377329454, guid: e98df49282ef5e14fbdea289ab5e3dab, type: 3}
   backArmJump: {fileID: -7607684987259783466, guid: 7a950d9e48e7dc34ca322cd36594e408, type: 3}
+  headRenderer: {fileID: 51285108776085480}
+  hairRenderer: {fileID: 1664218938550470190}
+  torsoRenderer: {fileID: 5606949891637271197}
   legsRenderer: {fileID: 4290266772917594716}
   frontArmRenderer: {fileID: 8981702099010259705}
   backArmRenderer: {fileID: 7677512927962482125}
@@ -641,6 +646,7 @@ MonoBehaviour:
   _placeColor: {r: 1, g: 1, b: 1, a: 0.4}
   _breakIdleColor: {r: 1, g: 0.3, b: 0.1, a: 0.5}
   _breakActiveColor: {r: 1, g: 0.3, b: 0.1, a: 0.8}
+  _smartBreakColor: {r: 0.3, g: 0.8, b: 1, a: 0.6}
   _cam: {fileID: 0}
   _reach: 5
 --- !u!114 &563494656830642947

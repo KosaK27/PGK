@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dac9fea4d10b1364bab6462314263aa3, type: 3}
+  m_Name: IronLegs
+  m_EditorClassIdentifier: Assembly-CSharp::LegsArmorDefinition
+  armorId: 3
+  displayName: Iron Legs
+  sprite: {fileID: -8113100670280440242, guid: a5fa3329d212ac342ab185393772fdf3, type: 3}
+  defense: 1
+  legsIdle: {fileID: -8113100670280440242, guid: a5fa3329d212ac342ab185393772fdf3, type: 3}
+  legsWalk:
+  - {fileID: -2775149121029619811, guid: fbc2a1b22bda4924cad66f5c837e7b78, type: 3}
+  - {fileID: -4283937254016471193, guid: 5b2643226a3a27f4391e9dc658309e9c, type: 3}
+  - {fileID: 4639021856564775232, guid: daf3772b9da77f44ca06ec2fac4282b3, type: 3}
+  - {fileID: -3161883649856015480, guid: faaf21b8044a0a044be5aab31f502184, type: 3}
+  legsJump: {fileID: 3490273578845484112, guid: c746afb097f227046a213afccb3bc127, type: 3}
