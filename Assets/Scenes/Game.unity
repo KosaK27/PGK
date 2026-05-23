@@ -3964,6 +3964,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 813728465}
   m_CullTransparentMesh: 1
+--- !u!1 &870772714
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 870772716}
+  - component: {fileID: 870772715}
+  m_Layer: 0
+  m_Name: NPCManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &870772715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870772714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 656944a2e40254845a1f70c632c2d438, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCManager
+  npcSpawnSettings:
+  - npcType: 2
+    entityData: {fileID: 11400000, guid: 84f544b8a66bf93449079892c00a850f, type: 2}
+  - npcType: 0
+    entityData: {fileID: 11400000, guid: df32408194e093f448a236ece6713e0b, type: 2}
+  - npcType: 1
+    entityData: {fileID: 11400000, guid: bd51a05fbf74fa6438ed40156d47a8c3, type: 2}
+--- !u!4 &870772716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870772714}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 55.52845, y: -0.01689, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &892946521
 GameObject:
   m_ObjectHideFlags: 0
@@ -10481,6 +10532,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 326d82f3a8f88f248a807b0197fd98aa, type: 2}
   - {fileID: 11400000, guid: ab451abf335222b4c8e4b307af495bb3, type: 2}
   - {fileID: 11400000, guid: d5cd7a0e29b45b34c92255a52faeb353, type: 2}
+  - {fileID: 11400000, guid: eeb1d7032807eca4292e057b602734b0, type: 2}
+  - {fileID: 11400000, guid: 79bf4024b15e2bb4c88c36ea14dae0a9, type: 2}
+  - {fileID: 11400000, guid: 4c5e192278f5a144f812fd7d9ddfa570, type: 2}
 --- !u!4 &2036512532
 Transform:
   m_ObjectHideFlags: 0
@@ -11409,3 +11463,4 @@ SceneRoots:
   - {fileID: 253483242}
   - {fileID: 1381351092}
   - {fileID: 1980531996}
+  - {fileID: 870772716}

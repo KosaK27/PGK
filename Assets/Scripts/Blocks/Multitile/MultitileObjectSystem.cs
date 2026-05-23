@@ -169,6 +169,13 @@ public class MultitileObjectSystem : MonoBehaviour
             door.InitializeDoor(doorDef, origin);
             return door;
         }
+        if (def is BedDefinition bedDef)
+        {
+            var go = new GameObject($"Bed_{origin.x}_{origin.y}");
+            var bed = go.AddComponent<BedObject>();
+            bed.InitializeBed(bedDef, origin);
+            return bed;
+        }
 
         var defaultGo = new GameObject($"MultitileObject_{def.displayName}_{origin.x}_{origin.y}");
         var obj = defaultGo.AddComponent<MultitileObject>();

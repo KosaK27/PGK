@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32d11e9ff1661f94e8cd2cd1e92548c9, type: 3}
+  m_Name: Multitile_Bed_Farmer
+  m_EditorClassIdentifier: Assembly-CSharp::BedDefinition
+  displayName: Bed_Farmer
+  size: {x: 3, y: 1}
+  sprite: {fileID: 1615821768, guid: 9d12a60225875f144871fbef9445c37e, type: 3}
+  hardness: 3
+  requiredTool: 2
+  dropItem: {fileID: 11400000, guid: eeb1d7032807eca4292e057b602734b0, type: 2}
+  dropAmount: 1
+  sortingOrder: 0
+  hasCollision: 0
+  editorTile: {fileID: 0}
+  npcType: 2
