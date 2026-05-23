@@ -20,13 +20,12 @@ public class ShootingEnemyAI : EntityAI
     protected override void UpdateState()
     {
         var d = stats.data;
-        float dist = distanceToPlayer;
 
-        if (!d.isHostile || dist >= d.detectionRange)
+        if (!d.isHostile || currentTarget == null || distanceToTarget >= d.detectionRange)
             State = EntityState.Patrol;
-        else if (dist < safeDistance)
+        else if (distanceToTarget < safeDistance)
             State = EntityState.Chase;
-        else if (dist < shootRange)
+        else if (distanceToTarget < shootRange)
             State = EntityState.Attack;
         else
             State = EntityState.Chase;
@@ -57,9 +56,9 @@ public class ShootingEnemyAI : EntityAI
 
     void DoChase()
     {
-        if (player == null) return;
+        if (currentTarget == null) return;
         var d = stats.data;
-        float dir = Mathf.Sign(player.position.x - transform.position.x);
+        float dir = Mathf.Sign(currentTarget.position.x - transform.position.x);
         rb.linearVelocity = new Vector2(dir * d.moveSpeed, rb.linearVelocity.y);
         FlipTowards(dir);
     }
@@ -67,13 +66,13 @@ public class ShootingEnemyAI : EntityAI
     void DoShoot()
     {
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-        if (player == null || _launcher == null) return;
+        if (currentTarget == null || _launcher == null) return;
 
         Vector2 origin = firePoint != null
             ? (Vector2)firePoint.position
             : (Vector2)transform.position;
 
-        Vector2 dir = (player.position - transform.position).normalized;
+        Vector2 dir = (currentTarget.position - transform.position).normalized;
         FlipTowards(dir.x);
         _launcher.Shoot(origin, dir);
     }

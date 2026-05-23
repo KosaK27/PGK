@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2016341397503483224}
   - component: {fileID: 3505465477637067442}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2544648253209742032}
   - component: {fileID: 7900097308041618724}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Legs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -190,7 +190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8184591976913418212}
   - component: {fileID: 1708343719227031263}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,7 +280,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3333525581565847121}
   - component: {fileID: 906346396705590697}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Arm_F
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -370,7 +370,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6820189153153915763}
   - component: {fileID: 8065074994879779740}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Arm_B
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -464,9 +464,12 @@ GameObject:
   - component: {fileID: 5374042279583358678}
   - component: {fileID: 3120178877088971448}
   - component: {fileID: -1463342867088809655}
-  m_Layer: 0
+  - component: {fileID: 7899691702371701041}
+  - component: {fileID: 4732612723434176922}
+  - component: {fileID: 6579122058839501817}
+  m_Layer: 12
   m_Name: Warrior
-  m_TagString: Untagged
+  m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -519,6 +522,7 @@ MonoBehaviour:
   wanderRadius: 15
   teleportDistance: 30
   moveInterval: 3
+  jumpForce: 7
 --- !u!50 &5374042279583358678
 Rigidbody2D:
   serializedVersion: 5
@@ -605,3 +609,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapTrackable
   _markerType: 2
+--- !u!114 &7899691702371701041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6832051277181474599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18e22fa66aecf0c46a3b2f5e66f67fde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContactDamage
+--- !u!114 &4732612723434176922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6832051277181474599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2745c0a969846224ea5034272f4572c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitEffect
+  flashDuration: 0.12
+  flashColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  iframeBlinkInterval: 0.1
+--- !u!114 &6579122058839501817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6832051277181474599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8baf7306438ab7d4da678008edea2fa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LitSprite

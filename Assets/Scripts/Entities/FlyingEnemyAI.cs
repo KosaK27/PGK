@@ -21,7 +21,7 @@ public class FlyingEnemyAI : EntityAI
     protected override void UpdateState()
     {
         var d = stats.data;
-        State = d.isHostile && distanceToPlayer < d.detectionRange
+        State = d.isHostile && currentTarget != null && distanceToTarget < d.detectionRange
             ? EntityState.Chase
             : EntityState.Patrol;
     }
@@ -38,10 +38,10 @@ public class FlyingEnemyAI : EntityAI
 
     void ChasePlayer()
     {
-        if (player == null) return;
+        if (currentTarget == null) return;
         var d = stats.data;
 
-        Vector2 dir = (player.position - transform.position).normalized;
+        Vector2 dir = (currentTarget.position - transform.position).normalized;
         dir.y -= glideDownSpeed * Time.deltaTime;
 
         float wave = Mathf.Sin(_time * chaseFrequency) * chaseAmplitude;
