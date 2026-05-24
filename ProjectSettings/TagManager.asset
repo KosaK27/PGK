@@ -7,6 +7,8 @@ TagManager:
   - Boss
   - Water
   - Background
+  - Enemy
+  - NPC
   layers:
   - Default
   - TransparentFX
@@ -20,7 +22,7 @@ TagManager:
   - ChunkColliders
   - Boss
   - BossProjectile
-  - 
+  - NPC
   - 
   - 
   - 

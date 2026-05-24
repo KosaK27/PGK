@@ -26,10 +26,9 @@ public class WalkingEnemyAI : EntityAI
     protected override void UpdateState()
     {
         var d = stats.data;
-        float dist = distanceToPlayer;
 
-        if (d.isHostile && dist < d.detectionRange)
-            State = dist < d.attackRange ? EntityState.Attack : EntityState.Chase;
+        if (d.isHostile && currentTarget != null && distanceToTarget < d.detectionRange)
+            State = distanceToTarget < d.attackRange ? EntityState.Attack : EntityState.Chase;
         else
             State = EntityState.Patrol;
     }
@@ -62,8 +61,8 @@ public class WalkingEnemyAI : EntityAI
 
     private void DoChase(EntityData d)
     {
-        if (player == null) return;
-        float dir = Mathf.Sign(player.position.x - transform.position.x);
+        if (currentTarget == null) return;
+        float dir = Mathf.Sign(currentTarget.position.x - transform.position.x);
         rb.linearVelocity = new Vector2(dir * d.moveSpeed, rb.linearVelocity.y);
         FlipTowards(dir);
     }

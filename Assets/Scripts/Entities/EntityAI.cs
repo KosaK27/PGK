@@ -9,6 +9,7 @@ public abstract class EntityAI : MonoBehaviour
     protected Transform player;
     protected Rigidbody2D rb;
     protected SpriteRenderer sr;
+    protected Transform currentTarget;
 
     public EntityState State { get; protected set; } = EntityState.Patrol;
     protected float knockbackTimer;
@@ -16,6 +17,9 @@ public abstract class EntityAI : MonoBehaviour
 
     protected float distanceToPlayer =>
         player != null ? Vector2.Distance(transform.position, player.position) : float.MaxValue;
+
+    protected float distanceToTarget =>
+        currentTarget != null ? Vector2.Distance(transform.position, currentTarget.position) : float.MaxValue;
 
     protected virtual void Awake()
     {
@@ -39,8 +43,62 @@ public abstract class EntityAI : MonoBehaviour
             knockbackTimer -= Time.deltaTime;
             return;
         }
+        UpdateTargetPriority();
         UpdateState();
         Tick();
+    }
+
+    protected virtual void UpdateTargetPriority()
+    {
+        float range = stats.data != null ? stats.data.detectionRange : 8f;
+        Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, range);
+
+        if (stats.data != null && stats.data.isHostile)
+        {
+            Transform foundPlayer = null;
+            Transform foundNPC = null;
+            float closestNPCDist = float.MaxValue;
+
+            foreach (var c in cols)
+            {
+                if (c.CompareTag("Player"))
+                {
+                    foundPlayer = c.transform;
+                }
+                else if (c.CompareTag("NPC"))
+                {
+                    float d = Vector2.Distance(transform.position, c.transform.position);
+                    if (d < closestNPCDist)
+                    {
+                        closestNPCDist = d;
+                        foundNPC = c.transform;
+                    }
+                }
+            }
+
+            if (foundPlayer != null) currentTarget = foundPlayer;
+            else if (foundNPC != null) currentTarget = foundNPC;
+            else currentTarget = null;
+        }
+        else
+        {
+            Transform foundEnemy = null;
+            float closestEnemyDist = float.MaxValue;
+
+            foreach (var c in cols)
+            {
+                if (c.CompareTag("Enemy"))
+                {
+                    float d = Vector2.Distance(transform.position, c.transform.position);
+                    if (d < closestEnemyDist)
+                    {
+                        closestEnemyDist = d;
+                        foundEnemy = c.transform;
+                    }
+                }
+            }
+            currentTarget = foundEnemy;
+        }
     }
 
     public void ApplyKnockback()
