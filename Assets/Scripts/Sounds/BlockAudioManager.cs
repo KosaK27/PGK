@@ -7,6 +7,7 @@ public class BlockAudioManager : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip placeSound;
     [SerializeField] private AudioClip breakSound;
+    [SerializeField] private AudioClip explosionSound;
 
     private float _volume = 1f;
 
@@ -23,4 +24,5 @@ public class BlockAudioManager : MonoBehaviour
 
     public void PlayPlace() => audioSource.PlayOneShot(placeSound, _volume);
     public void PlayBreak() => audioSource.PlayOneShot(breakSound, _volume);
+    public void PlayExplosion() => audioSource.PlayOneShot(explosionSound, _volume);
 }

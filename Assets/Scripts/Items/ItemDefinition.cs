@@ -2,7 +2,7 @@ using UnityEngine;
 
 public enum ToolType { None, Pickaxe, Axe, Shovel }
 public enum WeaponType { None, Sword, Bow }
-public enum ConsumableType { None, HealPotion, HeartContainer, SummonBoss }
+public enum ConsumableType { None, HealPotion, HeartContainer, SummonBoss, Bomb }
 
 [CreateAssetMenu(fileName = "ItemDefinition", menuName = "Items/ItemDefinition")]
 public class ItemDefinition : ScriptableObject
@@ -42,6 +42,7 @@ public class ItemDefinition : ScriptableObject
     public int healAmount = 5;
     public int heartContainerAmount = 1;
     public GameObject bossPrefabToSummon;
+    public GameObject bombPrefab;
     [Header("Accessory")]
     public bool isAccessory;
     public AccessoryDefinition accessoryDefinition;

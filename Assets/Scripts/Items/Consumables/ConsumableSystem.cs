@@ -30,6 +30,9 @@ public class ConsumableSystem : MonoBehaviour
             case ConsumableType.SummonBoss:
                 used = UseSummonBoss(item);
                 break;
+            case ConsumableType.Bomb:
+                used = UseBomb(item);
+                break;
         }
 
         if (used && item.consumeOnUse)
@@ -57,6 +60,15 @@ public class ConsumableSystem : MonoBehaviour
     {
         if (item.bossPrefabToSummon == null) return false;
         BossSpawner.Instance.SpawnBossFromItem(item.bossPrefabToSummon);
+        return true;
+    }
+
+    private bool UseBomb(ItemDefinition item)
+    {
+        if (item.bombPrefab == null) return false;
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return false;
+        BombThrowSystem.Instance.ThrowBomb(item.bombPrefab, player.transform.position, item);
         return true;
     }
 
