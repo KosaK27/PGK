@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7bed6f043df8694e838330173f9d9b7, type: 3}
   m_Name: Log_Tile
   m_EditorClassIdentifier: Assembly-CSharp::CustomRuleTile
-  m_DefaultSprite: {fileID: 2368875588930414890, guid: d4abd84634f225a40b00204a683f3e65, type: 3}
+  m_DefaultSprite: {fileID: -2067898546876541913, guid: 370bbcce41059864d96b988fd7545bc2, type: 3}
   m_DefaultGameObject: {fileID: 0}
   m_DefaultColliderType: 1
   m_TilingRules: []

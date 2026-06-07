@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlockData
   blockType: 11
   displayName: Plank
-  tile: {fileID: 11400000, guid: f4df7721364f0b34eb79201c306c69f0, type: 2}
-  connectedTile: {fileID: 0}
+  tile: {fileID: 0}
+  connectedTile: {fileID: 11400000, guid: 1df0bab0dbbee024eb9283c779b4880f, type: 2}
   isSolid: 1
   destructible: 1
   hardness: 2

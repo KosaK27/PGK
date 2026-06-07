@@ -117,6 +117,7 @@ public class InventoryUI : MonoBehaviour
         _isOpen = false;
         mainInventoryPanel.SetActive(false);
         inventoryCraftButton?.gameObject.SetActive(false);
+        ItemTooltipUI.Instance?.Hide();
 
         if (_isHolding)
         {
@@ -205,6 +206,7 @@ public class InventoryUI : MonoBehaviour
             _holdIconImage.sprite = stack.item.sprite;
             _holdIconCount.text = stack.amount > 1 ? stack.amount.ToString() : "";
 
+            ItemTooltipUI.Instance?.Hide();
             SetSlotIconVisible(_holdFromIndex, _holdFromContainer, false);
         }
         else
@@ -343,10 +345,14 @@ public class InventoryUI : MonoBehaviour
         mainInventoryPanel.SetActive(_isOpen);
         inventoryCraftButton?.gameObject.SetActive(_isOpen);
 
-        if (!_isOpen && _isHolding)
+        if (!_isOpen)
         {
-            SetSlotIconVisible(_holdFromIndex, _holdFromContainer, true);
-            CancelHold();
+            ItemTooltipUI.Instance?.Hide();
+            if (_isHolding)
+            {
+                SetSlotIconVisible(_holdFromIndex, _holdFromContainer, true);
+                CancelHold();
+            }
         }
     }
 

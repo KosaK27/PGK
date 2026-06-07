@@ -17,6 +17,7 @@ public class InventorySlotUI : MonoBehaviour,
 
     private int _slotIndex;
     private Action<int> _onClicked;
+    private ItemStack _currentStack;
 
     public void Init(int index, Action<int> onClicked)
     {
@@ -32,6 +33,7 @@ public class InventorySlotUI : MonoBehaviour,
 
     public void Refresh(ItemStack stack)
     {
+        _currentStack = stack;
         bool hasItem = stack != null && !stack.IsEmpty;
         itemIcon.enabled = hasItem;
         countLabel.enabled = hasItem && stack.amount > 1;
@@ -47,14 +49,11 @@ public class InventorySlotUI : MonoBehaviour,
 
     public void SetHighlight(bool selected, Color normal, Color selectedColor)
     {
-        
         slotBackground.color = selected ? selectedColor : normal;
 
-        
         if (highlightOverlay != null)
         {
             highlightOverlay.gameObject.SetActive(selected);
-            
             highlightOverlay.color = Color.white;
         }
     }
@@ -68,10 +67,12 @@ public class InventorySlotUI : MonoBehaviour,
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (highlightOverlay != null) highlightOverlay.color = hoverTint;
+        ItemTooltipUI.Instance?.Show(_currentStack);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (highlightOverlay != null) highlightOverlay.color = Color.clear;
+        ItemTooltipUI.Instance?.Hide();
     }
 }

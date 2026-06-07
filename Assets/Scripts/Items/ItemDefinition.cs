@@ -9,6 +9,8 @@ public class ItemDefinition : ScriptableObject
 {
     public string itemId;
     public string displayName;
+    [TextArea(2, 4)]
+    public string description;
     public Sprite sprite;
     public int maxStack = 99;
     [Header("Block")]
