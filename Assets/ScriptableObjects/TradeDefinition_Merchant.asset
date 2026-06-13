@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb1653753aaf4ff449c15951a1db4272, type: 3}
+  m_Name: TradeDefinition_Merchant
+  m_EditorClassIdentifier: Assembly-CSharp::TradeDefinition
+  offers:
+  - costItem: {fileID: 11400000, guid: c6e46751f3e037447b80201805d2f86c, type: 2}
+    costAmount: 1
+    rewardItem: {fileID: 11400000, guid: 0361cd9039f5acb4394699ce63c75d95, type: 2}
+    rewardAmount: 1
+  - costItem: {fileID: 11400000, guid: 0361cd9039f5acb4394699ce63c75d95, type: 2}
+    costAmount: 1
+    rewardItem: {fileID: 11400000, guid: c6e46751f3e037447b80201805d2f86c, type: 2}
+    rewardAmount: 1

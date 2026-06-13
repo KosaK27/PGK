@@ -557,6 +557,7 @@ GameObject:
   - component: {fileID: 8788577651146131146}
   - component: {fileID: 4442833831355328375}
   - component: {fileID: 8854124407189286831}
+  - component: {fileID: 4218937012198272602}
   m_Layer: 12
   m_Name: Merchant
   m_TagString: NPC
@@ -739,3 +740,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8baf7306438ab7d4da678008edea2fa8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LitSprite
+--- !u!114 &4218937012198272602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6832051277181474599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6210061a8b0cf114c9c6ab21292f247a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCTrader
+  tradeDefinition: {fileID: 11400000, guid: 0e78d1817c09a29418a158085f81d62b, type: 2}

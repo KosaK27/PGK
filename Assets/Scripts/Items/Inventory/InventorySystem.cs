@@ -103,12 +103,12 @@ public class InventorySystem : MonoBehaviour
         if (fromIndex == toIndex) return;
 
         var from = _slots[fromIndex];
-        var to   = _slots[toIndex];
+        var to = _slots[toIndex];
 
         if (from == null || from.IsEmpty)
         {
             _slots[fromIndex] = to;
-            _slots[toIndex]   = null;
+            _slots[toIndex] = null;
             OnInventoryChanged?.Invoke();
             return;
         }
@@ -127,7 +127,7 @@ public class InventorySystem : MonoBehaviour
             }
         }
 
-        _slots[toIndex]   = from;
+        _slots[toIndex] = from;
         _slots[fromIndex] = to;
         OnInventoryChanged?.Invoke();
     }
@@ -138,5 +138,15 @@ public class InventorySystem : MonoBehaviour
         if (SelectedHotbarIndex == index) return;
         SelectedHotbarIndex = index;
         OnHotbarSelectionChanged?.Invoke(index);
+    }
+
+    public bool HasItemAmount(ItemDefinition itemDef, int amount)
+    {
+        return HasItem(itemDef, amount);
+    }
+
+    public void ConsumeItem(ItemDefinition itemDef, int amountToConsume)
+    {
+        RemoveItem(itemDef, amountToConsume);
     }
 }
