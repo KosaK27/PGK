@@ -9,6 +9,9 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 10f;
     [SerializeField] private int maxJumpsBase = 1;
 
+    [Header("Jump Settings")]
+    [SerializeField] private float jumpBoostForce = 25f;
+
     [Header("Dash Settings")]
     [SerializeField] private float dashSpeed = 18f;
     [SerializeField] private float dashDuration = 0.15f;
@@ -52,8 +55,11 @@ public class PlayerMovement : MonoBehaviour
     private float _groundedTimer;
     private float _defaultGravityScale;
     private float _knockbackTimer;
+    private bool _isJumping;
+    private float _jumpTimer;
     private const float GROUNDED_COOLDOWN = 0.1f;
     private const float KNOCKBACK_DURATION = 0.15f;
+    private const float MAX_JUMP_HOLD_TIME = 0.3f;
 
     private bool HasDash => AccessorySystem.Instance != null && AccessorySystem.Instance.HasEffect(AccessoryEffect.LightningBoots);
     private bool HasDoubleJump => AccessorySystem.Instance != null && AccessorySystem.Instance.HasEffect(AccessoryEffect.BatWings);
@@ -214,20 +220,38 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private const float MIN_JUMP_FORCE = 6f;
+
     private void Jump()
     {
         if (Keyboard.current.spaceKey.wasPressedThisFrame && _jumpsLeft > 0)
         {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, jumpForce);
-
-            if (_jumpsLeft == MaxJumps)
-                PlayerAudioManager.Instance?.PlayJump();
-            else
-                PlayerAudioManager.Instance?.PlayDoubleJump();
-
+            _isJumping = true;
+            _jumpTimer = 0f;
             _jumpsLeft--;
             isGrounded = false;
             _groundedTimer = 0;
+            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, MIN_JUMP_FORCE);
+
+            if (_jumpsLeft == MaxJumps - 1)
+                PlayerAudioManager.Instance?.PlayJump();
+            else
+                PlayerAudioManager.Instance?.PlayDoubleJump();
+        }
+
+        if (_isJumping)
+        {
+            if (Keyboard.current.spaceKey.isPressed && _jumpTimer < MAX_JUMP_HOLD_TIME)
+            {
+                float t = _jumpTimer / MAX_JUMP_HOLD_TIME;
+                float currentJumpSpeed = Mathf.Lerp(MIN_JUMP_FORCE, jumpForce, t);
+                _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, currentJumpSpeed);
+                _jumpTimer += Time.deltaTime;
+            }
+            else
+            {
+                _isJumping = false;
+            }
         }
     }
 
@@ -276,6 +300,8 @@ public class PlayerMovement : MonoBehaviour
                 if (!isGrounded) _jumpsLeft = MaxJumps;
                 isGrounded = true;
                 _groundedTimer = GROUNDED_COOLDOWN;
+                if (_rb.linearVelocity.y <= 0f)
+                    _isJumping = false;
                 return;
             }
         }
