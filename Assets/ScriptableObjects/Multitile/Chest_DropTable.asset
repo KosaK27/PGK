@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Chest_DropTable
   m_EditorClassIdentifier: Assembly-CSharp::DropTable
   drops:
-  - item: {fileID: 11400000, guid: fce448c1a98af014bb1d25fe46ad214b, type: 2}
-    chance: 50
+  - item: {fileID: 11400000, guid: e9154929021488d4cafe94809b126dcb, type: 2}
+    chance: 576
   - item: {fileID: 11400000, guid: 68c1f1411c5fba141811aa1b159f1710, type: 2}
     chance: 1000
   - item: {fileID: 11400000, guid: 4b599f0a504e7604b8c4870e105072fe, type: 2}
@@ -25,5 +25,9 @@ MonoBehaviour:
     chance: 550
   - item: {fileID: 11400000, guid: 6350159510b91b4458e05d06909805b6, type: 2}
     chance: 750
+  - item: {fileID: 11400000, guid: a58e67551af49c6438e9a4f4c4279fbf, type: 2}
+    chance: 850
+  - item: {fileID: 11400000, guid: db66b74a35d4e324884015cd082b9018, type: 2}
+    chance: 646
   - item: {fileID: 11400000, guid: a58e67551af49c6438e9a4f4c4279fbf, type: 2}
     chance: 850

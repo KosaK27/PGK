@@ -10,12 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0885b8dbd510ac840919b32f042420ec, type: 3}
-  m_Name: LightningBoots_Recipe
+  m_Name: WarriorBed_Recipe
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
-  outputItem: {fileID: 11400000, guid: 214a677678850864dbdd47804469fb75, type: 2}
+  outputItem: {fileID: 11400000, guid: 4c5e192278f5a144f812fd7d9ddfa570, type: 2}
   outputAmount: 1
   ingredients:
-  - item: {fileID: 11400000, guid: a1494a9712a4516479a8fbd94add4e38, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: a0c4d7f56a81f6e49bc1bf6dd062bbf0, type: 2}
-    amount: 1
+  - item: {fileID: 11400000, guid: 9daf2b0ba7b276841a01b6a04fb6839f, type: 2}
+    amount: 10
+  - item: {fileID: 11400000, guid: 0361cd9039f5acb4394699ce63c75d95, type: 2}
+    amount: 10
+  - item: {fileID: 11400000, guid: 5d3dd7673b966fc4496c230173ab9dc9, type: 2}
+    amount: 5

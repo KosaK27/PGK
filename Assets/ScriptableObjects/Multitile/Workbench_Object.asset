@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e1ccd444a9a80a42bae05b20bf66656, type: 3}
   m_Name: Workbench_Object
   m_EditorClassIdentifier: Assembly-CSharp::CraftingStationDefinition
-  displayName: 
+  displayName: Workbench
   size: {x: 2, y: 1}
   sprite: {fileID: 3911900145115944293, guid: 9c50190aa71b0e64b9d341ee616e6596, type: 3}
   hardness: 3
@@ -30,3 +30,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9e9a8507c903c3b46b97ad5e8b57e833, type: 2}
   - {fileID: 11400000, guid: 4d3a1205fd0d38c41a1a197c8e7ea56e, type: 2}
   - {fileID: 11400000, guid: 78f11e989a0304d4e8f7087126eb1344, type: 2}
+  - {fileID: 11400000, guid: 4c2a10e59a3c8994d90e03f6540605ef, type: 2}
+  - {fileID: 11400000, guid: 04ba74801f9df08479b1e1350188afd7, type: 2}
+  - {fileID: 11400000, guid: 24ea85daca80b9c4abb01642a02c5912, type: 2}

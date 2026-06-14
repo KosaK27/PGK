@@ -35,7 +35,7 @@ MonoBehaviour:
   shootCooldown: 0.8
   isConsumable: 1
   consumableType: 4
-  consumeOnUse: 0
+  consumeOnUse: 1
   healAmount: 5
   heartContainerAmount: 1
   bossPrefabToSummon: {fileID: 0}

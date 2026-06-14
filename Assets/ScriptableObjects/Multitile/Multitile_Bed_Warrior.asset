@@ -16,7 +16,7 @@ MonoBehaviour:
   size: {x: 3, y: 1}
   sprite: {fileID: 468894396, guid: a13dbd0639e73014dbb6a986c74ea003, type: 3}
   hardness: 3
-  requiredTool: 2
+  requiredTool: 1
   dropItem: {fileID: 11400000, guid: 4c5e192278f5a144f812fd7d9ddfa570, type: 2}
   dropAmount: 1
   sortingOrder: 0
