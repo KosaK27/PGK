@@ -4,7 +4,7 @@ public class SwordHitbox : MonoBehaviour
 {
     private int _damage;
     private Transform _playerTransform;
-    private Color _hitboxColor = new Color(1f, 0.1f, 0.1f, 0.35f);
+    private Color _hitboxColor = new Color(1f, 0.1f, 0.1f, 0f);
 
     public void Init(int damage, Transform playerTransform = null)
     {

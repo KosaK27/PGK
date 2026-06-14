@@ -41,6 +41,15 @@ public class HitEffect : MonoBehaviour
         _playerAnimation?.RefreshArmorCache();
     }
 
+    public void StopIframesKeepHidden()
+    {
+        if (_blinkCoroutine != null)
+        {
+            StopCoroutine(_blinkCoroutine);
+            _blinkCoroutine = null;
+        }
+    }
+
     private IEnumerator DoFlash()
     {
         foreach (var sr in _renderers) sr.color = flashColor;

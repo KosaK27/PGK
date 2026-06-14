@@ -20,7 +20,7 @@ public class BossSpawner : MonoBehaviour
     void Update()
     {
         if (Keyboard.current[Key.B].wasPressedThisFrame)
-            SpawnBoss();
+            return;
     }
 
     public void SpawnBoss()

@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Bed_Merchant_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 78
-  displayName: Bed_Merchant
+  displayName: Merchant Bed
+  description: 
   sprite: {fileID: 633941070, guid: 249fa8dc35d4fc345b6436c33179c2ff, type: 3}
   maxStack: 99
   isBlock: 0
@@ -38,6 +39,7 @@ MonoBehaviour:
   healAmount: 5
   heartContainerAmount: 1
   bossPrefabToSummon: {fileID: 0}
+  bombPrefab: {fileID: 0}
   isAccessory: 0
   accessoryDefinition: {fileID: 0}
   isArmor: 0

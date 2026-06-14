@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Bed_Farmer_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 77
-  displayName: Bed_Farmer
+  displayName: Farmer Bed
+  description: 
   sprite: {fileID: 1615821768, guid: 9d12a60225875f144871fbef9445c37e, type: 3}
   maxStack: 99
   isBlock: 0
@@ -38,6 +39,7 @@ MonoBehaviour:
   healAmount: 5
   heartContainerAmount: 1
   bossPrefabToSummon: {fileID: 0}
+  bombPrefab: {fileID: 0}
   isAccessory: 0
   accessoryDefinition: {fileID: 0}
   isArmor: 0

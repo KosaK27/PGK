@@ -373,7 +373,6 @@ GameObject:
   - component: {fileID: 8180394387876590099}
   - component: {fileID: 2214761990221315283}
   - component: {fileID: 8981495855634309192}
-  - component: {fileID: 8586743150569446516}
   - component: {fileID: 8844961302905461198}
   - component: {fileID: 1812226459800828785}
   - component: {fileID: 1346497717015371000}
@@ -391,6 +390,7 @@ GameObject:
   - component: {fileID: -4161875913129442402}
   - component: {fileID: 8786627986954176815}
   - component: {fileID: 8556724394328392436}
+  - component: {fileID: 375473661402727643}
   m_Layer: 6
   m_Name: Player 1
   m_TagString: Player
@@ -522,7 +522,6 @@ MonoBehaviour:
   moveSpeed: 8
   jumpForce: 20
   maxJumpsBase: 1
-  jumpBoostForce: 25
   dashSpeed: 18
   dashDuration: 0.3
   dashCooldown: 0.8
@@ -531,21 +530,6 @@ MonoBehaviour:
   waterMoveSpeedMultiplier: 0.6
   waterLeapForce: 10
   isGrounded: 0
---- !u!114 &8586743150569446516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4175107969890725933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1baf5bdc3f484f4f8eaa2f306e8f7d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
-  maxHP: 20
-  currentHP: 20
-  iframeDuration: 0.6
 --- !u!114 &8844961302905461198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -950,6 +934,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LightSource
   LightColor: {r: 1, g: 1, b: 1, a: 1}
   Strength: 0.3
+--- !u!114 &375473661402727643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4175107969890725933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1baf5bdc3f484f4f8eaa2f306e8f7d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+  maxHP: 20
+  currentHP: 20
+  iframeDuration: 0.6
+  respawnUI: {fileID: 0}
+  respawnText: {fileID: 0}
 --- !u!1 &5291934614461029377
 GameObject:
   m_ObjectHideFlags: 0
