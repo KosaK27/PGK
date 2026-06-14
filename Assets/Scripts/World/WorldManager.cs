@@ -79,6 +79,9 @@ public class WorldManager : MonoBehaviour
     public BlockData GetBlockData(int worldX, int worldY) =>
         blockRegistry.Get(GetBlock(worldX, worldY));
 
+    public BlockData GetBlockDataForType(BlockType type) =>
+        blockRegistry.Get(type);
+
     public TileBase GetConnectedTileBase(int wx, int wy, ConnectedTile connectedTile)
     {
         bool up = IsSolidBlock(wx, wy + 1);

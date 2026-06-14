@@ -48,6 +48,7 @@ public class WorldSaveData
     public List<RLEEntry> liquidRLE = new();
     public List<MultitileObjectSave> multitileObjects = new();
     public List<Vector2Int> discoveredChunks = new();
+    public List<FallingBlockSave> fallingBlocks = new();
 }
 
 [Serializable]
@@ -65,6 +66,14 @@ public class MultitileObjectSave
     public int originY;
     public int openDirection;
     public List<ItemSlotSave> containerSlots = new();
+}
+
+[Serializable]
+public class FallingBlockSave
+{
+    public int blockType;
+    public float x;
+    public float y;
 }
 
 [Serializable]

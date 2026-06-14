@@ -6405,6 +6405,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GravityBlockSystem
   checkInterval: 0.1
+  blockSpriteMap: {fileID: 11400000, guid: f797b9771e8e5204894f4d716b8c8e42, type: 2}
 --- !u!4 &1150588883
 Transform:
   m_ObjectHideFlags: 0

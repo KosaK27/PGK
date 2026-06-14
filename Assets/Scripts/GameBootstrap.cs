@@ -54,6 +54,7 @@ public class GameBootstrap : MonoBehaviour
             ChunkManager.Instance.RebuildAll(_worldManager.OffsetX, _worldManager.OffsetY);
             yield return null;
             RestoreMultitileObjects(worldSave);
+            GravityBlockSystem.Instance.RestoreFromSave(worldSave);
         }
         else
         {
@@ -120,6 +121,7 @@ public class GameBootstrap : MonoBehaviour
 
         if (worldSave != null && _worldManager != null)
         {
+            GravityBlockSystem.Instance.CaptureToSave(worldSave);
             sm.CaptureWorldState(worldSave, _worldManager.Data);
             CaptureMultitileObjects(worldSave);
             sm.SaveWorld(worldSave);

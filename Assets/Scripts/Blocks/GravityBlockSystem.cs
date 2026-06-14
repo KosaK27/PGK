@@ -5,12 +5,12 @@ public class GravityBlockSystem : MonoBehaviour
 {
     public static GravityBlockSystem Instance { get; private set; }
 
-    [Header("Settings")]
     [SerializeField] private float checkInterval = 0.1f;
+    [SerializeField] private BlockSpriteMap blockSpriteMap;
 
     private float _timer;
-    private HashSet<Vector2Int> _toCheck = new();
-    private List<FallingBlock> _falling = new();
+    private readonly HashSet<Vector2Int> _toCheck = new();
+    private readonly List<FallingBlock> _fallingBlocks = new();
 
     void Awake()
     {
@@ -21,11 +21,9 @@ public class GravityBlockSystem : MonoBehaviour
     void Update()
     {
         _timer -= Time.deltaTime;
-        if (_timer <= 0f)
-        {
-            _timer = checkInterval;
-            ProcessPending();
-        }
+        if (_timer > 0f) return;
+        _timer = checkInterval;
+        ProcessPending();
     }
 
     public void NotifyNeighbors(int worldX, int worldY)
@@ -40,6 +38,32 @@ public class GravityBlockSystem : MonoBehaviour
         _toCheck.Add(new Vector2Int(worldX, worldY));
     }
 
+    public bool IsGravityBlock(BlockType type) => type == BlockType.Sand;
+
+    public void RemoveFalling(FallingBlock fallingBlock) => _fallingBlocks.Remove(fallingBlock);
+
+    public void CaptureToSave(WorldSaveData save)
+    {
+        save.fallingBlocks.Clear();
+        foreach (var fallingBlock in _fallingBlocks)
+        {
+            if (fallingBlock == null) continue;
+            save.fallingBlocks.Add(new FallingBlockSave
+            {
+                blockType = (int)fallingBlock.BlockType,
+                x = fallingBlock.transform.position.x,
+                y = fallingBlock.transform.position.y
+            });
+        }
+    }
+
+    public void RestoreFromSave(WorldSaveData save)
+    {
+        if (save.fallingBlocks == null) return;
+        foreach (var saved in save.fallingBlocks)
+            SpawnFallingBlock(saved.x, saved.y, (BlockType)saved.blockType);
+    }
+
     void ProcessPending()
     {
         var snapshot = new List<Vector2Int>(_toCheck);
@@ -50,41 +74,26 @@ public class GravityBlockSystem : MonoBehaviour
             var block = WorldManager.Instance.GetBlock(pos.x, pos.y);
             if (!IsGravityBlock(block)) continue;
 
+            if (MultitileObjectSystem.Instance.IsSupporting(pos))
+                continue;
+
             var below = WorldManager.Instance.GetBlock(pos.x, pos.y - 1);
             if (below != BlockType.Air) continue;
 
             WorldManager.Instance.DestroyBlock(pos.x, pos.y);
-            SpawnFallingBlock(pos.x, pos.y, block);
+            SpawnFallingBlock(pos.x + 0.5f, pos.y + 0.5f, block);
         }
     }
 
-    void SpawnFallingBlock(int worldX, int worldY, BlockType type)
+    void SpawnFallingBlock(float worldX, float worldY, BlockType type)
     {
         var go = new GameObject($"FallingBlock_{type}");
-        var fb = go.AddComponent<FallingBlock>();
-        var rb = go.AddComponent<Rigidbody2D>();
-        var col = go.AddComponent<BoxCollider2D>();
-        var sr = go.AddComponent<SpriteRenderer>();
-
-        go.transform.position = new Vector3(worldX + 0.5f, worldY + 0.5f, 0);
-
-        rb.gravityScale = 3f;
-        rb.freezeRotation = true;
-        col.size = Vector2.one * 0.9f;
-        sr.sortingOrder = 50;
-        sr.color = GetFallbackColor(type);
-
-        fb.Init(type);
-        _falling.Add(fb);
+        go.transform.position = new Vector3(worldX, worldY, 0f);
+        go.AddComponent<Rigidbody2D>();
+        go.AddComponent<BoxCollider2D>();
+        go.AddComponent<SpriteRenderer>();
+        var fallingBlock = go.AddComponent<FallingBlock>();
+        fallingBlock.Init(type, blockSpriteMap);
+        _fallingBlocks.Add(fallingBlock);
     }
-
-    Color GetFallbackColor(BlockType type) => type switch
-    {
-        BlockType.Sand => new Color(0.87f, 0.78f, 0.45f),
-        _ => Color.white
-    };
-
-    public bool IsGravityBlock(BlockType type) => type == BlockType.Sand;
-
-    public void RemoveFalling(FallingBlock fb) => _falling.Remove(fb);
 }

@@ -72,6 +72,26 @@ public class MultitileObjectSystem : MonoBehaviour
         return true;
     }
 
+    public void ForceDestroy(Vector2Int cell, bool dropItems)
+    {
+        var obj = Get(cell);
+        if (obj == null) return;
+
+        if (dropItems && obj.Definition.dropItem != null)
+        {
+            var dropPos = new Vector2(
+                obj.Origin.x + obj.Definition.size.x * 0.5f,
+                obj.Origin.y + obj.Definition.size.y * 0.5f);
+            ItemDropSystem.Instance?.DropItem(
+                new ItemStack(obj.Definition.dropItem, obj.Definition.dropAmount), dropPos);
+        }
+
+        if (ContainerUIManager.Instance != null && ContainerUIManager.Instance.IsOpen)
+            ContainerUIManager.Instance.CloseContainer();
+
+        DestroyObject(obj);
+    }
+
     private bool IsChestEmpty(ChestObject chest)
     {
         for (int i = 0; i < chest.Container.SlotCount; i++)
