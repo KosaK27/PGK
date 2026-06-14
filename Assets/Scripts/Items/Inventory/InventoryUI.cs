@@ -39,6 +39,8 @@ public class InventoryUI : MonoBehaviour
 
     private Canvas _canvas;
 
+    public bool IsHolding => _isHolding;
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
@@ -77,7 +79,54 @@ public class InventoryUI : MonoBehaviour
         {
             if (_holdStack != null && !_holdStack.IsEmpty && _holdStack.item.isConsumable)
             {
-                ConsumableSystem.Instance?.TryUseSelected();
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null)
+                {
+                    var stats = player.GetComponent<PlayerStats>();
+                    if (stats != null)
+                    {
+                        var item = _holdStack.item;
+                        bool used = false;
+
+                        switch (item.consumableType)
+                        {
+                            case ConsumableType.HealPotion:
+                                if (stats.currentHP < stats.maxHP)
+                                {
+                                    stats.Heal(item.healAmount);
+                                    used = true;
+                                }
+                                break;
+                            case ConsumableType.HeartContainer:
+                                stats.AddMaxHP(item.heartContainerAmount);
+                                used = true;
+                                break;
+                            case ConsumableType.SummonBoss:
+                                if (item.bossPrefabToSummon != null)
+                                {
+                                    BossSpawner.Instance.SpawnBossFromItem(item.bossPrefabToSummon);
+                                    used = true;
+                                }
+                                break;
+                            case ConsumableType.Bomb:
+                                if (item.bombPrefab != null)
+                                {
+                                    BombThrowSystem.Instance.ThrowBomb(item.bombPrefab, player.transform.position, item);
+                                    used = true;
+                                }
+                                break;
+                        }
+
+                        if (used && item.consumeOnUse)
+                        {
+                            _holdStack.amount--;
+                            if (_holdStack.amount <= 0)
+                                _holdFromContainer.SetSlot(_holdFromIndex, null);
+                            else
+                                _holdFromContainer.SetSlot(_holdFromIndex, _holdStack);
+                        }
+                    }
+                }
                 SetSlotIconVisible(_holdFromIndex, _holdFromContainer, true);
                 CancelHold();
             }

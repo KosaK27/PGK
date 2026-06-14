@@ -89,14 +89,6 @@ public class BombExplosionSystem : MonoBehaviour
         if (ContainerUIManager.Instance.IsOpen)
             ContainerUIManager.Instance.CloseContainer();
 
-        if (def.dropItem != null)
-        {
-            Vector2 dropPos = new Vector2(
-                origin.x + def.size.x * 0.5f,
-                origin.y + def.size.y * 0.5f);
-            ItemDropSystem.Instance.DropItem(new ItemStack(def.dropItem, def.dropAmount), dropPos);
-        }
-
         var cellsToCheck = new System.Collections.Generic.List<Vector2Int>();
         for (int y = 0; y < def.size.y; y++)
         for (int x = 0; x < def.size.x; x++)

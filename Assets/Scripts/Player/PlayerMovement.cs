@@ -9,9 +9,6 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 10f;
     [SerializeField] private int maxJumpsBase = 1;
 
-    [Header("Jump Settings")]
-    [SerializeField] private float jumpBoostForce = 25f;
-
     [Header("Dash Settings")]
     [SerializeField] private float dashSpeed = 18f;
     [SerializeField] private float dashDuration = 0.15f;

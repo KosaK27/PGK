@@ -204,11 +204,12 @@ public class PlayerInteraction : MonoBehaviour
 
     private void HandlePlacement()
     {
-        var selected  = InventorySystem.Instance.SelectedItem;
-        bool hasTool   = selected != null && !selected.IsEmpty && selected.item.isTool;
-        bool hasWeapon = selected != null && !selected.IsEmpty && selected.item.isWeapon;
+        var selected        = InventorySystem.Instance.SelectedItem;
+        bool hasTool        = selected != null && !selected.IsEmpty && selected.item.isTool;
+        bool hasWeapon      = selected != null && !selected.IsEmpty && selected.item.isWeapon;
+        bool hasConsumable  = selected != null && !selected.IsEmpty && selected.item.isConsumable;
 
-        if (hasTool || hasWeapon) return;
+        if (hasTool || hasWeapon || hasConsumable) return;
         if (!Mouse.current.leftButton.wasPressedThisFrame) return;
 
         var cell = GetCellUnderMouse();
@@ -259,21 +260,24 @@ public class PlayerInteraction : MonoBehaviour
     private void HandleDropKey()
     {
         if (!Keyboard.current.qKey.wasPressedThisFrame) return;
+        if (InventoryUI.Instance != null && InventoryUI.Instance.IsHolding) return;
 
         int idx   = InventorySystem.Instance.SelectedHotbarIndex;
         var stack = InventorySystem.Instance.GetSlot(idx);
         if (stack == null || stack.IsEmpty) return;
 
-        int amount     = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
-        Vector2 playerPos = transform.position;
-        var mousePos   = Mouse.current.position.ReadValue();
+        int amount         = Keyboard.current.leftCtrlKey.isPressed ? stack.amount : 1;
+        var itemToDrop     = stack.item;
+        Vector2 playerPos  = transform.position;
+        var mousePos       = Mouse.current.position.ReadValue();
         Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
-        mouseWorld.z   = 0;
-        Vector2 dir    = ((Vector2)mouseWorld - playerPos).normalized;
+        mouseWorld.z       = 0;
+        Vector2 dir        = ((Vector2)mouseWorld - playerPos).normalized;
         if (dir == Vector2.zero) dir = Vector2.right;
 
-        ItemDropSystem.Instance.DropItem(new ItemStack(stack.item, amount), playerPos, dir.x);
-        InventorySystem.Instance.RemoveItem(stack.item, amount);
+        int removed = InventorySystem.Instance.RemoveItem(itemToDrop, amount);
+        if (removed > 0)
+            ItemDropSystem.Instance.DropItem(new ItemStack(itemToDrop, removed), playerPos, dir.x);
     }
 
     private bool IsInReach(Vector3Int cell)
