@@ -34,7 +34,7 @@ public class Boss1AI : EntityAI
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         _attackTimer = Random.Range(minAttackCooldown, maxAttackCooldown);
 
-        _healthBar = FindFirstObjectByType<BossHealthBar>();
+        _healthBar = FindAnyObjectByType<BossHealthBar>();
         if (_healthBar != null)
             _healthBar.Initialize(stats);
 

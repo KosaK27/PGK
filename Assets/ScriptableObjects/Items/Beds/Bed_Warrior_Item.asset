@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: 79
   displayName: Warrior Bed
   description: 
-  sprite: {fileID: 468894396, guid: a13dbd0639e73014dbb6a986c74ea003, type: 3}
+  sprite: {fileID: -7956889686519859901, guid: 63e70e82dc774d547bca73a701ed8e0d, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 0

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0885b8dbd510ac840919b32f042420ec, type: 3}
+  m_Name: StoneAxe_Recipe
+  m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
+  outputItem: {fileID: 11400000, guid: 071303af1d9f2524397a306909ed807d, type: 2}
+  outputAmount: 1
+  ingredients:
+  - item: {fileID: 11400000, guid: 56eebe76c05216948aaf25522683f0bb, type: 2}
+    amount: 25
+  - item: {fileID: 11400000, guid: 9daf2b0ba7b276841a01b6a04fb6839f, type: 2}
+    amount: 10

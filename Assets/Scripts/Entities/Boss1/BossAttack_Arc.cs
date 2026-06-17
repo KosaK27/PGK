@@ -12,10 +12,6 @@ public class BossAttack_Arc : MonoBehaviour
     [SerializeField] private int projectileDamage = 10;
     [SerializeField] private float projectileSpeed = 8f;
 
-    [Header("Audio")]
-    [SerializeField] private AudioClip lightningSound;
-    [SerializeField] private AudioSource audioSource;
-
     public IEnumerator Execute(Transform boss, Transform player, Rigidbody2D rb)
     {
         Vector2 startPos = new Vector2(player.position.x - sideOffset, player.position.y);
@@ -70,8 +66,7 @@ public class BossAttack_Arc : MonoBehaviour
     {
         if (projectilePrefab == null) return;
 
-        if (lightningSound != null && audioSource != null)
-            audioSource.PlayOneShot(lightningSound);
+        PlayerAudioManager.Instance?.PlayLightning();
 
         Vector2 dir = ((Vector2)player.position - (Vector2)boss.position).normalized;
         var go = Instantiate(projectilePrefab, boss.position, Quaternion.identity);

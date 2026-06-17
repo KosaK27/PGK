@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: 77
   displayName: Farmer Bed
   description: 
-  sprite: {fileID: 1615821768, guid: 9d12a60225875f144871fbef9445c37e, type: 3}
+  sprite: {fileID: -6530302227639612149, guid: b99e4ac00a3852b40b5e57fc6073cb11, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 0

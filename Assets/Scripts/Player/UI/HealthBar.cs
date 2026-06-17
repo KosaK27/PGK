@@ -30,7 +30,7 @@ public class HealthBar : MonoBehaviour
     {
         while (playerStats == null)
         {
-            playerStats = FindFirstObjectByType<PlayerStats>();
+            playerStats = FindAnyObjectByType<PlayerStats>();
             yield return null;
         }
 

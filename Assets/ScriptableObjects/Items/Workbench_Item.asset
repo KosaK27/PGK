@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 39
   displayName: Workbench
-  sprite: {fileID: 3911900145115944293, guid: 9c50190aa71b0e64b9d341ee616e6596, type: 3}
+  description: 
+  sprite: {fileID: 171050378684313746, guid: 05c65e29739e35c45af70af899ecd612, type: 3}
   maxStack: 99
   isBlock: 0
   blockType: 0
@@ -32,6 +33,17 @@ MonoBehaviour:
   hitboxDistance: 1.2
   projectileSpeed: 14
   shootCooldown: 0.8
+  isConsumable: 0
+  consumableType: 0
+  consumeOnUse: 0
+  healAmount: 5
+  heartContainerAmount: 1
+  bossPrefabToSummon: {fileID: 0}
+  bombPrefab: {fileID: 0}
+  isAccessory: 0
+  accessoryDefinition: {fileID: 0}
+  isArmor: 0
+  armorDefinition: {fileID: 0}
   holdPositionUp: {x: 0, y: 0}
   holdPositionForward: {x: 0, y: 0}
   holdPositionDown: {x: 0, y: 0}

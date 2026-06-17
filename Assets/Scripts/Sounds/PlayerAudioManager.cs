@@ -19,6 +19,10 @@ public class PlayerAudioManager : MonoBehaviour
     [SerializeField] private AudioClip playerHitSound;
     [SerializeField] private AudioClip enemyHitSound;
 
+    [SerializeField] private AudioClip tornadoSound;
+    [SerializeField] private AudioClip chargeSound;
+    [SerializeField] private AudioClip lightningSound;
+
     private float _volume = 1f;
     private int _footstepIndex;
     private float _footstepTimer;
@@ -58,4 +62,7 @@ public class PlayerAudioManager : MonoBehaviour
     public void PlayBowShoot() => audioSource.PlayOneShot(bowShootSound, _volume);
     public void PlayPlayerHit() => audioSource.PlayOneShot(playerHitSound, _volume);
     public void PlayEnemyHit() => audioSource.PlayOneShot(enemyHitSound, _volume);
+    public void PlayTornado() => audioSource.PlayOneShot(tornadoSound, _volume);
+    public void PlayCharge() => audioSource.PlayOneShot(chargeSound, _volume);
+    public void PlayLightning() => audioSource.PlayOneShot(lightningSound, _volume);
 }

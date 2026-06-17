@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: 99
   displayName: Bow
+  description: 
   sprite: {fileID: -7997439479626426851, guid: 5426c3017aa559b4c90a98c23b9d9987, type: 3}
   maxStack: 1
   isBlock: 0
@@ -28,10 +29,21 @@ MonoBehaviour:
   isWeapon: 1
   weaponType: 2
   damage: 10
-  hitboxSize: {x: 2.5, y: 0.6}
+  hitboxSize: {x: 0, y: 0}
   hitboxDistance: 1.2
   projectileSpeed: 14
   shootCooldown: 0.8
+  isConsumable: 0
+  consumableType: 0
+  consumeOnUse: 0
+  healAmount: 5
+  heartContainerAmount: 1
+  bossPrefabToSummon: {fileID: 0}
+  bombPrefab: {fileID: 0}
+  isAccessory: 0
+  accessoryDefinition: {fileID: 0}
+  isArmor: 0
+  armorDefinition: {fileID: 0}
   holdPositionUp: {x: 0, y: 0}
   holdPositionForward: {x: 0, y: 0}
   holdPositionDown: {x: 0, y: 0}
