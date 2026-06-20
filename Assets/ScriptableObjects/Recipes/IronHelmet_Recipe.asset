@@ -10,14 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0885b8dbd510ac840919b32f042420ec, type: 3}
-  m_Name: MonsterSword_Recipe
+  m_Name: IronHelmet_Recipe
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
-  outputItem: {fileID: 11400000, guid: 648f7085b65e52149b05c67e51871253, type: 2}
+  outputItem: {fileID: 11400000, guid: ab451abf335222b4c8e4b307af495bb3, type: 2}
   outputAmount: 1
   ingredients:
-  - item: {fileID: 11400000, guid: 5d3dd7673b966fc4496c230173ab9dc9, type: 2}
-    amount: 4
-  - item: {fileID: 11400000, guid: 4b599f0a504e7604b8c4870e105072fe, type: 2}
-    amount: 2
   - item: {fileID: 11400000, guid: 0361cd9039f5acb4394699ce63c75d95, type: 2}
     amount: 10

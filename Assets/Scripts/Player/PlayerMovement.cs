@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
     private bool HasDash => AccessorySystem.Instance != null && AccessorySystem.Instance.HasEffect(AccessoryEffect.LightningBoots);
     private bool HasDoubleJump => AccessorySystem.Instance != null && AccessorySystem.Instance.HasEffect(AccessoryEffect.BatWings);
     private bool HasStepUp => AccessorySystem.Instance != null && (AccessorySystem.Instance.HasEffect(AccessoryEffect.LeatherBoots) || AccessorySystem.Instance.HasEffect(AccessoryEffect.LightningBoots));
-    private int MaxJumps => HasDoubleJump ? 2 : maxJumpsBase;
+    private int MaxJumps => HasDoubleJump ? 1 : 1;
 
     public void ApplyKnockback()
     {
