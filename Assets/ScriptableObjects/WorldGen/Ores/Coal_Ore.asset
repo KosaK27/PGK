@@ -16,4 +16,4 @@ MonoBehaviour:
   rarity: 0.3
   veinSize: 0.3
   minDepth: 10
-  maxDepth: 100
+  maxDepth: 500

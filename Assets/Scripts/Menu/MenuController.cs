@@ -9,9 +9,15 @@ public class MenuController : MonoBehaviour
     [SerializeField] private GameObject _characterPanel;
     [SerializeField] private GameObject _worldPanel;
     [SerializeField] private GameObject _settingsPanel;
+
     [SerializeField] private TextMeshProUGUI _characterLabel;
     [SerializeField] private TextMeshProUGUI _worldLabel;
+
     [SerializeField] private Button _playButton;
+
+    [SerializeField] private Color _enabledColor = new Color(0.894f, 1f, 0.859f);
+    [SerializeField] private Color _disabledColor = Color.gray;
+
     [SerializeField] private string _loadingSceneName = "Loading";
 
     void Start()
@@ -31,17 +37,27 @@ public class MenuController : MonoBehaviour
     public void RefreshLabels()
     {
         var sm = SaveManager.Instance;
+
+        bool canPlay = sm.SelectedCharacter != null && sm.SelectedWorld != null;
+
         _characterLabel.text = sm.SelectedCharacter?.characterName ?? "None";
         _worldLabel.text = sm.SelectedWorld?.worldName ?? "None";
-        _playButton.interactable = sm.SelectedCharacter != null && sm.SelectedWorld != null;
+
+        _playButton.interactable = canPlay;
+
+        var tmp = _playButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (tmp != null)
+            tmp.color = canPlay ? _enabledColor : _disabledColor;
     }
 
     public void OnPlayClicked()
     {
         var sm = SaveManager.Instance;
         if (sm.SelectedCharacter == null || sm.SelectedWorld == null) return;
+
         var worldSave = sm.SelectedWorld;
         LoadingContext.IsNewWorld = worldSave.lastPlayedAt == 0;
+
         SceneManager.LoadScene(_loadingSceneName);
     }
 

@@ -84,7 +84,7 @@ public static class ItemTooltip
             {
                 AccessoryEffect.LeatherBoots => "Effect: Autostep",
                 AccessoryEffect.LightningBoots => "Effect: Dash + Autostep",
-                AccessoryEffect.BatWings => "Effect: Double jump",
+                AccessoryEffect.BatWings => "Effect: Extra jump",
                 _ => string.Empty
             };
             if (!string.IsNullOrEmpty(effect))

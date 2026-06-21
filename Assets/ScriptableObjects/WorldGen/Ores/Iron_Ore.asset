@@ -15,5 +15,5 @@ MonoBehaviour:
   blockType: 7
   rarity: 0.3
   veinSize: 0.2
-  minDepth: 10
-  maxDepth: 100
+  minDepth: 50
+  maxDepth: 500

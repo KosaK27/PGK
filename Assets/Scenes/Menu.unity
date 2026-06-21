@@ -2091,6 +2091,8 @@ MonoBehaviour:
   _characterLabel: {fileID: 764696042}
   _worldLabel: {fileID: 1835081604}
   _playButton: {fileID: 568810638}
+  _enabledColor: {r: 0.894, g: 1, b: 0.859, a: 1}
+  _disabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   _loadingSceneName: Loading
 --- !u!1 &289407893
 GameObject:
